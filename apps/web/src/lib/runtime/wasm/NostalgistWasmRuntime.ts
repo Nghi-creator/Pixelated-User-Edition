@@ -129,6 +129,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
     this.stop();
     this.abortController = new AbortController();
     const signal = this.abortController.signal;
+    this.options.onProgress?.({ loadedBytes: 0, phase: "downloading", totalBytes: source.expectedSize || source.file?.size || null });
     const bytes = await downloadRom(source, signal, this.options.onProgress);
     this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "verifying", totalBytes: bytes.byteLength });
     await validateNesRom(bytes, source);

@@ -87,10 +87,10 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 4.6 Research measurements that fit the browser
 
-- Core download time, ROM download time, verification time, and time to first frame.
-- Frame pacing, long tasks, memory estimates where supported, and runtime errors.
-- Browser/OS capability snapshot with informed consent.
-- Exportable measurement bundle with edition/runtime metadata.
+- [x] ROM download, verification, emulator-core load, and launch-to-first-browser-frame timings.
+- [x] Animation-frame pacing, dropped-frame estimates, long tasks, supported JS heap estimates, and runtime errors.
+- [x] Browser/OS capability snapshot is captured only after explicit informed consent.
+- [x] Exportable TAR bundle with User Edition/WASM metadata, summary JSON, frame/long-task CSV files, and runtime errors.
 
 ## 5. Features that require changes
 

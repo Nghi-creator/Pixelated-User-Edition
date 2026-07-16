@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { PlayerHeader } from "../../features/player/components/PlayerHeader";
 import { PlayerInstructions } from "../../features/player/components/PlayerControls";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
+import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
 import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
 import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
@@ -11,6 +12,7 @@ import { useGameMetadata } from "../../features/player/hooks/useGameMetadata";
 import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNavigation";
 import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
+import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
 import type { WebRTCStatus } from "../../lib/webrtc/webrtcSession";
 import { getBrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
 
@@ -43,6 +45,8 @@ export default function Player() {
   const { backRoute, backText } = usePlayerNavigation(location, id);
   const { authorName, game, gameRights, gameTitle, isError: metadataError, isLoading: metadataLoading } = useGameMetadata(id);
   const player = useWasmPlayer(id);
+  const gameKey = `catalog:${id || "unknown"}`;
+  const research = useWasmResearch({ error: player.error, gameKey, progress: player.progress, status: player.status });
   const compatibility = useMemo(() => getBrowserGameCompatibility(game), [game]);
   const canStart = !metadataLoading && !metadataError && compatibility.kind === "browser";
 
@@ -111,7 +115,7 @@ export default function Player() {
           volume={player.volume}
         />
         <WasmTouchControls
-          gameKey={`catalog:${id || "unknown"}`}
+          gameKey={gameKey}
           onPress={player.pressInput}
           onRelease={player.releaseInput}
           status={player.status}
@@ -119,10 +123,11 @@ export default function Player() {
         <WasmSavePanel
           captureBatterySave={player.captureBatterySave}
           captureState={player.captureState}
-          gameKey={`catalog:${id || "unknown"}`}
+          gameKey={gameKey}
           restoreState={player.restoreState}
           status={player.status}
         />
+        <WasmResearchPanel research={research} />
       </div>
 
       <div className="mt-3 flex w-full max-w-5xl justify-end">

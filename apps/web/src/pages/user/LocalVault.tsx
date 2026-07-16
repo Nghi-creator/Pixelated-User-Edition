@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
+import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
 import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
 import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
@@ -26,6 +27,7 @@ import {
   type LocalRomRecent,
 } from "../../features/local-vault/localRomRecents";
 import { useLocalWasmPlayer } from "../../features/local-vault/useLocalWasmPlayer";
+import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
 
 type SelectedSystem = { id: LocalRomSystemId; label: string };
 
@@ -45,6 +47,10 @@ export default function LocalVault() {
   const [selectedSystem, setSelectedSystem] = useState<SelectedSystem | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const player = useLocalWasmPlayer(selectedFile);
+  const gameKey = selectedFile
+    ? `local:${selectedFile.name}:${selectedFile.size}:${selectedFile.lastModified}`
+    : "local:none";
+  const research = useWasmResearch({ error: player.error, gameKey, progress: player.progress, status: player.status });
 
   const refreshRecents = async () => {
     try {
@@ -176,7 +182,7 @@ export default function LocalVault() {
               volume={player.volume}
             />
             <WasmTouchControls
-              gameKey={`local:${selectedFile.name}:${selectedFile.size}:${selectedFile.lastModified}`}
+              gameKey={gameKey}
               onPress={player.pressInput}
               onRelease={player.releaseInput}
               status={player.status}
@@ -184,10 +190,11 @@ export default function LocalVault() {
             <WasmSavePanel
               captureBatterySave={player.captureBatterySave}
               captureState={player.captureState}
-              gameKey={`local:${selectedFile.name}:${selectedFile.size}:${selectedFile.lastModified}`}
+              gameKey={gameKey}
               restoreState={player.restoreState}
               status={player.status}
             />
+            <WasmResearchPanel research={research} />
           </div>
         </section>
       )}
