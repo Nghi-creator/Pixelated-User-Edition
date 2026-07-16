@@ -1,0 +1,34 @@
+import type {
+  ApiGameSubmissionPayload,
+  ApiSessionResponse,
+} from "./apiTypes";
+
+type SessionApiDependencies = {
+  apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
+};
+
+export function createSessionApi({ apiRequest }: SessionApiDependencies) {
+  return {
+    createSession: (gameId: string, clientSessionId: string) =>
+      apiRequest<ApiSessionResponse>("/sessions", {
+        body: JSON.stringify({
+          clientSessionId,
+          gameId,
+          mode: "cloud",
+        }),
+        method: "POST",
+      }),
+    stopSession: (sessionId: string) =>
+      apiRequest<void>(`/sessions/${sessionId}`, {
+        method: "DELETE",
+      }),
+    submitGame: (payload: ApiGameSubmissionPayload) =>
+      apiRequest<{ submission: { id: string; status: "pending" } }>(
+        "/submissions/games",
+        {
+          body: JSON.stringify(payload),
+          method: "POST",
+        },
+      ),
+  };
+}
