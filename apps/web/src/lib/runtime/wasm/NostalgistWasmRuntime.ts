@@ -18,9 +18,14 @@ type NostalgistInstance = Pick<
   Nostalgist,
   | "exit"
   | "getStatus"
+  | "loadState"
   | "pause"
+  | "pressDown"
+  | "pressUp"
   | "restart"
   | "resume"
+  | "saveSRAM"
+  | "saveState"
   | "sendCommand"
   | "start"
 >;
@@ -139,6 +144,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
       retroarchConfig: {
         audio_volume: 0,
         input_joypad_driver: "sdl2",
+        savestate_thumbnail_enable: true,
         video_smooth: false,
       },
       rom: {
@@ -172,6 +178,30 @@ export class NostalgistWasmRuntime implements GameRuntime {
 
   reset() {
     this.instance?.restart();
+  }
+
+  async captureState() {
+    if (!this.instance) throw new Error("Start the game before saving a state.");
+    const { state, thumbnail } = await this.instance.saveState();
+    return { state, thumbnail };
+  }
+
+  async restoreState(state: Blob) {
+    if (!this.instance) throw new Error("Start the game before loading a state.");
+    await this.instance.loadState(state);
+  }
+
+  async captureBatterySave() {
+    if (!this.instance) throw new Error("Start the game before backing up battery RAM.");
+    return this.instance.saveSRAM();
+  }
+
+  pressInput(button: string) {
+    this.instance?.pressDown(button);
+  }
+
+  releaseInput(button: string) {
+    this.instance?.pressUp(button);
   }
 
   setMuted(muted: boolean) {

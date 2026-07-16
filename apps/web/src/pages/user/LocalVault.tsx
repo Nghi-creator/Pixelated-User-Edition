@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
+import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
+import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
 import {
   inspectLocalRomFile,
   type LocalRomSystemId,
@@ -172,6 +174,19 @@ export default function LocalVault() {
               pixelPerfect={pixelPerfect}
               status={player.status}
               volume={player.volume}
+            />
+            <WasmTouchControls
+              gameKey={`local:${selectedFile.name}:${selectedFile.size}:${selectedFile.lastModified}`}
+              onPress={player.pressInput}
+              onRelease={player.releaseInput}
+              status={player.status}
+            />
+            <WasmSavePanel
+              captureBatterySave={player.captureBatterySave}
+              captureState={player.captureState}
+              gameKey={`local:${selectedFile.name}:${selectedFile.size}:${selectedFile.lastModified}`}
+              restoreState={player.restoreState}
+              status={player.status}
             />
           </div>
         </section>

@@ -26,9 +26,14 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
           return {
             exit: () => { status = "terminated"; actions.push("exit"); },
             getStatus: () => status,
+            loadState: async () => { actions.push("load-state"); },
             pause: () => { status = "paused"; actions.push("pause"); },
+            pressDown: (button: string) => { actions.push(`down:${button}`); },
+            pressUp: (button: string) => { actions.push(`up:${button}`); },
             restart: () => { actions.push("restart"); },
             resume: () => { status = "running"; actions.push("resume"); },
+            saveSRAM: async () => new Blob(["sram"]),
+            saveState: async () => ({ state: new Blob(["state"]), thumbnail: undefined }),
             sendCommand: (command: string) => { actions.push(command); },
             start: async () => { status = "running"; actions.push("start"); },
           };
@@ -42,13 +47,22 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
   runtime.pause();
   runtime.resume();
   runtime.reset();
+  const saved = await runtime.captureState();
+  await runtime.restoreState(saved.state);
+  assert.equal((await runtime.captureBatterySave()).size, 4);
+  runtime.pressInput("a");
+  runtime.releaseInput("a");
   runtime.setMuted(true);
   runtime.setVolume(0.5);
   runtime.stop();
 
-  assert.deepEqual(actions.slice(0, 5), ["start", "pause", "resume", "restart", "MUTE"]);
+  assert.deepEqual(actions.slice(0, 4), ["start", "pause", "resume", "restart"]);
+  assert.ok(actions.includes("MUTE"));
   assert.equal(actions.filter((action) => action === "VOLUME_DOWN").length, 30);
   assert.equal(actions.at(-1), "exit");
+  assert.ok(actions.includes("load-state"));
+  assert.ok(actions.includes("down:a"));
+  assert.ok(actions.includes("up:a"));
 });
 
 test("prepares a local File source without making a network request", async (context) => {
@@ -70,9 +84,14 @@ test("prepares a local File source without making a network request", async (con
           return {
             exit: () => undefined,
             getStatus: () => "initial" as const,
+            loadState: async () => undefined,
             pause: () => undefined,
+            pressDown: () => undefined,
+            pressUp: () => undefined,
             restart: () => undefined,
             resume: () => undefined,
+            saveSRAM: async () => new Blob(),
+            saveState: async () => ({ state: new Blob(), thumbnail: undefined }),
             sendCommand: () => undefined,
             start: async () => undefined,
           };

@@ -145,6 +145,20 @@ export function useWasmPlayer(gameId: string | undefined) {
   }, [status]);
 
   const reset = useCallback(() => runtimeRef.current?.reset(), []);
+  const captureState = useCallback(() => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before saving a state."));
+    return runtimeRef.current.captureState();
+  }, []);
+  const restoreState = useCallback((state: Blob) => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before loading a state."));
+    return runtimeRef.current.restoreState(state);
+  }, []);
+  const captureBatterySave = useCallback(() => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before backing up battery RAM."));
+    return runtimeRef.current.captureBatterySave();
+  }, []);
+  const pressInput = useCallback((button: string) => runtimeRef.current?.pressInput(button), []);
+  const releaseInput = useCallback((button: string) => runtimeRef.current?.releaseInput(button), []);
   const setMuted = useCallback((muted: boolean) => {
     runtimeRef.current?.setMuted(muted);
     setIsMutedState(muted);
@@ -177,11 +191,16 @@ export function useWasmPlayer(gameId: string | undefined) {
 
   return {
     canvasRef,
+    captureBatterySave,
+    captureState,
     error,
     gamepadName,
     isMuted,
     progress,
+    pressInput,
     reset,
+    releaseInput,
+    restoreState,
     setMuted,
     setVolume,
     start,
@@ -191,4 +210,3 @@ export function useWasmPlayer(gameId: string | undefined) {
     volume,
   };
 }
-

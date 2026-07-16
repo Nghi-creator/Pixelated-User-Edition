@@ -76,12 +76,14 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 4.5 Saves and usability
 
-- Save states and battery saves in IndexedDB.
-- Import/export saves.
-- Per-game control remapping and accessibility presets.
-- Touch controls for mobile-sized screens.
+- [x] Three versioned, per-game save-state slots are stored in a dedicated IndexedDB database.
+- [x] Save states can be imported, exported, loaded, overwritten, and deleted with size/type validation.
+- [x] Battery RAM can be backed up as an export. Restore remains pending because Nostalgist 0.21 exposes no supported SRAM-load API.
+- [x] Per-game touch A/B layout remapping and compact, large-target, and high-contrast accessibility presets.
+- [x] Pointer-safe touch controls for mobile-sized screens, including D-pad, A/B, Start, and Select.
+- Keyboard/gamepad remapping remains pending; it needs a pre-launch RetroArch configuration flow and conflict validation.
 - PWA shell and offline replay for assets the user is legally allowed to cache.
-- Storage quota checks and recovery instructions.
+- [x] Browser storage quota/usage checks and recovery/export instructions.
 
 ### 4.6 Research measurements that fit the browser
 

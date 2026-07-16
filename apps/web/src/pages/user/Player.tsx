@@ -3,7 +3,9 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { PlayerHeader } from "../../features/player/components/PlayerHeader";
 import { PlayerInstructions } from "../../features/player/components/PlayerControls";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
+import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
+import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
 import { useAuthUser } from "../../features/player/hooks/useAuthUser";
 import { useGameMetadata } from "../../features/player/hooks/useGameMetadata";
 import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNavigation";
@@ -107,6 +109,19 @@ export default function Player() {
           pixelPerfect={pixelPerfect}
           status={player.status}
           volume={player.volume}
+        />
+        <WasmTouchControls
+          gameKey={`catalog:${id || "unknown"}`}
+          onPress={player.pressInput}
+          onRelease={player.releaseInput}
+          status={player.status}
+        />
+        <WasmSavePanel
+          captureBatterySave={player.captureBatterySave}
+          captureState={player.captureState}
+          gameKey={`catalog:${id || "unknown"}`}
+          restoreState={player.restoreState}
+          status={player.status}
         />
       </div>
 
