@@ -7,6 +7,7 @@ import { api } from "../../lib/api/apiClient";
 import {
   useAuthSessionQuery,
   useProfileQuery,
+  useProfileActivityQuery,
 } from "../../lib/api/apiQueries";
 import { invalidateProfileQueries } from "../../lib/api/queryClient";
 import { supabase } from "../../lib/auth/supabaseClient";
@@ -61,6 +62,10 @@ export function useProfileSettings() {
   const sessionQuery = useAuthSessionQuery();
   const profileQuery = useProfileQuery({
     enabled: Boolean(sessionQuery.data),
+  });
+  const activityQuery = useProfileActivityQuery({
+    enabled: Boolean(sessionQuery.data),
+    userId: sessionQuery.data?.user.id,
   });
 
   useEffect(() => {
@@ -165,6 +170,9 @@ export function useProfileSettings() {
   };
 
   return {
+    activity: activityQuery.data?.activity || [],
+    activityError: activityQuery.isError,
+    activityLoading: activityQuery.isLoading,
     closeDeleteModal: deleteAccount.closeDeleteModal,
     crop: avatar.crop,
     currentPassword: password.currentPassword,
@@ -191,6 +199,7 @@ export function useProfileSettings() {
     passwordCaptchaResetKey,
     passwordCaptchaToken,
     profileMessage,
+    retryActivity: activityQuery.refetch,
     savingPassword: password.savingPassword,
     savingProfile,
     setCrop: avatar.setCrop,

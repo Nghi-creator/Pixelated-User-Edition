@@ -348,3 +348,16 @@ export type ApiProfile = {
   role: string;
   username: string | null;
 };
+
+export type ApiProfileActivityEntry = {
+  client_edition: "studio" | "user";
+  game: {
+    cover_url: string | null;
+    id: string;
+    title: string;
+  };
+  game_id: string;
+  last_played_at: string;
+  play_count: number;
+  runtime_kind: "wasm" | "webrtc" | "native";
+};

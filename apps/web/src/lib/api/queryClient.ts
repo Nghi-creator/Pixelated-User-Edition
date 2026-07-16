@@ -62,6 +62,7 @@ export const queryKeys = {
   localMultiplayerGames: () => ["localMultiplayerGames"] as const,
   permissions: () => ["permissions"] as const,
   profile: () => ["profile"] as const,
+  profileActivity: (userId: string | undefined) => ["profileActivity", userId] as const,
 };
 
 export const invalidateAdminReportsQueries = (client: QueryClientInstance) =>

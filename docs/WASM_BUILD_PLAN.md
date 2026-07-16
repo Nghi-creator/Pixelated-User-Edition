@@ -55,10 +55,13 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 4.3 Accounts and community
 
-- Existing Supabase authentication and profile flows.
-- Likes/dislikes, comments, comment reactions, reports, and moderation.
-- Play counts and recent activity where current privacy rules permit it.
-- Shared data across editions, with an `edition` or `runtime_kind` field where analytics need separation.
+- [x] Existing Supabase authentication, social-provider, password, CAPTCHA, profile, avatar, and account-deletion flows.
+- [x] Favorites, likes/dislikes, comments, comment reactions, reports, role checks, and moderation remain shared across editions.
+- [x] Global play counts are recorded only after 30 seconds of active gameplay.
+- [x] Privacy-scoped recent activity appears on the account page and is readable only by its owner.
+- [x] Activity is aggregated per user/game/edition/runtime instead of creating an unlimited event log.
+- [x] `client_edition` and `runtime_kind` distinguish User Edition WASM from Studio WebRTC/native activity.
+- [x] Account deletion cascades to activity records through the existing auth-user ownership model.
 
 ### 4.4 Personal ROMs
 

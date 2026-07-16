@@ -6,6 +6,7 @@ import {
   ProfileLoadingState,
   ProfileLoadError,
   PublicProfileSection,
+  RecentActivitySection,
   SecuritySection,
 } from "../../features/profile/ProfileSettingsSections";
 import { useProfileSettings } from "../../features/profile/useProfileSettings";
@@ -72,6 +73,7 @@ export default function Profile() {
 
         <div className="space-y-8">
           <PublicProfileSection profile={profile} />
+          <RecentActivitySection profile={profile} />
           <SecuritySection profile={profile} />
         </div>
       </div>

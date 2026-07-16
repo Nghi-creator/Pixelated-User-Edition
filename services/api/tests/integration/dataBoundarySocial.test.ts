@@ -287,7 +287,7 @@ test("write-heavy social and play routes are rate limited per user", async () =>
   });
   assert.equal(blockedPlay.statusCode, 429);
   assert.equal(
-    playsDb.rpcCalls.filter((call) => call.fn === "increment_play_count").length,
+    playsDb.rpcCalls.filter((call) => call.fn === "record_game_play").length,
     60,
   );
   await playsApp.close();
@@ -751,4 +751,3 @@ test("admin reports filter target roles before pagination", async () => {
   assert.equal(userResponse.json<{ totalPages: number }>().totalPages, 2);
   await app.close();
 });
-

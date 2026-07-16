@@ -123,6 +123,20 @@ export function useAuthSessionQuery() {
   });
 }
 
+export function useProfileActivityQuery({
+  enabled = true,
+  userId,
+}: {
+  enabled?: boolean;
+  userId: string | undefined;
+}) {
+  return useQuery({
+    enabled,
+    queryKey: queryKeys.profileActivity(userId),
+    queryFn: () => api.profileActivity(),
+  });
+}
+
 export function useFavoriteIdsQuery() {
   return useQuery({
     queryKey: queryKeys.favoriteIds(),

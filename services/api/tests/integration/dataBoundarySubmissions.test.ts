@@ -339,8 +339,72 @@ test("play counts are incremented through the backend RPC boundary", async () =>
 
   assert.equal(response.statusCode, 200);
   assert.deepEqual(db.rpcCalls, [
-    { fn: "increment_play_count", params: { game_id: GAME_ID } },
+    {
+      fn: "record_game_play",
+      params: {
+        p_client_edition: "studio",
+        p_game_id: GAME_ID,
+        p_runtime_kind: "webrtc",
+        p_user_id: USER_ID,
+      },
+    },
   ]);
+  await app.close();
+});
+
+test("play activity records explicit User Edition WASM metadata", async () => {
+  const db = new FakeSupabase();
+  const app = await createDataBoundaryApp(db, USER_ID);
+
+  const response = await app.inject({
+    method: "POST",
+    payload: { clientEdition: "user", runtimeKind: "wasm" },
+    url: `/games/${GAME_ID}/play-count`,
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(db.rpcCalls[0], {
+    fn: "record_game_play",
+    params: {
+      p_client_edition: "user",
+      p_game_id: GAME_ID,
+      p_runtime_kind: "wasm",
+      p_user_id: USER_ID,
+    },
+  });
+  await app.close();
+});
+
+test("profile activity returns only the authenticated user's recent games", async () => {
+  const db = new FakeSupabase();
+  db.rows.games.push({ cover_url: "/tiny.png", id: GAME_ID, title: "Tiny Quest" });
+  db.rows.user_game_activity.push(
+    {
+      client_edition: "user",
+      game_id: GAME_ID,
+      last_played_at: "2026-07-16T12:00:00.000Z",
+      play_count: 3,
+      runtime_kind: "wasm",
+      user_id: USER_ID,
+    },
+    {
+      client_edition: "studio",
+      game_id: GAME_ID,
+      last_played_at: "2026-07-16T13:00:00.000Z",
+      play_count: 9,
+      runtime_kind: "webrtc",
+      user_id: OTHER_USER_ID,
+    },
+  );
+  const app = await createDataBoundaryApp(db, USER_ID);
+
+  const response = await app.inject({ method: "GET", url: "/profile/activity?limit=8" });
+
+  assert.equal(response.statusCode, 200);
+  const activity = response.json<{ activity: RecordRow[] }>().activity;
+  assert.equal(activity.length, 1);
+  assert.equal(activity[0]?.client_edition, "user");
+  assert.equal((activity[0]?.game as RecordRow)?.title, "Tiny Quest");
   await app.close();
 });
 

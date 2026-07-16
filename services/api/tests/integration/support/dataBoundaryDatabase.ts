@@ -14,6 +14,7 @@ type TableName =
   | "local_engine_pairings"
   | "reported_comments"
   | "stream_metrics"
+  | "user_game_activity"
   | "profiles";
 
 export type RecordRow = Record<string, unknown>;
@@ -54,6 +55,7 @@ export class FakeSupabase {
     local_engine_pairings: [],
     reported_comments: [],
     stream_metrics: [],
+    user_game_activity: [],
     profiles: [],
   };
   rpcCalls: { fn: string; params: RecordRow }[] = [];

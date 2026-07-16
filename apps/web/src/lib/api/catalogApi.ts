@@ -18,6 +18,7 @@ export function createCatalogApi({
   return {
     countPlay: (gameId: string) =>
       apiRequest<{ success: true }>(`/games/${gameId}/play-count`, {
+        body: JSON.stringify({ clientEdition: "user", runtimeKind: "wasm" }),
         method: "POST",
       }),
     favoriteIds: () => getFavoriteIds(),

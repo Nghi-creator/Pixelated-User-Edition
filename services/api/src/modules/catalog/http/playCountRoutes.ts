@@ -10,6 +10,10 @@ import { createRateLimiter } from "../../security/sharedRateLimiter.js";
 const gameParamsSchema = z.object({
   gameId: z.string().uuid(),
 });
+const playCountBodySchema = z.object({
+  clientEdition: z.enum(["studio", "user"]).default("studio"),
+  runtimeKind: z.enum(["wasm", "webrtc", "native"]).default("webrtc"),
+});
 
 type SupabaseServiceLike = NonNullable<typeof supabaseService>;
 
@@ -49,6 +53,10 @@ export async function registerPlayCountRoutes(
       if (!parsedParams.success) {
         return reply.status(400).send({ error: "Invalid game id" });
       }
+      const parsedBody = playCountBodySchema.safeParse(request.body || {});
+      if (!parsedBody.success) {
+        return reply.status(400).send({ error: "Invalid play activity metadata" });
+      }
       if (
         rejectRateLimitedRequest(
           reply,
@@ -59,8 +67,11 @@ export async function registerPlayCountRoutes(
         return;
       }
 
-      const { error } = await service.rpc("increment_play_count", {
-        game_id: parsedParams.data.gameId,
+      const { error } = await service.rpc("record_game_play", {
+        p_client_edition: parsedBody.data.clientEdition,
+        p_game_id: parsedParams.data.gameId,
+        p_runtime_kind: parsedBody.data.runtimeKind,
+        p_user_id: user.id,
       });
 
       if (error) {
