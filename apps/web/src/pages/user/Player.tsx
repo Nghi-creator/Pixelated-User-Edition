@@ -10,6 +10,7 @@ import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNaviga
 import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
 import type { WebRTCStatus } from "../../lib/webrtc/webrtcSession";
+import { getBrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
 
 const PlayerCommunitySection = lazy(() =>
   import("../../features/player/components/PlayerCommunitySection").then(
@@ -38,8 +39,10 @@ export default function Player() {
   const [pixelPerfect, setPixelPerfect] = useState(true);
   const currentUser = useAuthUser();
   const { backRoute, backText } = usePlayerNavigation(location, id);
-  const { authorName, gameRights, gameTitle } = useGameMetadata(id);
+  const { authorName, game, gameRights, gameTitle, isError: metadataError, isLoading: metadataLoading } = useGameMetadata(id);
   const player = useWasmPlayer(id);
+  const compatibility = useMemo(() => getBrowserGameCompatibility(game), [game]);
+  const canStart = !metadataLoading && !metadataError && compatibility.kind === "browser";
 
   usePlayCount(id, player.status === "playing");
 
@@ -67,13 +70,25 @@ export default function Player() {
         onToggleTelemetry={() => undefined}
         showStreamTelemetry={false}
         status={headerStatus}
-        statusLabelOverride={statusLabels[player.status]}
+        statusLabelOverride={
+          player.status === "idle" && !metadataLoading && compatibility.kind !== "browser"
+            ? compatibility.label
+            : statusLabels[player.status]
+        }
       />
 
       <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-synth-border bg-synth-surface shadow-panel" ref={stageRef}>
         <WasmStage
+          canStart={canStart}
           canvasRef={player.canvasRef}
           error={player.error}
+          idleMessage={
+            metadataLoading
+              ? "Checking browser compatibility…"
+              : metadataError
+                ? "Could not verify this game's browser build. Return to the catalog and try again."
+                : compatibility.reason
+          }
           onStart={player.start}
           pixelPerfect={pixelPerfect}
           progress={player.progress}

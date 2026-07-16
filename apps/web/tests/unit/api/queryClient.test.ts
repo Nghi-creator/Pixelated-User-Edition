@@ -15,11 +15,13 @@ test("query keys are stable and scoped by API concern", () => {
   assert.deepEqual(queryKeys.authSession(), ["authSession"]);
   assert.deepEqual(queryKeys.permissions(), ["permissions"]);
   assert.deepEqual(queryKeys.profile(), ["profile"]);
-  assert.deepEqual(queryKeys.gameCatalog(2, 15, "mario"), [
+  assert.deepEqual(queryKeys.gameCatalog(2, 15, "mario", "nes", "browser"), [
     "gameCatalog",
     2,
     15,
     "mario",
+    "nes",
+    "browser",
   ]);
   assert.deepEqual(queryKeys.adminUsers(1, 25, "sam"), [
     "adminUsers",

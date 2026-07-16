@@ -4,9 +4,11 @@ import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
 import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/NostalgistWasmRuntime";
 
 type WasmStageProps = {
+  canStart?: boolean;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   error: string | null;
   onStart: () => void;
+  idleMessage?: string;
   pixelPerfect: boolean;
   progress: WasmRuntimeProgress | null;
   status: WasmPlayerStatus;
@@ -20,7 +22,7 @@ const loadingLabels: Partial<Record<WasmPlayerStatus, string>> = {
   starting: "Starting game…",
 };
 
-export function WasmStage({ canvasRef, error, onStart, pixelPerfect, progress, status }: WasmStageProps) {
+export function WasmStage({ canStart = true, canvasRef, error, idleMessage, onStart, pixelPerfect, progress, status }: WasmStageProps) {
   const loadingLabel = loadingLabels[status];
   const progressPercent = progress?.totalBytes
     ? Math.min(100, Math.round((progress.loadedBytes / progress.totalBytes) * 100))
@@ -38,16 +40,18 @@ export function WasmStage({ canvasRef, error, onStart, pixelPerfect, progress, s
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/80 px-6 text-center">
           {error && <AlertTriangle className="h-9 w-9 text-red-400" />}
           <p className={`max-w-xl text-sm ${error ? "text-red-200" : "text-gray-300"}`}>
-            {error || "Run this NES game locally in your browser with WebAssembly."}
+            {error || idleMessage || "Run this NES game locally in your browser with WebAssembly."}
           </p>
-          <button
-            className="inline-flex items-center gap-2 rounded-md bg-synth-primary px-5 py-3 font-bold text-white transition hover:brightness-110"
-            onClick={onStart}
-            type="button"
-          >
-            <Play className="h-5 w-5 fill-current" />
-            {status === "idle" ? "Start game" : status === "stopped" ? "Play again" : "Retry"}
-          </button>
+          {canStart && (
+            <button
+              className="inline-flex items-center gap-2 rounded-md bg-synth-primary px-5 py-3 font-bold text-white transition hover:brightness-110"
+              onClick={onStart}
+              type="button"
+            >
+              <Play className="h-5 w-5 fill-current" />
+              {status === "idle" ? "Start game" : status === "stopped" ? "Play again" : "Retry"}
+            </button>
+          )}
         </div>
       )}
       {loadingLabel && (

@@ -24,10 +24,14 @@ export function createCatalogApi({
     games: ({
       page = 1,
       pageSize = 15,
+      platform = "",
+      runtime = "all",
       search = "",
     }: {
       page?: number;
       pageSize?: number;
+      platform?: string;
+      runtime?: "all" | "browser" | "desktop" | "unavailable";
       search?: string;
     } = {}) => {
       const params = new URLSearchParams({
@@ -35,6 +39,8 @@ export function createCatalogApi({
         pageSize: String(pageSize),
       });
       if (search.trim()) params.set("search", search.trim());
+      if (platform) params.set("platform", platform);
+      if (runtime !== "all") params.set("runtime", runtime);
 
       return apiRequest<ApiPaginatedGamesResponse>(`/games?${params}`, {
         authenticated: false,

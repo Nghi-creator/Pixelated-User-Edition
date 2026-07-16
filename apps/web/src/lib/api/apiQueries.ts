@@ -163,18 +163,22 @@ export function useFeaturedGamesQuery() {
 export function useGameCatalogQuery({
   page,
   pageSize,
+  platform = "",
+  runtime = "all",
   search,
   enabled = true,
 }: {
   enabled?: boolean;
   page: number;
   pageSize: number;
+  platform?: string;
+  runtime?: "all" | "browser" | "desktop" | "unavailable";
   search: string;
 }) {
   return useQuery({
     enabled,
-    queryKey: queryKeys.gameCatalog(page, pageSize, search),
-    queryFn: () => api.games({ page, pageSize, search }),
+    queryKey: queryKeys.gameCatalog(page, pageSize, search, platform, runtime),
+    queryFn: () => api.games({ page, pageSize, platform, runtime, search }),
   });
 }
 

@@ -12,20 +12,16 @@ import {
   HeroSkeleton,
 } from "../../components/ui/Skeleton";
 import { Pagination } from "../../components/ui/Pagination";
+import type { ApiGame } from "../../lib/api/apiTypes";
+import {
+  getBrowserGameCompatibility,
+  PLATFORM_OPTIONS,
+} from "../../features/catalog/browserCompatibility";
 
 const GAMES_PER_PAGE = 15;
 const ZERO_PLAY_FEATURED_REFRESH_MS = 30_000;
 
-interface Game {
-  id: string;
-  title: string;
-  cover_url: string;
-  rom_filename?: string | null;
-  backdrop_url?: string | null;
-  play_count?: number | null;
-}
-
-const hasOnlyZeroPlayCounts = (games: Game[]) =>
+const hasOnlyZeroPlayCounts = (games: ApiGame[]) =>
   games.length > 1 &&
   games.every((game) => !game.play_count || game.play_count <= 0);
 
@@ -44,18 +40,22 @@ function CatalogRefreshPanel({ label }: { label: string }) {
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [platformFilter, setPlatformFilter] = useState("");
+  const [runtimeFilter, setRuntimeFilter] = useState<"all" | "browser" | "desktop" | "unavailable">("all");
 
   const catalogQuery = useGameCatalogQuery({
     page: currentPage,
     pageSize: GAMES_PER_PAGE,
+    platform: platformFilter,
+    runtime: runtimeFilter,
     search: searchQuery,
   });
   const featuredQuery = useFeaturedGamesQuery();
 
-  const games = (catalogQuery.data?.games || []) as Game[];
+  const games = (catalogQuery.data?.games || []) as ApiGame[];
   const featuredGames = featuredQuery.data?.featuredGames.length
-    ? (featuredQuery.data.featuredGames as Game[])
-    : ((catalogQuery.data?.featuredGames || []) as Game[]);
+    ? featuredQuery.data.featuredGames
+    : (catalogQuery.data?.featuredGames || []);
   const loading = catalogQuery.isLoading;
   const loadError = catalogQuery.isError
     ? "Could not load the game library. Check the API connection."
@@ -101,7 +101,7 @@ export default function Home() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <h2
             id="all-games"
             className="scroll-mt-24 text-2xl font-bold text-white"
@@ -109,20 +109,54 @@ export default function Home() {
             All Games
           </h2>
 
-          <div className="relative w-full md:w-96">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="text-gray-400 w-4 h-4" />
+          <div className="grid w-full gap-3 sm:grid-cols-3 lg:max-w-3xl">
+            <div className="relative sm:col-span-1">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search games..."
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setCurrentPage(1);
+                }}
+                className="block w-full rounded-lg border border-synth-border bg-synth-bg py-2 pl-10 pr-3 leading-5 text-white placeholder:text-gray-500 transition-colors focus:border-synth-secondary focus:outline-none"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search games..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="block w-full rounded-lg border border-synth-border bg-synth-bg py-2 pl-10 pr-10 leading-5 text-white placeholder:text-gray-500 transition-colors focus:border-synth-secondary focus:outline-none"
-            />
+            <label>
+              <span className="sr-only">Runtime availability</span>
+              <select
+                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
+                onChange={(event) => {
+                  setRuntimeFilter(event.target.value as typeof runtimeFilter);
+                  setCurrentPage(1);
+                }}
+                value={runtimeFilter}
+              >
+                <option value="all">All runtimes</option>
+                <option value="browser">Play in browser</option>
+                <option value="desktop">Desktop required</option>
+                <option value="unavailable">Currently unavailable</option>
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">Game system</span>
+              <select
+                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
+                onChange={(event) => {
+                  setPlatformFilter(event.target.value);
+                  setCurrentPage(1);
+                }}
+                value={platformFilter}
+              >
+                <option value="">All systems</option>
+                {PLATFORM_OPTIONS.map((platform) => (
+                  <option key={platform.id} value={platform.id}>{platform.label}</option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
@@ -144,7 +178,11 @@ export default function Home() {
         ) : games.length === 0 && !loading && !catalogQuery.isFetching ? (
           <div className="text-center py-20 text-gray-500">
             <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
-            <p className="text-xl">No games found matching "{searchQuery}"</p>
+            <p className="text-xl">
+              {searchQuery
+                ? `No games found matching “${searchQuery}” with these filters.`
+                : "No games match the selected runtime and system filters."}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -154,6 +192,7 @@ export default function Home() {
                 id={game.id}
                 title={game.title}
                 coverUrl={game.cover_url}
+                compatibility={getBrowserGameCompatibility(game)}
               />
             ))}
           </div>

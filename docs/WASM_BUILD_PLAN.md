@@ -44,11 +44,14 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 4.2 Catalog and discovery
 
-- Browse, search, pagination, game details, artwork, rights, author, and license links.
-- Favorites and profile-linked library state.
-- Eligibility badge such as “Play in browser” or “Desktop required.”
-- Filters by system, runtime availability, genre, and license.
-- Friendly unavailable-artifact and unsupported-system states.
+- [x] Browse, server-ranked search, pagination, artwork, rights, author, and license links.
+- [x] Favorites and profile-linked library state.
+- [x] Eligibility badges: “Play in browser,” “Desktop required,” and “Currently unavailable.”
+- [x] Correct server-side filters for system and runtime availability, including filtered pagination totals and cache keys.
+- [x] Friendly pre-launch unavailable-artifact, native-runtime, and unsupported-system states.
+- [x] Tested compatibility policy based on enabled build, runtime kind, platform, extension, size, and checksum metadata.
+- [ ] Genre filter after genre metadata is added to the shared catalog schema.
+- [ ] License filter/facets after the API exposes normalized per-game license metadata for catalog queries.
 
 ### 4.3 Accounts and community
 

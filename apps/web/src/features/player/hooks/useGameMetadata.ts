@@ -7,7 +7,7 @@ const formatFallbackTitle = (gameId: string) =>
   gameId.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 
 export function useGameMetadata(gameId: string | undefined) {
-  const { data, isError } = useGameMetadataQuery(gameId);
+  const { data, isError, isLoading } = useGameMetadataQuery(gameId);
 
   const game = data?.game;
   const gameTitle =
@@ -15,5 +15,5 @@ export function useGameMetadata(gameId: string | undefined) {
   const authorName = game?.author_name || null;
   const gameRights = (game?.game_rights || []) as GameRights[];
 
-  return { authorName, gameRights, gameTitle };
+  return { authorName, game, gameRights, gameTitle, isError, isLoading };
 }

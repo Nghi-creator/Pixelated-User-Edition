@@ -52,8 +52,8 @@ export const queryKeys = {
   favorites: () => ["favorites"] as const,
   favoriteIds: () => ["favoriteIds"] as const,
   game: (gameId: string | undefined) => ["game", gameId] as const,
-  gameCatalog: (page: number, pageSize: number, search: string) =>
-    ["gameCatalog", page, pageSize, search] as const,
+  gameCatalog: (page: number, pageSize: number, search: string, platform: string, runtime: string) =>
+    ["gameCatalog", page, pageSize, search, platform, runtime] as const,
   libraryGamePicker: (pageSize: number) =>
     ["libraryGamePicker", pageSize] as const,
   gameComments: (gameId: string | undefined) => ["gameComments", gameId] as const,

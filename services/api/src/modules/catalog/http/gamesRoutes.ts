@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { searchAndRankGames } from "../domain/catalogSearch.js";
+import { filterCatalogGames, type CatalogRuntimeFilter } from "../domain/catalogDiscovery.js";
 import { getCatalogCacheKey, getPageRange } from "../domain/catalogPolicy.js";
 import {
   fetchFeaturedGames,
@@ -23,12 +24,15 @@ async function buildCachedGamesPage(
   page: number,
   pageSize: number,
   search?: string,
+  platform?: string,
+  runtime: CatalogRuntimeFilter = "all",
 ): Promise<CachedGamesCatalogResponse> {
   const { end, start } = getPageRange(page, pageSize);
   const data = await fetchPublishedCatalogGames(service, timings, search);
   const rankedGames = search ? searchAndRankGames(data || [], search) : data || [];
-  const pagedGames = rankedGames.slice(start, end + 1);
-  const total = rankedGames.length;
+  const filteredGames = filterCatalogGames(rankedGames, { platform, runtime });
+  const pagedGames = filteredGames.slice(start, end + 1);
+  const total = filteredGames.length;
 
   return {
     games: pagedGames,
@@ -98,9 +102,9 @@ export function registerGamesCatalogRoutes(
       return reply.status(400).send({ error: "Invalid games query" });
     }
 
-    const { page, pageSize, search } = query.data;
+    const { page, pageSize, platform, runtime, search } = query.data;
     const timings = {};
-    const cacheKey = getCatalogCacheKey(page, pageSize, search);
+    const cacheKey = getCatalogCacheKey(page, pageSize, search, platform, runtime);
     const cachedResponse = gamesCatalogCache.get(cacheKey);
     if (cachedResponse) {
       let featuredGames = cachedResponse.featuredGames || [];
@@ -120,6 +124,8 @@ export function registerGamesCatalogRoutes(
         pageSize,
         resultCount: cachedResponse.games.length,
         search: Boolean(search),
+        platform: platform || "all",
+        runtime,
         total: cachedResponse.total,
       });
       return { ...cachedResponse, featuredGames };
@@ -133,6 +139,8 @@ export function registerGamesCatalogRoutes(
         page,
         pageSize,
         search,
+        platform,
+        runtime,
       );
     } catch (err) {
       request.log.error({ err }, "Failed to load games");
@@ -160,6 +168,8 @@ export function registerGamesCatalogRoutes(
       pageSize,
       resultCount: cachedPage.games.length,
       search: Boolean(search),
+      platform: platform || "all",
+      runtime,
       total: cachedPage.total,
     });
 

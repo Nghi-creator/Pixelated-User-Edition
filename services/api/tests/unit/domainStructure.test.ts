@@ -10,6 +10,10 @@ import {
   searchAndRankGames,
 } from "../../src/modules/catalog/domain/catalogSearch.js";
 import {
+  filterCatalogGames,
+  getCatalogCompatibility,
+} from "../../src/modules/catalog/domain/catalogDiscovery.js";
+import {
   canResolveTargetRole,
   canReviewOwnReport,
   getPageRange as getModerationPageRange,
@@ -54,6 +58,38 @@ test("catalog search ranks deterministic fuzzy matches without semantic guessing
   );
   assert.equal(getGameSearchScore({ title: "Super Pixel Quest" }, "spq"), 50);
   assert.equal(getGameSearchScore({ title: "Space Garden" }, "mario"), null);
+});
+
+const catalogGame = (
+  platform_id: string,
+  runtime_kind: "libretro" | "native_linux" = "libretro",
+) => ({
+  game_builds: [{
+    artifact_filename: runtime_kind === "libretro" ? `game.${platform_id === "nes" ? "nes" : "rom"}` : null,
+    artifact_sha256: runtime_kind === "libretro" ? "a".repeat(64) : null,
+    artifact_size: runtime_kind === "libretro" ? 32 : null,
+    enabled: true,
+    platform_id,
+    runtime_kind,
+  }],
+});
+
+test("catalog discovery distinguishes browser, desktop, and unavailable games", () => {
+  const browserGame = catalogGame("nes");
+  const desktopGame = catalogGame("linux", "native_linux");
+  const unavailableGame = { game_builds: [] };
+
+  assert.equal(getCatalogCompatibility(browserGame), "browser");
+  assert.equal(getCatalogCompatibility(desktopGame), "desktop");
+  assert.equal(getCatalogCompatibility(unavailableGame), "unavailable");
+  assert.deepEqual(
+    filterCatalogGames([browserGame, desktopGame, unavailableGame], { runtime: "browser" }),
+    [browserGame],
+  );
+  assert.deepEqual(
+    filterCatalogGames([browserGame, catalogGame("snes")], { platform: "snes" }),
+    [catalogGame("snes")],
+  );
 });
 
 test("moderation policy centralizes report and target privilege rules", () => {

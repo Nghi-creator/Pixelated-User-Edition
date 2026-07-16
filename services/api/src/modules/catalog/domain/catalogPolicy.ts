@@ -8,10 +8,14 @@ export function getCatalogCacheKey(
   page: number,
   pageSize: number,
   search?: string,
+  platform?: string,
+  runtime: string = "all",
 ) {
   return JSON.stringify({
     page,
     pageSize,
+    platform: platform || "",
+    runtime,
     search: search?.toLowerCase() || "",
   });
 }

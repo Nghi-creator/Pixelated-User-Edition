@@ -4,6 +4,8 @@ export const gameParamsSchema = z.object({ gameId: z.string().min(1).max(200) })
 export const gamesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(15),
+  platform: z.string().trim().regex(/^[a-z0-9_]+$/).max(40).optional(),
+  runtime: z.enum(["all", "browser", "desktop", "unavailable"]).default("all"),
   search: z.string().trim().max(120).optional(),
 });
 export const commentParamsSchema = z.object({ commentId: z.string().uuid() });
