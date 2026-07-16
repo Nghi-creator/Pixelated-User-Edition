@@ -44,6 +44,21 @@ async function downloadRom(
   signal: AbortSignal,
   onProgress?: RuntimeOptions["onProgress"],
 ) {
+  if (source.file) {
+    if (source.file.size > MAX_NES_ROM_BYTES) {
+      throw new Error("The game is larger than the 64 MB browser safety limit.");
+    }
+    const bytes = new Uint8Array(await source.file.arrayBuffer());
+    if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
+    onProgress?.({
+      loadedBytes: bytes.byteLength,
+      phase: "downloading",
+      totalBytes: bytes.byteLength,
+    });
+    return bytes;
+  }
+  if (!source.url) throw new Error("The game source is missing.");
+
   let response: Response;
   try {
     response = await fetch(source.url, { cache: "no-store", signal });
@@ -183,4 +198,3 @@ export class NostalgistWasmRuntime implements GameRuntime {
     this.volumeStep = 60;
   }
 }
-

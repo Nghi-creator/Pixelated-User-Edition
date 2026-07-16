@@ -2,7 +2,8 @@ export type GameRuntimeSource = {
   expectedSha256?: string | null;
   expectedSize?: number | null;
   fileName: string;
-  url: string;
+  file?: Blob;
+  url?: string;
 };
 
 export interface GameRuntime {
@@ -15,4 +16,3 @@ export interface GameRuntime {
   setMuted(muted: boolean): void;
   setVolume(volume: number): void;
 }
-

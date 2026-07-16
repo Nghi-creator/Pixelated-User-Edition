@@ -50,3 +50,41 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
   assert.equal(actions.filter((action) => action === "VOLUME_DOWN").length, 30);
   assert.equal(actions.at(-1), "exit");
 });
+
+test("prepares a local File source without making a network request", async (context) => {
+  const originalFetch = globalThis.fetch;
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  globalThis.fetch = async () => {
+    throw new Error("fetch should not run for a local file");
+  };
+
+  let prepared = false;
+  const runtime = new NostalgistWasmRuntime({
+    canvas: {} as HTMLCanvasElement,
+    loadNostalgist: async () => ({
+      Nostalgist: {
+        async prepare() {
+          prepared = true;
+          return {
+            exit: () => undefined,
+            getStatus: () => "initial" as const,
+            pause: () => undefined,
+            restart: () => undefined,
+            resume: () => undefined,
+            sendCommand: () => undefined,
+            start: async () => undefined,
+          };
+        },
+      },
+    }),
+  });
+
+  await runtime.prepare({
+    file: new Blob([validNesRom()]),
+    fileName: "local.nes",
+  });
+  assert.equal(prepared, true);
+  runtime.stop();
+});

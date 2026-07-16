@@ -8,6 +8,8 @@ import {
   normalizeLocalGameFilenames,
   toLocalVaultGames,
   validateLocalRomFile,
+  detectLocalRomSystem,
+  inspectLocalRomFile,
 } from "../../../src/features/local-vault/localVaultState.ts";
 
 function fileLike(name: string, size: number) {
@@ -30,6 +32,30 @@ test("local vault ROM validation rejects missing, unsupported, and oversized fil
   assert.equal(validateLocalRomFile(fileLike("demo.MD", 100)), null);
   assert.equal(validateLocalRomFile(fileLike("demo.SMS", 100)), null);
   assert.equal(validateLocalRomFile(fileLike("demo.GG", 100)), null);
+  assert.equal(validateLocalRomFile(fileLike("empty.nes", 0)), "The selected ROM file is empty.");
+});
+
+test("local ROM inspection detects systems and validates NES headers", async () => {
+  const file = (name: string, bytes: number[]) => ({
+    arrayBuffer: async () => Uint8Array.from(bytes).buffer,
+    name,
+    size: bytes.length,
+  }) as File;
+
+  assert.equal(detectLocalRomSystem("demo.SMC")?.id, "snes");
+  assert.equal(detectLocalRomSystem("demo.zip"), null);
+  assert.equal(
+    (await inspectLocalRomFile(file("demo.nes", [0x4e, 0x45, 0x53, 0x1a, ...new Array(12).fill(0)]))).browserPlayable,
+    true,
+  );
+  assert.equal(
+    (await inspectLocalRomFile(file("demo.gba", new Array(32).fill(0)))).browserPlayable,
+    false,
+  );
+  await assert.rejects(
+    () => inspectLocalRomFile(file("bad.nes", new Array(16).fill(0))),
+    /valid NES ROM header/,
+  );
 });
 
 test("local vault filenames normalize to playable local game cards", () => {

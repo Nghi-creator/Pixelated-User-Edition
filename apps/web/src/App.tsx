@@ -112,8 +112,8 @@ export default function App() {
           <Route path="/profile" element={lazyRoute(Profile)} />
           <Route path="/engine" element={lazyRoute(EngineConnection)} />
           <Route path="/play/:id" element={lazyRoute(Player)} />
+          <Route path="/local" element={lazyRoute(LocalVault)} />
           <Route element={<RequireEngineConnection />}>
-            <Route path="/local" element={lazyRoute(LocalVault)} />
             <Route path="/multiplayer" element={lazyRoute(Multiplayer)} />
           </Route>
           <Route path="/publish" element={lazyRoute(Publish)} />

@@ -65,10 +65,14 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 4.4 Personal ROMs
 
-- Local file picker and drag-and-drop launch without uploading the ROM.
-- Browser-side validation and system detection.
-- Recent-local-game metadata stored in IndexedDB, not the ROM unless the user opts in.
-- Clear messaging that local files remain on the device.
+- [x] Local file picker and drag-and-drop launch without uploading the ROM.
+- [x] Browser-side size, extension, system, and NES-header validation.
+- [x] NES files run directly from an in-memory `File` source through the existing WASM runtime.
+- [x] GB, GBC, GBA, SNES, Genesis, Master System, and Game Gear files are detected with honest future-core messaging.
+- [x] Recent-local-game metadata is stored in IndexedDB; ROM bytes are never persisted.
+- [x] Users can remove individual recent entries or clear local history.
+- [x] Clear privacy and legal-use messaging explains that local files remain on the device.
+- [x] `/local` no longer requires desktop-engine pairing in User Edition.
 
 ### 4.5 Saves and usability
 
