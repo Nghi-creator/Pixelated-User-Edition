@@ -46,7 +46,7 @@ export default function LocalVault() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedSystem, setSelectedSystem] = useState<SelectedSystem | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const player = useLocalWasmPlayer(selectedFile);
+  const player = useLocalWasmPlayer(selectedFile, selectedSystem?.id || null);
   const gameKey = selectedFile
     ? `local:${selectedFile.name}:${selectedFile.size}:${selectedFile.lastModified}`
     : "local:none";

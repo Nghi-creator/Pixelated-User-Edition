@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-synth-border/60 mt-auto bg-synth-bg py-8">
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
-        <p>&copy; 2026 PIXELATED Studio. All rights reserved.</p>
+        <p>&copy; 2026 PIXELATED User Edition. All rights reserved.</p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 md:mt-0">
           <span className="text-gray-400">Built by Nicholas Nguyen</span>
           <a

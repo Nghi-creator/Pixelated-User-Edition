@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../../lib/api/apiClient";
-import type { GameRuntimeSource } from "../../../lib/runtime/gameRuntime";
+import type {
+  GameRuntime,
+  GameRuntimeSource,
+} from "../../../lib/runtime/gameRuntime";
 import { getWasmBrowserSupport } from "../../../lib/runtime/wasm/browserSupport";
-import {
-  NostalgistWasmRuntime,
-  type WasmRuntimeProgress,
-} from "../../../lib/runtime/wasm/NostalgistWasmRuntime";
+import { resolveWasmCore } from "../../../lib/runtime/wasm/coreRegistry";
+import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/runtimeTypes";
 
 export type WasmPlayerStatus =
   | "idle"
@@ -40,7 +41,7 @@ function getLaunchError(error: unknown) {
 export function useWasmPlayer(gameId: string | undefined) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const generationRef = useRef(0);
-  const runtimeRef = useRef<NostalgistWasmRuntime | null>(null);
+  const runtimeRef = useRef<GameRuntime | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [gamepadName, setGamepadName] = useState<string | null>(null);
@@ -84,16 +85,6 @@ export function useWasmPlayer(gameId: string | undefined) {
     setProgress(null);
     setStatus("preparing");
 
-    const runtime = new NostalgistWasmRuntime({
-      canvas: canvasRef.current,
-      onProgress(nextProgress) {
-        if (generation !== generationRef.current) return;
-        setProgress(nextProgress);
-        setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
-      },
-    });
-    runtimeRef.current = runtime;
-
     try {
       const backendSession = await api.createSession(gameId, createClientSessionId());
       if (generation !== generationRef.current) return;
@@ -104,17 +95,33 @@ export function useWasmPlayer(gameId: string | undefined) {
       if (!backendSession.boot.romUrl) {
         throw new Error("This game does not have a browser-accessible ROM artifact.");
       }
+      if (!backendSession.boot.romFilename) {
+        throw new Error("This game does not have a browser ROM filename.");
+      }
       if (!backendSession.boot.browser.eligible) {
         throw new Error(backendSession.boot.browser.reason || "This game is not eligible for browser play.");
       }
-      if (backendSession.boot.browser.coreId !== "fceumm" || backendSession.boot.browser.systemId !== "nes") {
-        throw new Error("This browser build requires an unsupported emulator core.");
+      const core = resolveWasmCore(
+        backendSession.boot.browser.coreId,
+        backendSession.boot.browser.systemId,
+        backendSession.boot.romFilename,
+      );
+      if (!core) throw new Error("This browser build requires an unsupported emulator core.");
+
+      setStatus("loading-core");
+      const runtime = await core.loadRuntime({
+        canvas: canvasRef.current,
+        onProgress(nextProgress) {
+          if (generation !== generationRef.current) return;
+          setProgress(nextProgress);
+          setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
+        },
+      });
+      if (generation !== generationRef.current) {
+        runtime.stop();
+        return;
       }
-      if (!backendSession.boot.romFilename?.toLowerCase().endsWith(".nes")) {
-        throw new Error(
-          "This first WASM release supports NES games only. This catalog game needs a different emulator core.",
-        );
-      }
+      runtimeRef.current = runtime;
 
       const source: GameRuntimeSource = {
         expectedSha256: backendSession.boot.artifactSha256,
@@ -132,7 +139,7 @@ export function useWasmPlayer(gameId: string | undefined) {
       setStatus("playing");
     } catch (launchError) {
       if (generation !== generationRef.current) return;
-      runtime.stop();
+      runtimeRef.current?.stop();
       runtimeRef.current = null;
       releaseSession();
       setError(getLaunchError(launchError));

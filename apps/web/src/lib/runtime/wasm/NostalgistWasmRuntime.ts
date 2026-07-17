@@ -1,18 +1,8 @@
 import type { Nostalgist } from "nostalgist";
 import type { GameRuntime, GameRuntimeSource } from "../gameRuntime.ts";
 import { MAX_NES_ROM_BYTES, validateNesRom } from "./romValidation.ts";
-
-export type WasmRuntimePhase =
-  | "downloading"
-  | "verifying"
-  | "loading-core"
-  | "ready";
-
-export type WasmRuntimeProgress = {
-  loadedBytes: number;
-  phase: WasmRuntimePhase;
-  totalBytes: number | null;
-};
+import type { WasmRuntimeProgress } from "./runtimeTypes.ts";
+export type { WasmRuntimeProgress } from "./runtimeTypes.ts";
 
 type NostalgistInstance = Pick<
   Nostalgist,
@@ -38,6 +28,7 @@ type NostalgistModule = {
 
 type RuntimeOptions = {
   canvas: HTMLCanvasElement;
+  coreId?: "fceumm";
   loadNostalgist?: () => Promise<NostalgistModule>;
   onProgress?: (progress: WasmRuntimeProgress) => void;
 };
@@ -139,7 +130,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
     const { Nostalgist: NostalgistApi } = await (this.options.loadNostalgist || defaultLoader)();
     const instance = await NostalgistApi.prepare({
       cache: { core: true, rom: false },
-      core: "fceumm",
+      core: this.options.coreId || "fceumm",
       element: this.options.canvas,
       respondToGlobalEvents: true,
       retroarchConfig: {

@@ -5,15 +5,12 @@ import {
   Routes,
   Route,
   Outlet,
+  Navigate,
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import AdminLayout from "./components/layout/AdminLayout";
 import { useSessionTracker } from "./lib/session/useSessionTracker";
-import { useEngineConnectionMonitor } from "./lib/engine/useEngineConnectionMonitor";
-import { useDesktopLaunchPairing } from "./lib/engine/useDesktopLaunchPairing";
-
-import { RequireEngineConnection } from "./features/local-engine/RequireEngineConnection";
 
 const AccessLogs = lazy(() => import("./pages/admin/AccessLogs"));
 const CatalogCandidates = lazy(() => import("./pages/admin/CatalogCandidates"));
@@ -21,12 +18,10 @@ const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const Submissions = lazy(() => import("./pages/admin/Submissions"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Auth = lazy(() => import("./pages/user/Auth"));
-const EngineConnection = lazy(() => import("./pages/user/EngineConnection"));
 const Favorites = lazy(() => import("./pages/user/Favorites"));
 const Home = lazy(() => import("./pages/user/Home"));
 const Landing = lazy(() => import("./pages/user/Landing"));
 const LocalVault = lazy(() => import("./pages/user/LocalVault"));
-const Multiplayer = lazy(() => import("./pages/user/Multiplayer"));
 const Player = lazy(() => import("./pages/user/Player"));
 const Profile = lazy(() => import("./pages/user/Profile"));
 const Publish = lazy(() => import("./pages/user/Publish"));
@@ -73,22 +68,10 @@ const SessionTracker = () => {
   return null;
 };
 
-const EngineConnectionMonitor = () => {
-  useEngineConnectionMonitor();
-  return null;
-};
-
-const DesktopLaunchPairing = () => {
-  useDesktopLaunchPairing();
-  return null;
-};
-
 export default function App() {
   return (
     <Router>
       <SessionTracker />
-      <DesktopLaunchPairing />
-      <EngineConnectionMonitor />
       <Routes>
         {/* ADMIN ROUTES */}
         <Route element={<AdminLayout />}>
@@ -110,12 +93,10 @@ export default function App() {
           <Route path="/reset-password" element={lazyRoute(ResetPassword)} />
           <Route path="/favorites" element={lazyRoute(Favorites)} />
           <Route path="/profile" element={lazyRoute(Profile)} />
-          <Route path="/engine" element={lazyRoute(EngineConnection)} />
           <Route path="/play/:id" element={lazyRoute(Player)} />
           <Route path="/local" element={lazyRoute(LocalVault)} />
-          <Route element={<RequireEngineConnection />}>
-            <Route path="/multiplayer" element={lazyRoute(Multiplayer)} />
-          </Route>
+          <Route path="/engine" element={<Navigate replace to="/home" />} />
+          <Route path="/multiplayer" element={<Navigate replace to="/home" />} />
           <Route path="/publish" element={lazyRoute(Publish)} />
         </Route>
       </Routes>

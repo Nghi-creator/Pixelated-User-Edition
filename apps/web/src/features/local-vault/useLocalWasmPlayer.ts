@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { GameRuntime } from "../../lib/runtime/gameRuntime";
 import { getWasmBrowserSupport } from "../../lib/runtime/wasm/browserSupport";
-import {
-  NostalgistWasmRuntime,
-  type WasmRuntimeProgress,
-} from "../../lib/runtime/wasm/NostalgistWasmRuntime";
+import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
+import type { WasmRuntimeProgress } from "../../lib/runtime/wasm/runtimeTypes";
 import type { WasmPlayerStatus } from "../player/hooks/useWasmPlayer";
 
 function getLocalLaunchError(error: unknown) {
@@ -17,9 +16,9 @@ function getLocalLaunchError(error: unknown) {
   return "The browser emulator could not start this local ROM.";
 }
 
-export function useLocalWasmPlayer(file: File | null) {
+export function useLocalWasmPlayer(file: File | null, systemId: string | null) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const runtimeRef = useRef<NostalgistWasmRuntime | null>(null);
+  const runtimeRef = useRef<GameRuntime | null>(null);
   const generationRef = useRef(0);
   const [error, setError] = useState<string | null>(null);
   const [gamepadName, setGamepadName] = useState<string | null>(null);
@@ -61,17 +60,23 @@ export function useLocalWasmPlayer(file: File | null) {
     setError(null);
     setProgress(null);
     setStatus("preparing");
-    const runtime = new NostalgistWasmRuntime({
-      canvas: canvasRef.current,
-      onProgress(nextProgress) {
-        if (generation !== generationRef.current) return;
-        setProgress(nextProgress);
-        setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
-      },
-    });
-    runtimeRef.current = runtime;
-
     try {
+      const core = findWasmCoreForArtifact(systemId, file.name);
+      if (!core) throw new Error("This ROM requires an unsupported browser emulator core.");
+      setStatus("loading-core");
+      const runtime = await core.loadRuntime({
+        canvas: canvasRef.current,
+        onProgress(nextProgress) {
+          if (generation !== generationRef.current) return;
+          setProgress(nextProgress);
+          setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
+        },
+      });
+      if (generation !== generationRef.current) {
+        runtime.stop();
+        return;
+      }
+      runtimeRef.current = runtime;
       await runtime.prepare({ file, fileName: file.name });
       if (generation !== generationRef.current) return;
       await runtime.start();
@@ -81,12 +86,12 @@ export function useLocalWasmPlayer(file: File | null) {
       setStatus("playing");
     } catch (launchError) {
       if (generation !== generationRef.current) return;
-      runtime.stop();
+      runtimeRef.current?.stop();
       runtimeRef.current = null;
       setError(getLocalLaunchError(launchError));
       setStatus("error");
     }
-  }, [file, isMuted, stopRuntime, volume]);
+  }, [file, isMuted, stopRuntime, systemId, volume]);
 
   const togglePause = useCallback(() => {
     if (status === "playing") {

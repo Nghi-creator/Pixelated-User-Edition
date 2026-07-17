@@ -114,11 +114,11 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 5.3 Frontend architecture
 
-- Remove Studio-only engine monitors and desktop pairing from the User Edition app shell.
-- Replace or hide Engine Connection, Local Vault, native multiplayer, and stream telemetry navigation.
-- Split reusable catalog/community code into shared packages only after the WASM path stabilizes.
-- Add an emulator-core registry so future systems are configuration-driven.
-- Keep runtime packages lazy so catalog visitors do not download emulator code.
+- [x] Remove Studio-only engine monitors and desktop pairing from the User Edition app shell.
+- [x] Remove Engine Connection and native multiplayer routes; present the browser-only local picker as Personal ROMs and keep stream telemetry out of User navigation.
+- [x] Keep catalog/community code local until the WASM path stabilizes instead of prematurely creating shared packages.
+- [x] Add an emulator-core registry so compatibility and runtime selection are configuration-driven.
+- [x] Load the selected runtime and Nostalgist package only after a user starts a compatible game.
 
 ### 5.4 Security and deployment headers
 

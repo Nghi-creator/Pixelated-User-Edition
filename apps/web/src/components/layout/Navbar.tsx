@@ -13,13 +13,11 @@ import { getAuthSession } from "../../lib/api/apiClient";
 import { usePermissionsQuery } from "../../lib/api/apiQueries";
 import { queryKeys } from "../../lib/api/queryClient";
 import { Avatar } from "../ui/Avatar";
-import { ENGINE_PAIRING_EVENT, hasEngineToken } from "../../lib/engine/engineAuth";
 import { PixelIcon } from "../ui/PixelIcon";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEnginePaired, setIsEnginePaired] = useState(hasEngineToken);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -73,13 +71,6 @@ export default function Navbar() {
   }, [permissionsQuery.data, user]);
 
   useEffect(() => {
-    const refreshEnginePairing = () => setIsEnginePaired(hasEngineToken());
-    window.addEventListener(ENGINE_PAIRING_EVENT, refreshEnginePairing);
-    return () =>
-      window.removeEventListener(ENGINE_PAIRING_EVENT, refreshEnginePairing);
-  }, []);
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -108,9 +99,7 @@ export default function Navbar() {
 
   const isFavoritesPage = location.pathname === "/favorites";
   const isIntroPage = location.pathname === "/";
-  const isEnginePage = location.pathname === "/engine";
   const isLocalPage = location.pathname === "/local";
-  const isMultiplayerPage = location.pathname === "/multiplayer";
   const isPublishPage = location.pathname === "/publish";
   const profile = permissionsQuery.data?.profile;
   const dbUsername = profile?.username || null;
@@ -143,7 +132,7 @@ export default function Navbar() {
                 PIXELATED
               </span>
               <span className="hidden text-[10px] font-bold uppercase tracking-[0.22em] text-synth-secondary sm:inline">
-                Studio
+                User
               </span>
             </Link>
 
@@ -155,23 +144,6 @@ export default function Navbar() {
               <ScrollText className="h-5 w-5" />
             </Link>
 
-            <Link
-              to="/engine"
-              title={isEnginePaired ? "Engine Connected" : "Connect Engine"}
-              className={`relative ${getNavIconClass(isEnginePage)}`}
-            >
-              <PixelIcon
-                className={`h-6 w-6 ${
-                  isEnginePaired ? "text-[#9B0048]" : "text-gray-400"
-                }`}
-                name={isEnginePaired ? "engine-on" : "engine-off"}
-              />
-              <span
-                className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-synth-bg ${
-                  isEnginePaired ? "bg-[#9B0048]" : "bg-amber-400"
-                }`}
-              />
-            </Link>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6">
@@ -194,18 +166,9 @@ export default function Navbar() {
               </Link>
             ) : null}
 
-            {/* LOCAL VAULT LINK */}
-            <Link
-              to="/multiplayer"
-              title="Multiplayer"
-              className={getNavIconClass(isMultiplayerPage)}
-            >
-              <PixelIcon className="h-6 w-6" name="multiplayer" />
-            </Link>
-
             <Link
               to="/local"
-              title="Local Vault"
+              title="Personal ROMs"
               className={getNavIconClass(isLocalPage)}
             >
               <PixelIcon className="h-6 w-6" name="publish" />

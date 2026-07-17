@@ -94,7 +94,7 @@ export async function inspectLocalRomFile(
   }
 
   return {
-    browserPlayable: system.id === "nes",
+    browserPlayable: Boolean(findWasmCoreForArtifact(system.id, file.name)),
     system,
   };
 }
@@ -138,3 +138,4 @@ export function isInvalidEngineTokenError(
 ): error is InvalidEngineTokenError {
   return error instanceof InvalidEngineTokenError;
 }
+import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry.ts";

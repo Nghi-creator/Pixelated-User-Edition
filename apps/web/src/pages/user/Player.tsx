@@ -1,6 +1,9 @@
 import { lazy, Suspense, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { PlayerHeader } from "../../features/player/components/PlayerHeader";
+import {
+  PlayerHeader,
+  type PlayerHeaderStatus,
+} from "../../features/player/components/PlayerHeader";
 import { PlayerInstructions } from "../../features/player/components/PlayerControls";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
 import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
@@ -13,7 +16,6 @@ import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNaviga
 import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
 import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
-import type { WebRTCStatus } from "../../lib/webrtc/webrtcSession";
 import { getBrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
 
 const PlayerCommunitySection = lazy(() =>
@@ -52,7 +54,7 @@ export default function Player() {
 
   usePlayCount(id, player.status === "playing");
 
-  const headerStatus = useMemo<WebRTCStatus>(() => {
+  const headerStatus = useMemo<PlayerHeaderStatus>(() => {
     if (player.status === "playing" || player.status === "paused") return "playing";
     if (player.status === "error") return "error";
     if (["preparing", "downloading", "verifying", "loading-core", "starting"].includes(player.status)) {
