@@ -97,12 +97,18 @@ export function useWasmPlayer(gameId: string | undefined) {
     try {
       const backendSession = await api.createSession(gameId, createClientSessionId());
       if (generation !== generationRef.current) return;
-      sessionIdRef.current = backendSession.user.id ? backendSession.sessionId : null;
+      sessionIdRef.current = backendSession.sessionId;
       if (backendSession.boot.runtimeKind !== "libretro") {
         throw new Error("This game requires the native Studio runtime and cannot run in WASM.");
       }
       if (!backendSession.boot.romUrl) {
         throw new Error("This game does not have a browser-accessible ROM artifact.");
+      }
+      if (!backendSession.boot.browser.eligible) {
+        throw new Error(backendSession.boot.browser.reason || "This game is not eligible for browser play.");
+      }
+      if (backendSession.boot.browser.coreId !== "fceumm" || backendSession.boot.browser.systemId !== "nes") {
+        throw new Error("This browser build requires an unsupported emulator core.");
       }
       if (!backendSession.boot.romFilename?.toLowerCase().endsWith(".nes")) {
         throw new Error(

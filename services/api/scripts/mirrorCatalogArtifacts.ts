@@ -31,7 +31,7 @@ type MirrorReportEntry = {
 };
 
 const RAW_GITHUB_HOST = "raw.githubusercontent.com";
-const BUCKET_NAME = "catalog_artifacts";
+const BUCKET_NAME = "catalog_roms";
 
 function hasArg(name: string) {
   return process.argv.includes(name);
@@ -55,9 +55,9 @@ Options:
   --allow-failures    Exit 0 even when individual builds fail.
   --json              Print JSON report.
 
-Only https://raw.githubusercontent.com/... game_builds artifact_url rows are
-mirrored. Each artifact must match the existing artifact_sha256, and
-artifact_size is verified when present.
+Raw GitHub artifacts and existing public catalog_artifacts ROMs are mirrored
+into the private catalog_roms bucket. Each artifact must match the existing
+artifact_sha256, and artifact_size is verified when present.
 `);
 }
 
@@ -89,7 +89,7 @@ function sha256(bytes: Buffer) {
   return crypto.createHash("sha256").update(bytes).digest("hex");
 }
 
-function assertRawGithubUrl(value: string) {
+function assertAllowedSourceUrl(value: string) {
   let url: URL;
   try {
     url = new URL(value);
@@ -97,8 +97,16 @@ function assertRawGithubUrl(value: string) {
     throw new Error("Artifact URL is invalid.");
   }
 
-  if (url.protocol !== "https:" || url.hostname !== RAW_GITHUB_HOST) {
-    throw new Error(`Artifact URL is not a ${RAW_GITHUB_HOST} URL.`);
+  const supabaseOrigin = process.env.SUPABASE_URL
+    ? new URL(process.env.SUPABASE_URL).origin
+    : null;
+  const isRawGithub = url.protocol === "https:" && url.hostname === RAW_GITHUB_HOST;
+  const isLegacyPublicArtifact =
+    url.protocol === "https:" &&
+    url.origin === supabaseOrigin &&
+    url.pathname.startsWith("/storage/v1/object/public/catalog_artifacts/");
+  if (!isRawGithub && !isLegacyPublicArtifact) {
+    throw new Error("Artifact URL is not an approved raw GitHub or legacy catalog artifact URL.");
   }
 }
 
@@ -142,7 +150,15 @@ async function loadTargets(
     if (!build.artifact_url) return false;
     try {
       const url = new URL(build.artifact_url);
-      return url.protocol === "https:" && url.hostname === RAW_GITHUB_HOST;
+      if (url.protocol !== "https:") return false;
+      if (url.hostname === RAW_GITHUB_HOST) return true;
+      const supabaseOrigin = process.env.SUPABASE_URL
+        ? new URL(process.env.SUPABASE_URL).origin
+        : null;
+      return (
+        url.origin === supabaseOrigin &&
+        url.pathname.startsWith("/storage/v1/object/public/catalog_artifacts/")
+      );
     } catch {
       return false;
     }
@@ -159,7 +175,7 @@ async function downloadAndVerify(build: BuildRow) {
     throw new Error("Build is missing artifact_sha256; refusing to mirror.");
   }
 
-  assertRawGithubUrl(build.artifact_url);
+  assertAllowedSourceUrl(build.artifact_url);
   const response = await fetch(build.artifact_url);
   if (!response.ok) {
     throw new Error(`Failed to download artifact: HTTP ${response.status}`);
@@ -197,7 +213,7 @@ async function uploadMirroredArtifact(
 
   const { data } = bucket.getPublicUrl(objectPath);
   if (!data.publicUrl) {
-    throw new Error("Failed to resolve mirrored artifact public URL.");
+    throw new Error("Failed to resolve mirrored artifact storage URL.");
   }
 
   const { error: updateError } = await service

@@ -11,8 +11,9 @@ const gameParamsSchema = z.object({
   gameId: z.string().uuid(),
 });
 const playCountBodySchema = z.object({
-  clientEdition: z.enum(["studio", "user"]).default("studio"),
-  runtimeKind: z.enum(["wasm", "webrtc", "native"]).default("webrtc"),
+  clientEdition: z.enum(["studio", "user"]),
+  playEventId: z.string().regex(/^[a-zA-Z0-9_-]+$/).min(16).max(100),
+  runtimeKind: z.enum(["wasm", "webrtc", "native"]),
 });
 
 type SupabaseServiceLike = NonNullable<typeof supabaseService>;
@@ -53,7 +54,7 @@ export async function registerPlayCountRoutes(
       if (!parsedParams.success) {
         return reply.status(400).send({ error: "Invalid game id" });
       }
-      const parsedBody = playCountBodySchema.safeParse(request.body || {});
+      const parsedBody = playCountBodySchema.safeParse(request.body);
       if (!parsedBody.success) {
         return reply.status(400).send({ error: "Invalid play activity metadata" });
       }
@@ -69,6 +70,7 @@ export async function registerPlayCountRoutes(
 
       const { error } = await service.rpc("record_game_play", {
         p_client_edition: parsedBody.data.clientEdition,
+        p_event_id: parsedBody.data.playEventId,
         p_game_id: parsedParams.data.gameId,
         p_runtime_kind: parsedBody.data.runtimeKind,
         p_user_id: user.id,

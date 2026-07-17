@@ -96,21 +96,21 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 5.1 Backend and artifact delivery
 
-- Return `runtimeKind`, ROM filename, byte size, SHA-256, and a short-lived browser-readable artifact URL from the boot contract.
-- Configure artifact CORS for the deployed User Edition origins.
-- Prefer signed, expiring URLs; never expose storage service credentials.
-- Add browser eligibility metadata per artifact/core/system.
-- Rate-limit session creation and artifact URL issuance.
-- Decide whether anonymous demo sessions are allowed. The current implementation expects authentication.
+- [x] Return runtime kind, ROM filename, byte size, SHA-256, and a short-lived browser-readable artifact URL from the boot contract.
+- [x] Allow the deployed User Edition origin through API CORS; verify signed Supabase Storage artifact CORS during deployment.
+- [x] Issue five-minute signed URLs from server-only Supabase credentials; canonical ROM URLs point to a private bucket and are unusable unsigned.
+- [x] Return authoritative browser eligibility metadata for artifact, core, and system.
+- [x] Rate-limit session creation and signed artifact URL issuance independently per authenticated user.
+- [x] Anonymous demo sessions are disabled; browser artifact issuance requires authentication.
 
 ### 5.2 Shared API and database
 
-- Apply schema migrations from one authoritative location.
-- Treat both frontends as clients of the same API contract, not independent owners of the database.
-- Keep RLS enabled for browser-accessible tables and test every policy for both editions.
-- Add `client_edition`, `runtime_kind`, and browser-session metadata only where useful.
-- Keep production, preview, and local origins explicit in API CORS settings.
-- Avoid double-counting sessions or play events when a user retries a launch.
+- [x] Pixelated Studio Edition is the sole migration authority for the shared Supabase project.
+- [x] Both frontends use the same API contract and do not independently own database history.
+- [x] User activity remains behind authenticated API routes; its browser-readable table has RLS for owner-only reads.
+- [x] Backend sessions store edition, client runtime, and browser core/system metadata with constrained values.
+- [x] Production, preview, and local origins remain explicit in API CORS settings.
+- [x] Every play attempt has a stable event ID, making retries idempotent while preserving edition-aware recent activity.
 
 ### 5.3 Frontend architecture
 

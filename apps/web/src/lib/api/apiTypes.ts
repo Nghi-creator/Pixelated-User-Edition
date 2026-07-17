@@ -31,6 +31,13 @@ export type ApiSessionResponse = {
   boot: {
     artifactSha256: string | null;
     artifactSize: number | null;
+    browser: {
+      artifactUrlExpiresAt: string | null;
+      coreId: "fceumm" | null;
+      eligible: boolean;
+      reason: string | null;
+      systemId: "nes" | null;
+    };
     launchManifestId: string | null;
     romFilename: string | null;
     romUrl: string | null;

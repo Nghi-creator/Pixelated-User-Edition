@@ -125,7 +125,7 @@ Minimum hosted env:
 NODE_ENV=production
 HOST=0.0.0.0
 PORT=<provider port>
-WEB_ORIGIN=https://pixelated-studio-edition.vercel.app
+WEB_ORIGIN=https://pixelated-studio-edition.vercel.app,https://pixelated-user-edition.vercel.app
 CONTROL_PLANE_CLEANUP_INTERVAL_MS=3600000
 STREAM_METRIC_RETENTION_DAYS=7
 STUN_URLS=stun:stun.l.google.com:19302
@@ -138,6 +138,8 @@ FORMSPREE_SUBMISSION_URL=<optional Formspree endpoint for submission notificatio
 GLOBAL_RATE_LIMIT_PER_MINUTE=600
 PUBLIC_READ_RATE_LIMIT_PER_MINUTE=180
 HEALTH_RATE_LIMIT_PER_MINUTE=120
+BROWSER_ARTIFACT_URL_TTL_SECONDS=300
+BROWSER_ARTIFACT_RATE_LIMIT_PER_MINUTE=20
 RATE_LIMIT_REDIS_REST_URL=<Upstash-compatible Redis REST endpoint>
 RATE_LIMIT_REDIS_REST_TOKEN=<Redis REST bearer token>
 RATE_LIMIT_REDIS_TIMEOUT_MS=1000
@@ -147,6 +149,33 @@ SUPABASE_SERVICE_ROLE_KEY=<your Supabase service role key>
 ```
 
 Production readiness requires both Redis REST values. Local development may omit Redis and uses a bounded in-memory limiter.
+
+User Edition WASM sessions require authentication. The API accepts `clientEdition: "user"` with
+`runtimeKind: "wasm"`, validates the approved NES artifact, and replaces its permanent
+`game_builds.artifact_url` with a short-lived signed URL in the session response. The canonical
+private-bucket URL is unusable without signing. Browser-playable
+artifacts must first be mirrored into the private `catalog_roms` Supabase Storage bucket. Public
+cover/backdrop assets remain in `catalog_artifacts`. The
+service-role key remains API-only and is never returned to either frontend.
+
+Supabase Storage serves the signed object response directly. Before production deployment,
+verify an actual signed artifact from the User Edition origin (including an `OPTIONS` request
+and a browser download); do not fall back to an unrelated public host if that check fails.
+
+Deploy 5.1 in this order:
+
+1. From Pixelated Studio Edition only, review and apply
+   `20260717100000_shared_user_edition_contract.sql`. Do not push or repair migrations from
+   this repository.
+2. Deploy the compatible shared API with both allowed frontend origins and the browser artifact
+   TTL/rate-limit env. It supports both legacy public ROM URLs and new private URLs.
+3. From the Studio repository, run `npm run mirror:catalog-artifacts -- --dry-run`, inspect the
+   report, then repeat with `--apply`. This copies verified raw/legacy public ROMs into
+   `catalog_roms` and updates `game_builds.artifact_url`; public artwork is untouched.
+4. Test authenticated Studio and User Edition launches, signed URL expiry, CORS, checksum
+   rejection, rate limiting, and idempotent play events.
+5. Only after those checks pass, remove the old ROM objects from the public
+   `catalog_artifacts` paths. Never delete artwork paths or use recursive bucket-wide cleanup.
 
 Production enables Fastify proxy trust so `request.ip` uses the client address forwarded by Render's ingress. Keep production traffic behind a trusted ingress; do not expose the Node port directly while accepting client-supplied forwarded headers.
 

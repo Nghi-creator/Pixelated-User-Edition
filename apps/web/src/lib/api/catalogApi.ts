@@ -16,9 +16,9 @@ export function createCatalogApi({
   getFavoriteIds,
 }: CatalogApiDependencies) {
   return {
-    countPlay: (gameId: string) =>
+    countPlay: (gameId: string, playEventId: string) =>
       apiRequest<{ success: true }>(`/games/${gameId}/play-count`, {
-        body: JSON.stringify({ clientEdition: "user", runtimeKind: "wasm" }),
+        body: JSON.stringify({ clientEdition: "user", playEventId, runtimeKind: "wasm" }),
         method: "POST",
       }),
     favoriteIds: () => getFavoriteIds(),

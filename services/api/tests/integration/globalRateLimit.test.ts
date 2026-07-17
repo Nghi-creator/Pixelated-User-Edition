@@ -121,6 +121,25 @@ test("malformed CORS origins are denied without crashing the API", async () => {
   await app.close();
 });
 
+test("User Edition production origin is allowed by API CORS", async () => {
+  const app = Fastify();
+  await registerCors(app);
+  app.get("/ok", async () => ({ ok: true }));
+
+  const response = await app.inject({
+    headers: { origin: "https://pixelated-user-edition.vercel.app" },
+    method: "GET",
+    url: "/ok",
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(
+    response.headers["access-control-allow-origin"],
+    "https://pixelated-user-edition.vercel.app",
+  );
+  await app.close();
+});
+
 test("security headers are attached to API responses", async () => {
   const app = Fastify();
   await registerSecurityHeaders(app);

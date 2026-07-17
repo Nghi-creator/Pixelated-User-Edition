@@ -334,6 +334,11 @@ test("play counts are incremented through the backend RPC boundary", async () =>
 
   const response = await app.inject({
     method: "POST",
+    payload: {
+      clientEdition: "studio",
+      playEventId: "play_1111111111111111",
+      runtimeKind: "webrtc",
+    },
     url: `/games/${GAME_ID}/play-count`,
   });
 
@@ -343,6 +348,7 @@ test("play counts are incremented through the backend RPC boundary", async () =>
       fn: "record_game_play",
       params: {
         p_client_edition: "studio",
+        p_event_id: "play_1111111111111111",
         p_game_id: GAME_ID,
         p_runtime_kind: "webrtc",
         p_user_id: USER_ID,
@@ -358,7 +364,11 @@ test("play activity records explicit User Edition WASM metadata", async () => {
 
   const response = await app.inject({
     method: "POST",
-    payload: { clientEdition: "user", runtimeKind: "wasm" },
+    payload: {
+      clientEdition: "user",
+      playEventId: "play_2222222222222222",
+      runtimeKind: "wasm",
+    },
     url: `/games/${GAME_ID}/play-count`,
   });
 
@@ -367,6 +377,7 @@ test("play activity records explicit User Edition WASM metadata", async () => {
     fn: "record_game_play",
     params: {
       p_client_edition: "user",
+      p_event_id: "play_2222222222222222",
       p_game_id: GAME_ID,
       p_runtime_kind: "wasm",
       p_user_id: USER_ID,

@@ -277,12 +277,22 @@ test("write-heavy social and play routes are rate limited per user", async () =>
   for (let attempt = 0; attempt < 60; attempt += 1) {
     const response = await playsApp.inject({
       method: "POST",
+      payload: {
+        clientEdition: "user",
+        playEventId: `play_${String(attempt).padStart(16, "0")}`,
+        runtimeKind: "wasm",
+      },
       url: `/games/${GAME_ID}/play-count`,
     });
     assert.equal(response.statusCode, 200);
   }
   const blockedPlay = await playsApp.inject({
     method: "POST",
+    payload: {
+      clientEdition: "user",
+      playEventId: "play_blocked00000000",
+      runtimeKind: "wasm",
+    },
     url: `/games/${GAME_ID}/play-count`,
   });
   assert.equal(blockedPlay.statusCode, 429);

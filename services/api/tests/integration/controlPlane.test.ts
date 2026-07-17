@@ -346,8 +346,9 @@ function seedPublishedGame(
 async function createTestApp(db: FakeSupabase, userId = USER_ID) {
   const app = Fastify({ logger: false });
   const options = {
-    optionalUser: requireUser(userId),
     requireUser: requireUser(userId),
+    signBrowserArtifact: async (artifactUrl: string, expiresInSeconds: number) =>
+      `${artifactUrl}?signed=${expiresInSeconds}`,
     supabase: db as never,
   };
 
@@ -363,7 +364,7 @@ test("sessions persist hashed tokens and verify approved boot targets", async ()
   seedPublishedGame(db, {
     id: GAME_ID,
     rom_filename: "fallback.nes",
-    rom_url: "https://pxksbsloksyfwiqyfkrz.supabase.co/game.nes",
+    rom_url: "https://pxksbsloksyfwiqyfkrz.supabase.co/storage/v1/object/public/catalog_roms/game.nes",
   });
   const build = db.gameBuilds.get(`${GAME_ID}-build`);
   if (build) {
@@ -375,15 +376,21 @@ test("sessions persist hashed tokens and verify approved boot targets", async ()
 
   const createResponse = await app.inject({
     method: "POST",
-    payload: { clientSessionId: "session-1", gameId: GAME_ID, mode: "cloud" },
+    payload: { clientEdition: "user", clientSessionId: "session-1", gameId: GAME_ID, mode: "cloud", runtimeKind: "wasm" },
     url: "/sessions",
   });
 
   assert.equal(createResponse.statusCode, 200);
   const created = createResponse.json<{
+    boot: { browser: { coreId: string; eligible: boolean; systemId: string }; romUrl: string };
     sessionId: string;
     sessionToken: string;
   }>();
+  assert.equal(created.boot.romUrl, "https://pxksbsloksyfwiqyfkrz.supabase.co/storage/v1/object/public/catalog_roms/game.nes?signed=300");
+  assert.deepEqual(
+    { coreId: created.boot.browser.coreId, eligible: created.boot.browser.eligible, systemId: created.boot.browser.systemId },
+    { coreId: "fceumm", eligible: true, systemId: "nes" },
+  );
   const storedSession = db.sessions.get("session-1");
   assert.ok(storedSession);
   assert.equal(storedSession.session_token_hash === created.sessionToken, false);
@@ -397,7 +404,7 @@ test("sessions persist hashed tokens and verify approved boot targets", async ()
   assert.equal(verifyResponse.statusCode, 200);
   assert.equal(
     verifyResponse.json<{ boot: { romUrl: string } }>().boot.romUrl,
-    "https://pxksbsloksyfwiqyfkrz.supabase.co/game.nes",
+    "https://pxksbsloksyfwiqyfkrz.supabase.co/storage/v1/object/public/catalog_roms/game.nes",
   );
   assert.equal(
     verifyResponse.json<{ boot: { runtimeId: string } }>().boot.runtimeId,
@@ -450,7 +457,7 @@ test("sessions reject oversized client-provided session ids", async () => {
   await app.close();
 });
 
-test("anonymous users can create playable cloud sessions", async () => {
+test("anonymous users cannot create cloud sessions", async () => {
   const db = new FakeSupabase();
   seedPublishedGame(db, {
     id: GAME_ID,
@@ -465,8 +472,7 @@ test("anonymous users can create playable cloud sessions", async () => {
   }
   const app = Fastify({ logger: false });
   await registerSessionRoutes(app, {
-    optionalUser: async () => undefined,
-    requireUser: requireUser(USER_ID),
+    requireUser: async () => undefined,
     supabase: db as never,
   });
 
@@ -476,30 +482,8 @@ test("anonymous users can create playable cloud sessions", async () => {
     url: "/sessions",
   });
 
-  assert.equal(createResponse.statusCode, 200);
-  const created = createResponse.json<{
-    sessionId: string;
-    sessionToken: string;
-    user: { id: string | null };
-  }>();
-  assert.equal(created.user.id, null);
-  assert.equal(db.sessions.get("anonymous-session")?.user_id, null);
-
-  const verifyResponse = await app.inject({
-    method: "POST",
-    payload: { sessionToken: created.sessionToken },
-    url: `/sessions/${created.sessionId}/verify`,
-  });
-
-  assert.equal(verifyResponse.statusCode, 200);
-  assert.equal(
-    verifyResponse.json<{ boot: { runtimeId: string } }>().boot.runtimeId,
-    "mgba",
-  );
-  assert.equal(
-    verifyResponse.json<{ user: { id: string | null } }>().user.id,
-    null,
-  );
+  assert.equal(createResponse.statusCode, 401);
+  assert.equal(db.sessions.size, 0);
   await app.close();
 });
 
@@ -751,6 +735,45 @@ test("session creation cannot overwrite another user's active session", async ()
     db.sessions.get("shared-session")?.session_token_hash,
     "original-hash",
   );
+  await app.close();
+});
+
+test("signed browser artifact issuance is independently rate limited", async () => {
+  const db = new FakeSupabase();
+  seedPublishedGame(db, {
+    id: GAME_ID,
+    rom_filename: "game.nes",
+    rom_url: "https://project.supabase.co/storage/v1/object/public/catalog_roms/game.nes",
+  });
+  let artifactAttempts = 0;
+  let signedUrls = 0;
+  const app = Fastify({ logger: false });
+  await registerSessionRoutes(app, {
+    artifactUrlLimiter: {
+      consume: async () => {
+        artifactAttempts += 1;
+        return { allowed: artifactAttempts === 1, remaining: 0, resetAt: Date.now() + 60_000 };
+      },
+    },
+    requireUser: requireUser(USER_ID),
+    signBrowserArtifact: async (url) => {
+      signedUrls += 1;
+      return `${url}?signed=true`;
+    },
+    supabase: db as never,
+  });
+
+  const request = (clientSessionId: string) => app.inject({
+    method: "POST",
+    payload: { clientEdition: "user", clientSessionId, gameId: GAME_ID, runtimeKind: "wasm" },
+    url: "/sessions",
+  });
+  assert.equal((await request("browser-rate-1")).statusCode, 200);
+  const blocked = await request("browser-rate-2");
+  assert.equal(blocked.statusCode, 429);
+  assert.equal(blocked.headers["retry-after"], "60");
+  assert.equal(signedUrls, 1);
+  assert.equal(db.sessions.has("browser-rate-2"), false);
   await app.close();
 });
 
