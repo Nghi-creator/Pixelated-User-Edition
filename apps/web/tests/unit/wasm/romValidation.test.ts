@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { sha256Hex, validateNesRom } from "../../../src/lib/runtime/wasm/romValidation.ts";
+import {
+  MAX_NES_ROM_BYTES,
+  normalizeExpectedRomSize,
+  sha256Hex,
+  validateNesRom,
+} from "../../../src/lib/runtime/wasm/romValidation.ts";
 
 function validNesRom() {
   const bytes = new Uint8Array(32);
@@ -31,5 +36,13 @@ test("rejects a ROM with the wrong checksum", async () => {
   await assert.rejects(
     () => validateNesRom(validNesRom(), { expectedSha256: "0".repeat(64) }),
     /checksum verification failed/,
+  );
+});
+
+test("rejects unsafe catalog size metadata before allocation", () => {
+  assert.throws(() => normalizeExpectedRomSize(0), /invalid ROM byte size/);
+  assert.throws(
+    () => normalizeExpectedRomSize(MAX_NES_ROM_BYTES + 1),
+    /invalid ROM byte size/,
   );
 });

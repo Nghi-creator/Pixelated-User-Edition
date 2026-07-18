@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { NostalgistWasmRuntime } from "../../../src/lib/runtime/wasm/NostalgistWasmRuntime.ts";
+import { sha256Hex } from "../../../src/lib/runtime/wasm/romValidation.ts";
 
 function validNesRom() {
   const bytes = new Uint8Array(32);
@@ -42,7 +43,13 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
     }),
   });
 
-  await runtime.prepare({ fileName: "game.nes", url: "https://example.test/game.nes" });
+  const expectedBytes = validNesRom();
+  await runtime.prepare({
+    expectedSha256: await sha256Hex(expectedBytes),
+    expectedSize: expectedBytes.byteLength,
+    fileName: "game.nes",
+    url: "https://example.test/game.nes",
+  });
   await runtime.start();
   runtime.pause();
   runtime.resume();
@@ -105,5 +112,44 @@ test("prepares a local File source without making a network request", async (con
     fileName: "local.nes",
   });
   assert.equal(prepared, true);
+  runtime.stop();
+});
+
+test("rejects hosted ROM downloads without immutable evidence", async () => {
+  const runtime = new NostalgistWasmRuntime({ canvas: {} as HTMLCanvasElement });
+  await assert.rejects(
+    () => runtime.prepare({ fileName: "game.nes", url: "https://example.test/game.nes" }),
+    /verified byte size and SHA-256 checksum/,
+  );
+  runtime.stop();
+});
+
+test("aborts a stalled hosted launch at its configured deadline", async (context) => {
+  const originalFetch = globalThis.fetch;
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  globalThis.fetch = async (_input, options) =>
+    new Promise((_resolve, reject) => {
+      options?.signal?.addEventListener("abort", () => {
+        reject(new DOMException("aborted", "AbortError"));
+      });
+    });
+
+  const bytes = validNesRom();
+  const runtime = new NostalgistWasmRuntime({
+    canvas: {} as HTMLCanvasElement,
+    launchTimeoutMs: 5,
+  });
+  const expectedSha256 = await sha256Hex(bytes);
+  await assert.rejects(
+    () => runtime.prepare({
+      expectedSha256,
+      expectedSize: bytes.byteLength,
+      fileName: "game.nes",
+      url: "https://example.test/game.nes",
+    }),
+    /safety deadline/,
+  );
   runtime.stop();
 });

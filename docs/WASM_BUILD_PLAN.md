@@ -122,12 +122,12 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 5.4 Security and deployment headers
 
-- Keep all `.env` files ignored and provide sanitized `.env.example` files.
-- Rotate any credential ever committed or shown publicly; deleting Git history does not revoke it.
-- Add a restrictive Content Security Policy covering API, Supabase, artifacts, and WASM workers.
-- Add COOP/COEP only if a selected core needs `SharedArrayBuffer`; verify the effect on auth and third-party embeds first.
-- Pin emulator/core versions and monitor their supply chain.
-- Verify ROM checksum before execution and cap size, time, and memory exposure.
+- [x] Keep all `.env` files ignored and provide sanitized `.env.example` files.
+- [x] Document credential rotation; deleting Git history does not revoke a leaked credential.
+- [x] Add a restrictive Content Security Policy covering the shared API, Supabase, signed artifacts, Turnstile, the core CDN, WASM compilation, and workers.
+- [x] Leave COOP/COEP disabled because the selected core does not require `SharedArrayBuffer`; document the compatibility gate for enabling them later.
+- [x] Pin Nostalgist exactly, retain its lockfile integrity hash, and monitor frontend runtime updates with Dependabot.
+- [x] Require hosted ROM evidence, verify header/size/SHA-256 before execution, stream into bounded memory, and enforce a launch deadline.
 
 ### 5.5 Publishing and administration
 

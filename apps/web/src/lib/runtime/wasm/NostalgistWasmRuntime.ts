@@ -1,6 +1,11 @@
 import type { Nostalgist } from "nostalgist";
 import type { GameRuntime, GameRuntimeSource } from "../gameRuntime.ts";
-import { MAX_NES_ROM_BYTES, validateNesRom } from "./romValidation.ts";
+import {
+  MAX_NES_ROM_BYTES,
+  normalizeExpectedRomSize,
+  normalizeSha256,
+  validateNesRom,
+} from "./romValidation.ts";
 import type { WasmRuntimeProgress } from "./runtimeTypes.ts";
 export type { WasmRuntimeProgress } from "./runtimeTypes.ts";
 
@@ -29,11 +34,24 @@ type NostalgistModule = {
 type RuntimeOptions = {
   canvas: HTMLCanvasElement;
   coreId?: "fceumm";
+  launchTimeoutMs?: number;
   loadNostalgist?: () => Promise<NostalgistModule>;
   onProgress?: (progress: WasmRuntimeProgress) => void;
 };
 
 const defaultLoader = () => import("nostalgist") as Promise<NostalgistModule>;
+export const WASM_LAUNCH_TIMEOUT_MS = 60_000;
+
+function requireHostedRomEvidence(source: GameRuntimeSource) {
+  const expectedSize = normalizeExpectedRomSize(source.expectedSize);
+  const expectedSha256 = normalizeSha256(source.expectedSha256);
+  if (expectedSize === null || expectedSha256 === null) {
+    throw new Error(
+      "Hosted games require a verified byte size and SHA-256 checksum before download.",
+    );
+  }
+  return { expectedSha256, expectedSize };
+}
 
 async function downloadRom(
   source: GameRuntimeSource,
@@ -54,6 +72,7 @@ async function downloadRom(
     return bytes;
   }
   if (!source.url) throw new Error("The game source is missing.");
+  const evidence = requireHostedRomEvidence(source);
 
   let response: Response;
   try {
@@ -71,36 +90,50 @@ async function downloadRom(
   const headerSize = Number(response.headers.get("content-length"));
   const totalBytes = Number.isFinite(headerSize) && headerSize > 0
     ? headerSize
-    : source.expectedSize || null;
-  if (totalBytes && totalBytes > MAX_NES_ROM_BYTES) {
-    throw new Error("The game is larger than the 64 MB browser safety limit.");
+    : evidence.expectedSize;
+  if (totalBytes !== evidence.expectedSize) {
+    throw new Error(
+      `ROM size mismatch: expected ${evidence.expectedSize} bytes, received ${totalBytes}.`,
+    );
   }
   if (!response.body) {
     const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > MAX_NES_ROM_BYTES) {
+      throw new Error("The game is larger than the 64 MB browser safety limit.");
+    }
+    if (bytes.byteLength !== evidence.expectedSize) {
+      throw new Error(
+        `ROM size mismatch: expected ${evidence.expectedSize} bytes, received ${bytes.byteLength}.`,
+      );
+    }
     onProgress?.({ loadedBytes: bytes.byteLength, phase: "downloading", totalBytes });
     return bytes;
   }
 
   const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
+  const bytes = new Uint8Array(evidence.expectedSize);
   let loadedBytes = 0;
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    loadedBytes += value.byteLength;
-    if (loadedBytes > MAX_NES_ROM_BYTES) {
+    const nextLoadedBytes = loadedBytes + value.byteLength;
+    if (
+      nextLoadedBytes > MAX_NES_ROM_BYTES ||
+      nextLoadedBytes > evidence.expectedSize
+    ) {
       await reader.cancel();
-      throw new Error("The game is larger than the 64 MB browser safety limit.");
+      throw new Error(
+        `ROM size mismatch: expected ${evidence.expectedSize} bytes, received more data.`,
+      );
     }
-    chunks.push(value);
+    bytes.set(value, loadedBytes);
+    loadedBytes = nextLoadedBytes;
     onProgress?.({ loadedBytes, phase: "downloading", totalBytes });
   }
-
-  const bytes = new Uint8Array(loadedBytes);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
+  if (loadedBytes !== evidence.expectedSize) {
+    throw new Error(
+      `ROM size mismatch: expected ${evidence.expectedSize} bytes, received ${loadedBytes}.`,
+    );
   }
   return bytes;
 }
@@ -120,39 +153,55 @@ export class NostalgistWasmRuntime implements GameRuntime {
     this.stop();
     this.abortController = new AbortController();
     const signal = this.abortController.signal;
-    this.options.onProgress?.({ loadedBytes: 0, phase: "downloading", totalBytes: source.expectedSize || source.file?.size || null });
-    const bytes = await downloadRom(source, signal, this.options.onProgress);
-    this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "verifying", totalBytes: bytes.byteLength });
-    await validateNesRom(bytes, source);
-    if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
+    let launchTimedOut = false;
+    const timeoutId = globalThis.setTimeout(() => {
+      launchTimedOut = true;
+      this.abortController?.abort();
+    }, this.options.launchTimeoutMs || WASM_LAUNCH_TIMEOUT_MS);
 
-    this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "loading-core", totalBytes: bytes.byteLength });
-    const { Nostalgist: NostalgistApi } = await (this.options.loadNostalgist || defaultLoader)();
-    const instance = await NostalgistApi.prepare({
-      cache: { core: true, rom: false },
-      core: this.options.coreId || "fceumm",
-      element: this.options.canvas,
-      respondToGlobalEvents: true,
-      retroarchConfig: {
-        audio_volume: 0,
-        input_joypad_driver: "sdl2",
-        savestate_thumbnail_enable: true,
-        video_smooth: false,
-      },
-      rom: {
-        fileContent: new Blob([bytes], { type: "application/octet-stream" }),
-        fileName: source.fileName,
-      },
-      runEmulatorManually: true,
-      signal,
-      size: "auto",
-    });
-    if (signal.aborted) {
-      instance.exit({ removeCanvas: false });
-      throw new DOMException("Launch cancelled", "AbortError");
+    try {
+      this.options.onProgress?.({ loadedBytes: 0, phase: "downloading", totalBytes: source.expectedSize || source.file?.size || null });
+      const bytes = await downloadRom(source, signal, this.options.onProgress);
+      this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "verifying", totalBytes: bytes.byteLength });
+      await validateNesRom(bytes, source);
+      if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
+
+      this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "loading-core", totalBytes: bytes.byteLength });
+      const { Nostalgist: NostalgistApi } = await (this.options.loadNostalgist || defaultLoader)();
+      if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
+      const instance = await NostalgistApi.prepare({
+        cache: { core: true, rom: false },
+        core: this.options.coreId || "fceumm",
+        element: this.options.canvas,
+        respondToGlobalEvents: true,
+        retroarchConfig: {
+          audio_volume: 0,
+          input_joypad_driver: "sdl2",
+          savestate_thumbnail_enable: true,
+          video_smooth: false,
+        },
+        rom: {
+          fileContent: new Blob([bytes], { type: "application/octet-stream" }),
+          fileName: source.fileName,
+        },
+        runEmulatorManually: true,
+        signal,
+        size: "auto",
+      });
+      if (signal.aborted) {
+        instance.exit({ removeCanvas: false });
+        throw new DOMException("Launch cancelled", "AbortError");
+      }
+      this.instance = instance;
+      this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "ready", totalBytes: bytes.byteLength });
+    } catch (error) {
+      if (launchTimedOut) {
+        throw new Error("The browser emulator launch exceeded the 60-second safety deadline.");
+      }
+      throw error;
+    } finally {
+      globalThis.clearTimeout(timeoutId);
     }
-    this.instance = instance;
-    this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "ready", totalBytes: bytes.byteLength });
   }
 
   async start() {

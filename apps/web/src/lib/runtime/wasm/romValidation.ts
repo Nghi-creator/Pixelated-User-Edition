@@ -2,6 +2,16 @@ const NES_HEADER = [0x4e, 0x45, 0x53, 0x1a] as const;
 
 export const MAX_NES_ROM_BYTES = 64 * 1024 * 1024;
 
+export function normalizeExpectedRomSize(
+  value: number | null | undefined,
+) {
+  if (value === null || value === undefined) return null;
+  if (!Number.isSafeInteger(value) || value < 16 || value > MAX_NES_ROM_BYTES) {
+    throw new Error("The catalog supplied an invalid ROM byte size.");
+  }
+  return value;
+}
+
 export function assertNesRom(bytes: Uint8Array) {
   if (bytes.byteLength < 16) {
     throw new Error("The downloaded game is too small to be a valid NES ROM.");
@@ -40,9 +50,10 @@ export async function validateNesRom(
   if (bytes.byteLength > MAX_NES_ROM_BYTES) {
     throw new Error("The game is larger than the 64 MB browser safety limit.");
   }
-  if (expectedSize && bytes.byteLength !== expectedSize) {
+  const normalizedExpectedSize = normalizeExpectedRomSize(expectedSize);
+  if (normalizedExpectedSize !== null && bytes.byteLength !== normalizedExpectedSize) {
     throw new Error(
-      `ROM size mismatch: expected ${expectedSize} bytes, received ${bytes.byteLength}.`,
+      `ROM size mismatch: expected ${normalizedExpectedSize} bytes, received ${bytes.byteLength}.`,
     );
   }
   assertNesRom(bytes);
@@ -51,4 +62,3 @@ export async function validateNesRom(
     throw new Error("ROM checksum verification failed. The download may be corrupted.");
   }
 }
-

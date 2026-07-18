@@ -1,3 +1,5 @@
+import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry.ts";
+
 export const LOCAL_VAULT_EXTENSIONS = [
   ".nes",
   ".gb",
@@ -138,4 +140,3 @@ export function isInvalidEngineTokenError(
 ): error is InvalidEngineTokenError {
   return error instanceof InvalidEngineTokenError;
 }
-import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry.ts";
