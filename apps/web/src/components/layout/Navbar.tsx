@@ -5,6 +5,7 @@ import {
   LogOut,
   Code,
   ScrollText,
+  HardDrive,
 } from "lucide-react";
 import { supabase } from "../../lib/auth/supabaseClient";
 import type { User } from "@supabase/supabase-js";
@@ -201,6 +202,14 @@ export default function Navbar() {
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-synth-elevated hover:text-white transition-colors"
                       >
                         <PixelIcon className="w-4 h-4" name="profile" /> Profile
+                      </Link>
+
+                      <Link
+                        to="/storage"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-synth-elevated hover:text-white transition-colors"
+                      >
+                        <HardDrive className="h-4 w-4" /> Device Storage
                       </Link>
 
                       <button

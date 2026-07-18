@@ -140,16 +140,10 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 5.6 PWA and offline support
 
-- Design explicit cache rules; never cache authenticated API responses indiscriminately.
-- Obtain user consent before persisting large ROM artifacts.
-- Version saves and emulator cores so upgrades can migrate safely.
-- Provide a “clear downloaded games and saves” storage screen.
-
-### 5.7 Multiplayer
-
-- Local same-device multiplayer is possible when the emulator/core supports multiple controllers.
-- Internet multiplayer needs a purpose-built netplay protocol, synchronization, signaling, relay strategy, latency handling, and abuse controls.
-- The existing WebRTC video-stream architecture cannot simply be copied into a peer-to-peer deterministic emulator.
+- [x] Cache only the application shell, same-origin build assets, and the pinned emulator-core CDN; never cache authenticated API responses or ROM requests.
+- [x] Keep personal ROM bytes memory-only instead of persisting large artifacts without consent.
+- [x] Version browser saves and PWA/core caches so upgrades can clean up safely.
+- [x] Provide a device-storage screen for usage, persistence requests, cache clearing, saves, and local-file history.
 
 ## 6. Not possible in a pure hosted browser (do not plan for v1)
 
@@ -208,12 +202,6 @@ These are platform boundaries, not missing implementation tasks. Keep them in St
 1. Build a core/extension capability registry.
 2. Add one system at a time with fixtures and browser measurements.
 3. Keep unsupported catalog games on the Studio path.
-
-### Phase 5 — optional multiplayer research
-
-1. Prototype same-device multiplayer first.
-2. Research deterministic netplay separately from streaming.
-3. Do not promise LAN discovery from the hosted web app.
 
 ## 9. Initial issue backlog
 

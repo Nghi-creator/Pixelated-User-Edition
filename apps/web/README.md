@@ -10,7 +10,8 @@ Vite React frontend for PIXELATED Studio. The web app owns the user experience, 
 | `/home` | Cloud catalog, featured games, search, pagination, and game cards. |
 | `/engine` | Desktop engine pairing, launch-ticket redemption, and LAN invite pairing. |
 | `/play/:id` | Gameplay screen, WebRTC stream, input forwarding, social panels, and stream telemetry. |
-| `/local` | Local Vault upload/list/delete flow against the paired engine. |
+| `/local` | Memory-only personal ROM picker and browser WASM player. |
+| `/storage` | Browser storage usage, persistence, cache, saves, and local history controls. |
 | `/multiplayer` | LAN host/guest setup, invite links, lobby state, and game selection. |
 | `/favorites` | Signed-in user's saved games. |
 | `/publish` | Creator game submission and rights questionnaire. |
@@ -74,6 +75,17 @@ VITE_TURNSTILE_SITE_KEY=
 Set `VITE_PUBLIC_APP_URL` in Vercel and in Supabase Auth redirect settings so verification, recovery, and OAuth callbacks do not fall back to localhost.
 
 Set `VITE_TURNSTILE_SITE_KEY` only after enabling Cloudflare Turnstile CAPTCHA in Supabase Auth with the matching secret key. When configured, the auth page sends CAPTCHA tokens with email/password sign-in, signup confirmation, confirmation resend, and password recovery requests.
+
+## PWA and offline behavior
+
+Production builds register `public/sw.js` and can be installed as Pixelated User Edition.
+The service worker caches only the application shell, same-origin hashed assets, and the exact
+pinned FCEUmm/ZIP runtime artifacts. API responses, authenticated requests, Supabase traffic,
+and ROM downloads are never cached. Personal ROM bytes remain memory-only.
+
+When the app shell changes or the pinned emulator core is upgraded, bump `CACHE_VERSION` in
+`public/sw.js`; activation removes older Pixelated caches. Users can inspect usage, request
+persistent save storage, and clear caches or local saves at `/storage`.
 
 Recommended Supabase Authentication URL Configuration:
 

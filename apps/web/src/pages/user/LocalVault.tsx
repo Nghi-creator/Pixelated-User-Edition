@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Clock3,
   Gamepad2,
+  HardDrive,
   Loader2,
   ShieldCheck,
   Trash2,
@@ -131,6 +132,9 @@ export default function LocalVault() {
         <p className="mt-2 max-w-3xl text-gray-400">
           Choose a ROM you are legally allowed to use. Supported NES files run directly in this tab with WebAssembly.
         </p>
+        <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-synth-secondary hover:text-white" to="/storage">
+          <HardDrive className="h-4 w-4" /> Manage device storage
+        </Link>
       </div>
 
       <div className="mb-6 flex items-start gap-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-emerald-100">

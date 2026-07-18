@@ -100,6 +100,18 @@ export async function deleteWasmSaveRecord(gameKey: string, slot: WasmSaveSlot) 
   }
 }
 
+export async function clearAllWasmSaveRecords() {
+  const database = await openSaveDatabase();
+  if (!database) return;
+  try {
+    await requestResult(
+      database.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).clear(),
+    );
+  } finally {
+    database.close();
+  }
+}
+
 export async function getSaveStorageEstimate() {
   if (!navigator.storage?.estimate) return null;
   const { quota = 0, usage = 0 } = await navigator.storage.estimate();

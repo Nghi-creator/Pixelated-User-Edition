@@ -19,6 +19,8 @@ const LocalVault = lazy(() => import("./pages/user/LocalVault"));
 const Player = lazy(() => import("./pages/user/Player"));
 const Profile = lazy(() => import("./pages/user/Profile"));
 const ResetPassword = lazy(() => import("./pages/user/ResetPassword"));
+const DeviceStorage = lazy(() => import("./pages/user/DeviceStorage"));
+const BrowserSmoke = lazy(() => import("./pages/internal/BrowserSmoke"));
 
 function RouteLoading() {
   return (
@@ -66,6 +68,7 @@ export default function App() {
     <Router>
       <SessionTracker />
       <Routes>
+        <Route path="/internal/browser-smoke" element={lazyRoute(BrowserSmoke)} />
         {/* STANDARD ROUTES */}
         <Route element={<StandardLayout />}>
           <Route path="/" element={lazyRoute(Landing)} />
@@ -76,6 +79,7 @@ export default function App() {
           <Route path="/profile" element={lazyRoute(Profile)} />
           <Route path="/play/:id" element={lazyRoute(Player)} />
           <Route path="/local" element={lazyRoute(LocalVault)} />
+          <Route path="/storage" element={lazyRoute(DeviceStorage)} />
           <Route path="/engine" element={<Navigate replace to="/home" />} />
           <Route path="/multiplayer" element={<Navigate replace to="/home" />} />
           <Route path="/publish" element={<Navigate replace to="/home" />} />
