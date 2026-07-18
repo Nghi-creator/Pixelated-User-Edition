@@ -2,6 +2,7 @@ import type {
   ApiAdminReportAction,
   ApiAdminReportActionResponse,
   ApiCatalogCandidateReviewAction,
+  ApiCatalogCandidateBrowserSmokeStatus,
   ApiCatalogCandidateReviewResponse,
   ApiCatalogCandidateSourceKind,
   ApiCatalogCandidateStatus,
@@ -18,9 +19,10 @@ import type {
 
 type AdminApiDependencies = {
   apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
+  apiRequestBlob: (path: string, options?: { timeoutMs?: number }) => Promise<Blob>;
 };
 
-export function createAdminApi({ apiRequest }: AdminApiDependencies) {
+export function createAdminApi({ apiRequest, apiRequestBlob }: AdminApiDependencies) {
   return {
     accessLogs: <TLog>(page = 1, pageSize = 25) =>
       apiRequest<ApiPaginatedAccessLogsResponse<TLog>>(
@@ -87,6 +89,25 @@ export function createAdminApi({ apiRequest }: AdminApiDependencies) {
         {
           body: JSON.stringify({ action, notes }),
           method: "PATCH",
+        },
+      ),
+    catalogCandidateSmokeArtifact: (candidateId: string) =>
+      apiRequestBlob(
+        `/admin/catalog-candidates/${candidateId}/browser-smoke-artifact`,
+        { timeoutMs: 60_000 },
+      ),
+    recordCatalogCandidateBrowserSmoke: <TCandidate>(
+      candidateId: string,
+      result:
+        | { coreId: "fceumm"; status: Extract<ApiCatalogCandidateBrowserSmokeStatus, "passed"> }
+        | { coreId: "fceumm"; error: string; status: Extract<ApiCatalogCandidateBrowserSmokeStatus, "failed"> },
+    ) =>
+      apiRequest<{ candidate: TCandidate }>(
+        `/admin/catalog-candidates/${candidateId}/browser-smoke`,
+        {
+          body: JSON.stringify(result),
+          method: "POST",
+          timeoutMs: 60_000,
         },
       ),
     gameSubmissions: <TSubmission>({
