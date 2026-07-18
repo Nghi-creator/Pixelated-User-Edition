@@ -50,8 +50,8 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Correct server-side filters for system and runtime availability, including filtered pagination totals and cache keys.
 - [x] Friendly pre-launch unavailable-artifact, native-runtime, and unsupported-system states.
 - [x] Tested compatibility policy based on enabled build, runtime kind, platform, extension, size, and checksum metadata.
-- [ ] Genre filter after genre metadata is added to the shared catalog schema.
-- [ ] License filter/facets after the API exposes normalized per-game license metadata for catalog queries.
+- [x] Genre facets backed by normalized shared catalog metadata, server-side filtering, and correct pagination/cache separation.
+- [x] License facets derived from verified code/asset SPDX metadata and filtered server-side in both editions.
 
 ### 4.3 Accounts and community
 

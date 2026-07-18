@@ -63,11 +63,20 @@ export function useFeaturedGamesQuery() {
   });
 }
 
+export function useCatalogFiltersQuery() {
+  return useQuery({
+    queryKey: queryKeys.catalogFilters(),
+    queryFn: api.catalogFilters,
+  });
+}
+
 export function useGameCatalogQuery({
   page,
   pageSize,
   platform = "",
   runtime = "all",
+  genre = "",
+  license = "",
   search,
   enabled = true,
 }: {
@@ -76,12 +85,23 @@ export function useGameCatalogQuery({
   pageSize: number;
   platform?: string;
   runtime?: "all" | "browser" | "desktop" | "unavailable";
+  genre?: string;
+  license?: string;
   search: string;
 }) {
   return useQuery({
     enabled,
-    queryKey: queryKeys.gameCatalog(page, pageSize, search, platform, runtime),
-    queryFn: () => api.games({ page, pageSize, platform, runtime, search }),
+    queryKey: queryKeys.gameCatalog(
+      page,
+      pageSize,
+      search,
+      platform,
+      runtime,
+      genre,
+      license,
+    ),
+    queryFn: () =>
+      api.games({ genre, license, page, pageSize, platform, runtime, search }),
   });
 }
 

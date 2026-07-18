@@ -21,7 +21,14 @@ test("query keys are stable and scoped by API concern", () => {
     "mario",
     "nes",
     "browser",
+    "",
+    "",
   ]);
+  assert.deepEqual(queryKeys.catalogFilters(), ["catalogFilters"]);
+  assert.notDeepEqual(
+    queryKeys.gameCatalog(2, 15, "mario", "nes", "browser", "action", "MIT"),
+    queryKeys.gameCatalog(2, 15, "mario", "nes", "browser", "puzzle", "MIT"),
+  );
   assert.deepEqual(queryKeys.localMultiplayerGames(), ["localMultiplayerGames"]);
 });
 
