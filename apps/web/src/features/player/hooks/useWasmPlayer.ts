@@ -7,6 +7,7 @@ import type {
 import { getWasmBrowserSupport } from "../../../lib/runtime/wasm/browserSupport";
 import { resolveWasmCore } from "../../../lib/runtime/wasm/coreRegistry";
 import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/runtimeTypes";
+import { useWasmInputBindings } from "../input/useWasmInputBindings";
 
 export type WasmPlayerStatus =
   | "idle"
@@ -44,7 +45,6 @@ export function useWasmPlayer(gameId: string | undefined) {
   const runtimeRef = useRef<GameRuntime | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [gamepadName, setGamepadName] = useState<string | null>(null);
   const [isMuted, setIsMutedState] = useState(false);
   const [progress, setProgress] = useState<WasmRuntimeProgress | null>(null);
   const [status, setStatus] = useState<WasmPlayerStatus>("idle");
@@ -180,20 +180,11 @@ export function useWasmPlayer(gameId: string | undefined) {
     runtimeRef.current?.setVolume(nextVolume);
     setVolumeState(nextVolume);
   }, []);
-
-  useEffect(() => {
-    const refreshGamepads = () => {
-      const gamepad = navigator.getGamepads?.().find(Boolean);
-      setGamepadName(gamepad?.id || null);
-    };
-    refreshGamepads();
-    window.addEventListener("gamepadconnected", refreshGamepads);
-    window.addEventListener("gamepaddisconnected", refreshGamepads);
-    return () => {
-      window.removeEventListener("gamepadconnected", refreshGamepads);
-      window.removeEventListener("gamepaddisconnected", refreshGamepads);
-    };
-  }, []);
+  const inputBindings = useWasmInputBindings({
+    active: status === "playing",
+    onPress: pressInput,
+    onRelease: releaseInput,
+  });
 
   useEffect(() => () => {
     generationRef.current += 1;
@@ -207,7 +198,8 @@ export function useWasmPlayer(gameId: string | undefined) {
     captureBatterySave,
     captureState,
     error,
-    gamepadName,
+    gamepadName: inputBindings.gamepadName,
+    inputBindings,
     isMuted,
     progress,
     pressInput,

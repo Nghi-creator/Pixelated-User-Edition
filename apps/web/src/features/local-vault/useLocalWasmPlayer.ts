@@ -4,6 +4,7 @@ import { getWasmBrowserSupport } from "../../lib/runtime/wasm/browserSupport";
 import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
 import type { WasmRuntimeProgress } from "../../lib/runtime/wasm/runtimeTypes";
 import type { WasmPlayerStatus } from "../player/hooks/useWasmPlayer";
+import { useWasmInputBindings } from "../player/input/useWasmInputBindings";
 
 function getLocalLaunchError(error: unknown) {
   if (error instanceof Error) {
@@ -21,7 +22,6 @@ export function useLocalWasmPlayer(file: File | null, systemId: string | null) {
   const runtimeRef = useRef<GameRuntime | null>(null);
   const generationRef = useRef(0);
   const [error, setError] = useState<string | null>(null);
-  const [gamepadName, setGamepadName] = useState<string | null>(null);
   const [isMuted, setIsMutedState] = useState(false);
   const [progress, setProgress] = useState<WasmRuntimeProgress | null>(null);
   const [status, setStatus] = useState<WasmPlayerStatus>("idle");
@@ -126,20 +126,11 @@ export function useLocalWasmPlayer(file: File | null, systemId: string | null) {
     runtimeRef.current?.setVolume(nextVolume);
     setVolumeState(nextVolume);
   }, []);
-
-  useEffect(() => {
-    const refreshGamepads = () => {
-      const gamepad = navigator.getGamepads?.().find(Boolean);
-      setGamepadName(gamepad?.id || null);
-    };
-    refreshGamepads();
-    window.addEventListener("gamepadconnected", refreshGamepads);
-    window.addEventListener("gamepaddisconnected", refreshGamepads);
-    return () => {
-      window.removeEventListener("gamepadconnected", refreshGamepads);
-      window.removeEventListener("gamepaddisconnected", refreshGamepads);
-    };
-  }, []);
+  const inputBindings = useWasmInputBindings({
+    active: status === "playing",
+    onPress: pressInput,
+    onRelease: releaseInput,
+  });
 
   useEffect(() => () => stopRuntime(), [stopRuntime]);
 
@@ -148,7 +139,8 @@ export function useLocalWasmPlayer(file: File | null, systemId: string | null) {
     captureBatterySave,
     captureState,
     error,
-    gamepadName,
+    gamepadName: inputBindings.gamepadName,
+    inputBindings,
     isMuted,
     progress,
     pressInput,

@@ -73,6 +73,7 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Users can remove individual recent entries or clear local history.
 - [x] Clear privacy and legal-use messaging explains that local files remain on the device.
 - [x] `/local` no longer requires desktop-engine pairing in User Edition.
+- [ ] **Deferred post-v1:** optionally persist ROM bytes in IndexedDB only after explicit per-game consent. This must include quota/eviction handling, clear deletion controls, legal-use messaging, and a memory-only default. Do this after keyboard/gamepad remapping, not as part of v1.
 
 ### 4.5 Saves and usability
 
@@ -81,7 +82,7 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Battery RAM can be backed up as an export. Restore remains pending because Nostalgist 0.21 exposes no supported SRAM-load API.
 - [x] Per-game touch A/B layout remapping and compact, large-target, and high-contrast accessibility presets.
 - [x] Pointer-safe touch controls for mobile-sized screens, including D-pad, A/B, Start, and Select.
-- Keyboard/gamepad remapping remains pending; it needs a pre-launch RetroArch configuration flow and conflict validation.
+- [x] Keyboard/gamepad remapping uses a pre-launch browser input layer with conflict validation, accessible defaults, per-controller profiles, reset controls, and local persistence.
 - PWA shell and offline replay for assets the user is legally allowed to cache.
 - [x] Browser storage quota/usage checks and recovery/export instructions.
 

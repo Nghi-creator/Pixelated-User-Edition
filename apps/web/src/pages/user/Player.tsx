@@ -10,6 +10,7 @@ import { WasmResearchPanel } from "../../features/player/components/WasmResearch
 import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
 import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
+import { WasmInputSettings } from "../../features/player/components/WasmInputSettings";
 import { useAuthUser } from "../../features/player/hooks/useAuthUser";
 import { useGameMetadata } from "../../features/player/hooks/useGameMetadata";
 import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNavigation";
@@ -115,6 +116,16 @@ export default function Player() {
           pixelPerfect={pixelPerfect}
           status={player.status}
           volume={player.volume}
+        />
+        <WasmInputSettings
+          disabled={!(["idle", "stopped", "error"] as string[]).includes(player.status)}
+          gamepadMapping={player.inputBindings.gamepadMapping}
+          gamepadName={player.inputBindings.gamepadName}
+          keyboardMapping={player.inputBindings.keyboardMapping}
+          onGamepadBindingChange={player.inputBindings.setGamepadBinding}
+          onKeyboardBindingChange={player.inputBindings.setKeyboardBinding}
+          onResetGamepad={player.inputBindings.resetGamepadMapping}
+          onResetKeyboard={player.inputBindings.resetKeyboardMapping}
         />
         <WasmTouchControls
           gameKey={gameKey}

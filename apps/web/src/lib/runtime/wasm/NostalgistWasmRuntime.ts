@@ -173,7 +173,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
         cache: { core: true, rom: false },
         core: this.options.coreId || "fceumm",
         element: this.options.canvas,
-        respondToGlobalEvents: true,
+        respondToGlobalEvents: false,
         retroarchConfig: {
           audio_volume: 0,
           input_joypad_driver: "sdl2",

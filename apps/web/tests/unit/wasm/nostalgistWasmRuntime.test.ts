@@ -24,6 +24,7 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
       Nostalgist: {
         async prepare(options) {
           assert.equal(options.core, "fceumm");
+          assert.equal(options.respondToGlobalEvents, false);
           return {
             exit: () => { status = "terminated"; actions.push("exit"); },
             getStatus: () => status,

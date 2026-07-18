@@ -34,6 +34,8 @@ tests/interaction/      Browser interaction harness
 
 The browser should use `src/lib/api/*` for app data owned by `services/api`. Direct Supabase browser use is intentionally limited to auth/session handling and Storage uploads for signed-in submission workflows.
 
+WASM keyboard mappings and per-controller gamepad profiles are configured from the player before launch and stored locally in the browser. The custom input layer disables Nostalgist's global input listener so remapped and default controls cannot fire twice.
+
 ## Local development
 
 ```sh
