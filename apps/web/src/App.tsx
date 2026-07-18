@@ -9,14 +9,8 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
-import AdminLayout from "./components/layout/AdminLayout";
 import { useSessionTracker } from "./lib/session/useSessionTracker";
 
-const AccessLogs = lazy(() => import("./pages/admin/AccessLogs"));
-const CatalogCandidates = lazy(() => import("./pages/admin/CatalogCandidates"));
-const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
-const Submissions = lazy(() => import("./pages/admin/Submissions"));
-const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Auth = lazy(() => import("./pages/user/Auth"));
 const Favorites = lazy(() => import("./pages/user/Favorites"));
 const Home = lazy(() => import("./pages/user/Home"));
@@ -24,7 +18,6 @@ const Landing = lazy(() => import("./pages/user/Landing"));
 const LocalVault = lazy(() => import("./pages/user/LocalVault"));
 const Player = lazy(() => import("./pages/user/Player"));
 const Profile = lazy(() => import("./pages/user/Profile"));
-const Publish = lazy(() => import("./pages/user/Publish"));
 const ResetPassword = lazy(() => import("./pages/user/ResetPassword"));
 
 function RouteLoading() {
@@ -73,18 +66,6 @@ export default function App() {
     <Router>
       <SessionTracker />
       <Routes>
-        {/* ADMIN ROUTES */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={lazyRoute(Dashboard)} />
-          <Route path="/admin/submissions" element={lazyRoute(Submissions)} />
-          <Route
-            path="/admin/catalog-candidates"
-            element={lazyRoute(CatalogCandidates)}
-          />
-          <Route path="/admin/users" element={lazyRoute(UserManagement)} />
-          <Route path="/admin/logs" element={lazyRoute(AccessLogs)} />
-        </Route>
-
         {/* STANDARD ROUTES */}
         <Route element={<StandardLayout />}>
           <Route path="/" element={lazyRoute(Landing)} />
@@ -97,7 +78,8 @@ export default function App() {
           <Route path="/local" element={lazyRoute(LocalVault)} />
           <Route path="/engine" element={<Navigate replace to="/home" />} />
           <Route path="/multiplayer" element={<Navigate replace to="/home" />} />
-          <Route path="/publish" element={lazyRoute(Publish)} />
+          <Route path="/publish" element={<Navigate replace to="/home" />} />
+          <Route path="/admin/*" element={<Navigate replace to="/home" />} />
         </Route>
       </Routes>
     </Router>

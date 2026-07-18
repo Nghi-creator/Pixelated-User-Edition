@@ -4,7 +4,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   LogOut,
   Code,
-  Loader2,
   ScrollText,
 } from "lucide-react";
 import { supabase } from "../../lib/auth/supabaseClient";
@@ -18,7 +17,6 @@ import { PixelIcon } from "../ui/PixelIcon";
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,7 +28,6 @@ export default function Navbar() {
   useEffect(() => {
     const syncUser = (sessionUser: User | null) => {
       setUser(sessionUser);
-      setIsSessionLoading(false);
     };
 
     getAuthSession().then((session) => {
@@ -100,14 +97,10 @@ export default function Navbar() {
   const isFavoritesPage = location.pathname === "/favorites";
   const isIntroPage = location.pathname === "/";
   const isLocalPage = location.pathname === "/local";
-  const isPublishPage = location.pathname === "/publish";
   const profile = permissionsQuery.data?.profile;
   const dbUsername = profile?.username || null;
   const dbAvatarUrl = profile?.avatar_url || null;
-  const userRole = profile?.role || null;
   const isDeveloper = Boolean(profile?.is_developer);
-  const isIdentityLoading =
-    isSessionLoading || (Boolean(user) && permissionsQuery.isLoading);
   const getNavIconClass = (isActive: boolean) =>
     `inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors ${
       isActive
@@ -147,25 +140,6 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6">
-            {isIdentityLoading ? (
-              <span
-                aria-label="Loading game submission permissions"
-                className="flex h-5 w-5 items-center justify-center text-gray-500"
-                role="status"
-                title="Loading permissions"
-              >
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </span>
-            ) : userRole !== "super_admin" ? (
-              <Link
-                to="/publish"
-                title="Submit a Game"
-                className={getNavIconClass(isPublishPage)}
-              >
-                <PixelIcon className="h-5 w-5" name="mail" />
-              </Link>
-            ) : null}
-
             <Link
               to="/local"
               title="Personal ROMs"
@@ -220,17 +194,6 @@ export default function Navbar() {
                           {dbUsername || user.email}
                         </p>
                       </div>
-
-                      {/* ADMIN PANEL*/}
-                      {(userRole === "admin" || userRole === "super_admin") && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setIsDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-synth-elevated hover:text-white transition-colors"
-                        >
-                          <PixelIcon className="w-4 h-4" name="admin" /> Admin Panel
-                        </Link>
-                      )}
 
                       <Link
                         to="/profile"

@@ -131,11 +131,12 @@ The first release should prove one thing well: a user can choose an eligible gam
 
 ### 5.5 Publishing and administration
 
-- [x] Require system/runtime compatibility during review.
-- [x] Store verified checksum and size at approval time.
-- [x] Add a browser-play smoke test to the moderation flow.
-- [x] Show why a submission is not browser-compatible.
-- [x] Separate legal availability from technical compatibility.
+- [x] Keep publishing and administration out of the User Edition route and API bundles.
+- [x] Require system/runtime compatibility in the Studio Edition review flow.
+- [x] Store verified checksum and size at approval time in the shared backend.
+- [x] Run the User Edition browser-play smoke test from Studio administration.
+- [x] Show Studio reviewers why a submission is not browser-compatible.
+- [x] Keep legal availability separate from technical compatibility.
 
 ### 5.6 PWA and offline support
 
