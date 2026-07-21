@@ -28,6 +28,7 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Runtime abstraction independent from WebRTC.
 - [x] Lazy-load the emulator package in a separate `wasm-runtime` bundle.
 - [x] NES support using Nostalgist and the `fceumm` libretro core.
+- [x] Game Boy and Game Boy Color support using the `gambatte` libretro core.
 - [x] User-gesture launch to satisfy browser audio restrictions.
 - [x] Stream ROM downloads and display progress.
 - [x] Enforce a 64 MB client safety limit.
@@ -38,7 +39,7 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Create and clean up authenticated backend sessions.
 - [x] Keep play-count behavior, but start its timer only after gameplay begins.
 - [x] Remove `/play/:id` from the desktop-engine route guard.
-- [x] Give unsupported systems a clear NES-only error instead of attempting a broken launch.
+- [x] Give unsupported systems a clear browser-core availability error instead of attempting a broken launch.
 - [ ] Test the supported browser matrix on current Chrome, Edge, Firefox, and Safari.
 - [ ] Measure first-play download, startup time, memory use, and bundle-cache behavior.
 
@@ -50,96 +51,101 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Correct server-side filters for system and runtime availability, including filtered pagination totals and cache keys.
 - [x] Friendly pre-launch unavailable-artifact, native-runtime, and unsupported-system states.
 - [x] Tested compatibility policy based on enabled build, runtime kind, platform, extension, size, and checksum metadata.
-- [ ] Genre filter after genre metadata is added to the shared catalog schema.
-- [ ] License filter/facets after the API exposes normalized per-game license metadata for catalog queries.
+- [x] Genre facets backed by normalized shared catalog metadata, server-side filtering, and correct pagination/cache separation.
+- [x] License facets derived from verified code/asset SPDX metadata and filtered server-side in both editions.
 
 ### 4.3 Accounts and community
 
-- Existing Supabase authentication and profile flows.
-- Likes/dislikes, comments, comment reactions, reports, and moderation.
-- Play counts and recent activity where current privacy rules permit it.
-- Shared data across editions, with an `edition` or `runtime_kind` field where analytics need separation.
+- [x] Existing Supabase authentication, social-provider, password, CAPTCHA, profile, avatar, and account-deletion flows.
+- [x] Favorites, likes/dislikes, comments, comment reactions, reports, role checks, and moderation remain shared across editions.
+- [x] Global play counts are recorded only after 30 seconds of active gameplay.
+- [x] Privacy-scoped recent activity appears on the account page and is readable only by its owner.
+- [x] Activity is aggregated per user/game/edition/runtime instead of creating an unlimited event log.
+- [x] `client_edition` and `runtime_kind` distinguish User Edition WASM from Studio WebRTC/native activity.
+- [x] Account deletion cascades to activity records through the existing auth-user ownership model.
 
 ### 4.4 Personal ROMs
 
-- Local file picker and drag-and-drop launch without uploading the ROM.
-- Browser-side validation and system detection.
-- Recent-local-game metadata stored in IndexedDB, not the ROM unless the user opts in.
-- Clear messaging that local files remain on the device.
+- [x] Local file picker and drag-and-drop launch without uploading the ROM.
+- [x] Browser-side size, extension, system, and NES-header validation.
+- [x] NES files run directly from an in-memory `File` source through the existing WASM runtime.
+- [x] GB, GBC, GBA, SNES, Genesis, Master System, and Game Gear files are detected with honest future-core messaging.
+- [x] Recent-local-game metadata is stored in IndexedDB; ROM bytes are never persisted.
+- [x] Users can remove individual recent entries or clear local history.
+- [x] Clear privacy and legal-use messaging explains that local files remain on the device.
+- [x] `/local` no longer requires desktop-engine pairing in User Edition.
+- [ ] **Deferred post-v1:** optionally persist ROM bytes in IndexedDB only after explicit per-game consent. This must include quota/eviction handling, clear deletion controls, legal-use messaging, and a memory-only default. Do this after keyboard/gamepad remapping, not as part of v1.
 
 ### 4.5 Saves and usability
 
-- Save states and battery saves in IndexedDB.
-- Import/export saves.
-- Per-game control remapping and accessibility presets.
-- Touch controls for mobile-sized screens.
+- [x] Three versioned, per-game save-state slots are stored in a dedicated IndexedDB database.
+- [x] Save states can be imported, exported, loaded, overwritten, and deleted with size/type validation.
+- [x] Battery RAM can be backed up as an export. Restore remains pending because Nostalgist 0.21 exposes no supported SRAM-load API.
+- [x] Per-game touch A/B layout remapping and compact, large-target, and high-contrast accessibility presets.
+- [x] Pointer-safe touch controls for mobile-sized screens, including D-pad, A/B, Start, and Select.
+- [x] Keyboard/gamepad remapping uses a pre-launch browser input layer with conflict validation, accessible defaults, per-controller profiles, reset controls, and local persistence.
 - PWA shell and offline replay for assets the user is legally allowed to cache.
-- Storage quota checks and recovery instructions.
+- [x] Browser storage quota/usage checks and recovery/export instructions.
 
 ### 4.6 Research measurements that fit the browser
 
-- Core download time, ROM download time, verification time, and time to first frame.
-- Frame pacing, long tasks, memory estimates where supported, and runtime errors.
-- Browser/OS capability snapshot with informed consent.
-- Exportable measurement bundle with edition/runtime metadata.
+- [x] ROM download, verification, emulator-core load, and launch-to-first-browser-frame timings.
+- [x] Animation-frame pacing, dropped-frame estimates, long tasks, supported JS heap estimates, and runtime errors.
+- [x] Browser/OS capability snapshot is captured only after explicit informed consent.
+- [x] Exportable TAR bundle with User Edition/WASM metadata, summary JSON, frame/long-task CSV files, and runtime errors.
 
 ## 5. Features that require changes
 
 ### 5.1 Backend and artifact delivery
 
-- Return `runtimeKind`, ROM filename, byte size, SHA-256, and a short-lived browser-readable artifact URL from the boot contract.
-- Configure artifact CORS for the deployed User Edition origins.
-- Prefer signed, expiring URLs; never expose storage service credentials.
-- Add browser eligibility metadata per artifact/core/system.
-- Rate-limit session creation and artifact URL issuance.
-- Decide whether anonymous demo sessions are allowed. The current implementation expects authentication.
+- [x] Return runtime kind, ROM filename, byte size, SHA-256, and a short-lived browser-readable artifact URL from the boot contract.
+- [x] Allow the deployed User Edition origin through API CORS; verify signed Supabase Storage artifact CORS during deployment.
+- [x] Issue five-minute signed URLs from server-only Supabase credentials; canonical ROM URLs point to a private bucket and are unusable unsigned.
+- [x] Return authoritative browser eligibility metadata for artifact, core, and system.
+- [x] Rate-limit session creation and signed artifact URL issuance independently per authenticated user.
+- [x] Anonymous demo sessions are disabled; browser artifact issuance requires authentication.
 
 ### 5.2 Shared API and database
 
-- Apply schema migrations from one authoritative location.
-- Treat both frontends as clients of the same API contract, not independent owners of the database.
-- Keep RLS enabled for browser-accessible tables and test every policy for both editions.
-- Add `client_edition`, `runtime_kind`, and browser-session metadata only where useful.
-- Keep production, preview, and local origins explicit in API CORS settings.
-- Avoid double-counting sessions or play events when a user retries a launch.
+- [x] Pixelated Studio Edition is the sole migration authority for the shared Supabase project.
+- [x] Both frontends use the same API contract and do not independently own database history.
+- [x] User activity remains behind authenticated API routes; its browser-readable table has RLS for owner-only reads.
+- [x] Backend sessions store edition, client runtime, and browser core/system metadata with constrained values.
+- [x] Production, preview, and local origins remain explicit in API CORS settings.
+- [x] Every play attempt has a stable event ID, making retries idempotent while preserving edition-aware recent activity.
 
 ### 5.3 Frontend architecture
 
-- Remove Studio-only engine monitors and desktop pairing from the User Edition app shell.
-- Replace or hide Engine Connection, Local Vault, native multiplayer, and stream telemetry navigation.
-- Split reusable catalog/community code into shared packages only after the WASM path stabilizes.
-- Add an emulator-core registry so future systems are configuration-driven.
-- Keep runtime packages lazy so catalog visitors do not download emulator code.
+- [x] Remove Studio-only engine monitors and desktop pairing from the User Edition app shell.
+- [x] Remove Engine Connection and native multiplayer routes; present the browser-only local picker as Personal ROMs and keep stream telemetry out of User navigation.
+- [x] Keep catalog/community code local until the WASM path stabilizes instead of prematurely creating shared packages.
+- [x] Add an emulator-core registry so compatibility and runtime selection are configuration-driven.
+- [x] Load the selected runtime and Nostalgist package only after a user starts a compatible game.
 
 ### 5.4 Security and deployment headers
 
-- Keep all `.env` files ignored and provide sanitized `.env.example` files.
-- Rotate any credential ever committed or shown publicly; deleting Git history does not revoke it.
-- Add a restrictive Content Security Policy covering API, Supabase, artifacts, and WASM workers.
-- Add COOP/COEP only if a selected core needs `SharedArrayBuffer`; verify the effect on auth and third-party embeds first.
-- Pin emulator/core versions and monitor their supply chain.
-- Verify ROM checksum before execution and cap size, time, and memory exposure.
+- [x] Keep all `.env` files ignored and provide sanitized `.env.example` files.
+- [x] Document credential rotation; deleting Git history does not revoke a leaked credential.
+- [x] Add a restrictive Content Security Policy covering the shared API, Supabase, signed artifacts, Turnstile, the core CDN, WASM compilation, and workers.
+- [x] Leave COOP/COEP disabled because the selected core does not require `SharedArrayBuffer`; document the compatibility gate for enabling them later.
+- [x] Pin Nostalgist exactly, retain its lockfile integrity hash, and monitor frontend runtime updates with Dependabot.
+- [x] Require hosted ROM evidence, verify header/size/SHA-256 before execution, stream into bounded memory, and enforce a launch deadline.
 
 ### 5.5 Publishing and administration
 
-- Require system/runtime compatibility during review.
-- Store verified checksum and size at approval time.
-- Add a browser-play smoke test to the moderation flow.
-- Show why a submission is not browser-compatible.
-- Separate legal availability from technical compatibility.
+- [x] Keep publishing and administration out of the User Edition route and API bundles.
+- [x] Require system/runtime compatibility in the Studio Edition review flow.
+- [x] Store verified checksum and size at approval time in the shared backend.
+- [x] Run the User Edition browser-play smoke test from Studio administration.
+- [x] Show Studio reviewers why a submission is not browser-compatible.
+- [x] Keep legal availability separate from technical compatibility.
 
 ### 5.6 PWA and offline support
 
-- Design explicit cache rules; never cache authenticated API responses indiscriminately.
-- Obtain user consent before persisting large ROM artifacts.
-- Version saves and emulator cores so upgrades can migrate safely.
-- Provide a “clear downloaded games and saves” storage screen.
-
-### 5.7 Multiplayer
-
-- Local same-device multiplayer is possible when the emulator/core supports multiple controllers.
-- Internet multiplayer needs a purpose-built netplay protocol, synchronization, signaling, relay strategy, latency handling, and abuse controls.
-- The existing WebRTC video-stream architecture cannot simply be copied into a peer-to-peer deterministic emulator.
+- [x] Cache only the application shell, same-origin build assets, and the pinned emulator-core CDN; never cache authenticated API responses or ROM requests.
+- [x] Keep personal ROM bytes memory-only instead of persisting large artifacts without consent.
+- [x] Version browser saves and PWA/core caches so upgrades can clean up safely.
+- [x] Provide a device-storage screen for usage, persistence requests, cache clearing, saves, and local-file history.
 
 ## 6. Not possible in a pure hosted browser (do not plan for v1)
 
@@ -198,12 +204,6 @@ These are platform boundaries, not missing implementation tasks. Keep them in St
 1. Build a core/extension capability registry.
 2. Add one system at a time with fixtures and browser measurements.
 3. Keep unsupported catalog games on the Studio path.
-
-### Phase 5 — optional multiplayer research
-
-1. Prototype same-device multiplayer first.
-2. Research deterministic netplay separately from streaming.
-3. Do not promise LAN discovery from the hosted web app.
 
 ## 9. Initial issue backlog
 

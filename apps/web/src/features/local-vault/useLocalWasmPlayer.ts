@@ -1,0 +1,159 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { GameRuntime } from "../../lib/runtime/gameRuntime";
+import { getWasmBrowserSupport } from "../../lib/runtime/wasm/browserSupport";
+import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
+import type { WasmRuntimeProgress } from "../../lib/runtime/wasm/runtimeTypes";
+import type { WasmPlayerStatus } from "../player/hooks/useWasmPlayer";
+import { useWasmInputBindings } from "../player/input/useWasmInputBindings";
+
+function getLocalLaunchError(error: unknown) {
+  if (error instanceof Error) {
+    if (error.name === "AbortError") return "Local launch was cancelled.";
+    if (error.name === "NotAllowedError") {
+      return "The browser blocked game audio. Allow audio for this site and press Retry.";
+    }
+    return error.message;
+  }
+  return "The browser emulator could not start this local ROM.";
+}
+
+export function useLocalWasmPlayer(file: File | null, systemId: string | null) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const runtimeRef = useRef<GameRuntime | null>(null);
+  const generationRef = useRef(0);
+  const [error, setError] = useState<string | null>(null);
+  const [isMuted, setIsMutedState] = useState(false);
+  const [progress, setProgress] = useState<WasmRuntimeProgress | null>(null);
+  const [status, setStatus] = useState<WasmPlayerStatus>("idle");
+  const [volume, setVolumeState] = useState(1);
+
+  const stopRuntime = useCallback(() => {
+    generationRef.current += 1;
+    runtimeRef.current?.stop();
+    runtimeRef.current = null;
+  }, []);
+
+  const stop = useCallback(() => {
+    stopRuntime();
+    setProgress(null);
+    setStatus("stopped");
+  }, [stopRuntime]);
+
+  const resetForFile = useCallback(() => {
+    stopRuntime();
+    setError(null);
+    setProgress(null);
+    setStatus("idle");
+  }, [stopRuntime]);
+
+  const start = useCallback(async () => {
+    if (!file || !canvasRef.current) return;
+    const support = getWasmBrowserSupport();
+    if (!support.supported) {
+      setError(support.reason);
+      setStatus("error");
+      return;
+    }
+
+    stopRuntime();
+    const generation = generationRef.current;
+    setError(null);
+    setProgress(null);
+    setStatus("preparing");
+    try {
+      const core = findWasmCoreForArtifact(systemId, file.name);
+      if (!core) throw new Error("This ROM requires an unsupported browser emulator core.");
+      setStatus("loading-core");
+      const runtime = await core.loadRuntime({
+        canvas: canvasRef.current,
+        onProgress(nextProgress) {
+          if (generation !== generationRef.current) return;
+          setProgress(nextProgress);
+          setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
+        },
+      });
+      if (generation !== generationRef.current) {
+        runtime.stop();
+        return;
+      }
+      runtimeRef.current = runtime;
+      await runtime.prepare({ file, fileName: file.name });
+      if (generation !== generationRef.current) return;
+      await runtime.start();
+      if (generation !== generationRef.current) return;
+      runtime.setVolume(volume);
+      runtime.setMuted(isMuted);
+      setStatus("playing");
+    } catch (launchError) {
+      if (generation !== generationRef.current) return;
+      runtimeRef.current?.stop();
+      runtimeRef.current = null;
+      setError(getLocalLaunchError(launchError));
+      setStatus("error");
+    }
+  }, [file, isMuted, stopRuntime, systemId, volume]);
+
+  const togglePause = useCallback(() => {
+    if (status === "playing") {
+      runtimeRef.current?.pause();
+      setStatus("paused");
+    } else if (status === "paused") {
+      runtimeRef.current?.resume();
+      setStatus("playing");
+    }
+  }, [status]);
+
+  const reset = useCallback(() => runtimeRef.current?.reset(), []);
+  const captureState = useCallback(() => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before saving a state."));
+    return runtimeRef.current.captureState();
+  }, []);
+  const restoreState = useCallback((state: Blob) => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before loading a state."));
+    return runtimeRef.current.restoreState(state);
+  }, []);
+  const captureBatterySave = useCallback(() => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before backing up battery RAM."));
+    return runtimeRef.current.captureBatterySave();
+  }, []);
+  const pressInput = useCallback((button: string) => runtimeRef.current?.pressInput(button), []);
+  const releaseInput = useCallback((button: string) => runtimeRef.current?.releaseInput(button), []);
+  const setMuted = useCallback((muted: boolean) => {
+    runtimeRef.current?.setMuted(muted);
+    setIsMutedState(muted);
+  }, []);
+  const setVolume = useCallback((nextVolume: number) => {
+    runtimeRef.current?.setVolume(nextVolume);
+    setVolumeState(nextVolume);
+  }, []);
+  const inputBindings = useWasmInputBindings({
+    active: status === "playing",
+    onPress: pressInput,
+    onRelease: releaseInput,
+  });
+
+  useEffect(() => () => stopRuntime(), [stopRuntime]);
+
+  return {
+    canvasRef,
+    captureBatterySave,
+    captureState,
+    error,
+    gamepadName: inputBindings.gamepadName,
+    inputBindings,
+    isMuted,
+    progress,
+    pressInput,
+    reset,
+    resetForFile,
+    releaseInput,
+    restoreState,
+    setMuted,
+    setVolume,
+    start,
+    status,
+    stop,
+    togglePause,
+    volume,
+  };
+}

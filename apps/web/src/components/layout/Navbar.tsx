@@ -4,8 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   LogOut,
   Code,
-  Loader2,
   ScrollText,
+  HardDrive,
 } from "lucide-react";
 import { supabase } from "../../lib/auth/supabaseClient";
 import type { User } from "@supabase/supabase-js";
@@ -13,14 +13,11 @@ import { getAuthSession } from "../../lib/api/apiClient";
 import { usePermissionsQuery } from "../../lib/api/apiQueries";
 import { queryKeys } from "../../lib/api/queryClient";
 import { Avatar } from "../ui/Avatar";
-import { ENGINE_PAIRING_EVENT, hasEngineToken } from "../../lib/engine/engineAuth";
 import { PixelIcon } from "../ui/PixelIcon";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEnginePaired, setIsEnginePaired] = useState(hasEngineToken);
-  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +29,6 @@ export default function Navbar() {
   useEffect(() => {
     const syncUser = (sessionUser: User | null) => {
       setUser(sessionUser);
-      setIsSessionLoading(false);
     };
 
     getAuthSession().then((session) => {
@@ -73,13 +69,6 @@ export default function Navbar() {
   }, [permissionsQuery.data, user]);
 
   useEffect(() => {
-    const refreshEnginePairing = () => setIsEnginePaired(hasEngineToken());
-    window.addEventListener(ENGINE_PAIRING_EVENT, refreshEnginePairing);
-    return () =>
-      window.removeEventListener(ENGINE_PAIRING_EVENT, refreshEnginePairing);
-  }, []);
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -108,17 +97,11 @@ export default function Navbar() {
 
   const isFavoritesPage = location.pathname === "/favorites";
   const isIntroPage = location.pathname === "/";
-  const isEnginePage = location.pathname === "/engine";
   const isLocalPage = location.pathname === "/local";
-  const isMultiplayerPage = location.pathname === "/multiplayer";
-  const isPublishPage = location.pathname === "/publish";
   const profile = permissionsQuery.data?.profile;
   const dbUsername = profile?.username || null;
   const dbAvatarUrl = profile?.avatar_url || null;
-  const userRole = profile?.role || null;
   const isDeveloper = Boolean(profile?.is_developer);
-  const isIdentityLoading =
-    isSessionLoading || (Boolean(user) && permissionsQuery.isLoading);
   const getNavIconClass = (isActive: boolean) =>
     `inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors ${
       isActive
@@ -143,7 +126,7 @@ export default function Navbar() {
                 PIXELATED
               </span>
               <span className="hidden text-[10px] font-bold uppercase tracking-[0.22em] text-synth-secondary sm:inline">
-                Studio
+                User
               </span>
             </Link>
 
@@ -155,57 +138,12 @@ export default function Navbar() {
               <ScrollText className="h-5 w-5" />
             </Link>
 
-            <Link
-              to="/engine"
-              title={isEnginePaired ? "Engine Connected" : "Connect Engine"}
-              className={`relative ${getNavIconClass(isEnginePage)}`}
-            >
-              <PixelIcon
-                className={`h-6 w-6 ${
-                  isEnginePaired ? "text-[#9B0048]" : "text-gray-400"
-                }`}
-                name={isEnginePaired ? "engine-on" : "engine-off"}
-              />
-              <span
-                className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-synth-bg ${
-                  isEnginePaired ? "bg-[#9B0048]" : "bg-amber-400"
-                }`}
-              />
-            </Link>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6">
-            {isIdentityLoading ? (
-              <span
-                aria-label="Loading game submission permissions"
-                className="flex h-5 w-5 items-center justify-center text-gray-500"
-                role="status"
-                title="Loading permissions"
-              >
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </span>
-            ) : userRole !== "super_admin" ? (
-              <Link
-                to="/publish"
-                title="Submit a Game"
-                className={getNavIconClass(isPublishPage)}
-              >
-                <PixelIcon className="h-5 w-5" name="mail" />
-              </Link>
-            ) : null}
-
-            {/* LOCAL VAULT LINK */}
-            <Link
-              to="/multiplayer"
-              title="Multiplayer"
-              className={getNavIconClass(isMultiplayerPage)}
-            >
-              <PixelIcon className="h-6 w-6" name="multiplayer" />
-            </Link>
-
             <Link
               to="/local"
-              title="Local Vault"
+              title="Personal ROMs"
               className={getNavIconClass(isLocalPage)}
             >
               <PixelIcon className="h-6 w-6" name="publish" />
@@ -258,23 +196,20 @@ export default function Navbar() {
                         </p>
                       </div>
 
-                      {/* ADMIN PANEL*/}
-                      {(userRole === "admin" || userRole === "super_admin") && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setIsDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-synth-elevated hover:text-white transition-colors"
-                        >
-                          <PixelIcon className="w-4 h-4" name="admin" /> Admin Panel
-                        </Link>
-                      )}
-
                       <Link
                         to="/profile"
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-synth-elevated hover:text-white transition-colors"
                       >
                         <PixelIcon className="w-4 h-4" name="profile" /> Profile
+                      </Link>
+
+                      <Link
+                        to="/storage"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-synth-elevated hover:text-white transition-colors"
+                      >
+                        <HardDrive className="h-4 w-4" /> Device Storage
                       </Link>
 
                       <button

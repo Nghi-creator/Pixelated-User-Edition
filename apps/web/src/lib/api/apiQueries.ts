@@ -3,123 +3,26 @@ import { getAuthSession, api } from "./apiClient";
 import { queryKeys } from "./queryClient";
 import type {
   ApiGame,
-  ApiCatalogCandidateSourceKind,
-  ApiCatalogCandidateStatus,
-  ApiGameSubmissionStatus,
-  ApiPaginatedCatalogCandidatesResponse,
-  ApiPaginatedGameSubmissionsResponse,
-  ApiPaginatedAccessLogsResponse,
-  ApiPaginatedReportsResponse,
-  ApiPaginatedUsersResponse,
 } from "./apiTypes";
-
-export function useAccessLogsQuery<TLog>(page: number, pageSize: number) {
-  return useQuery({
-    queryKey: queryKeys.accessLogs(page, pageSize),
-    queryFn: () => api.accessLogs<TLog>(page, pageSize),
-  });
-}
-
-export function useAdminReportsQuery<TReport>(
-  page: number,
-  pageSize: number,
-  targetRole: "all" | "users" | "admins",
-  { enabled = true }: { enabled?: boolean } = {},
-) {
-  return useQuery<ApiPaginatedReportsResponse<TReport>>({
-    enabled,
-    queryKey: queryKeys.adminReports(page, pageSize, targetRole),
-    queryFn: () => api.adminReports<TReport>(page, pageSize, targetRole),
-  });
-}
-
-export function useAdminUsersQuery<TUser>({
-  enabled,
-  page,
-  pageSize,
-  search,
-}: {
-  enabled: boolean;
-  page: number;
-  pageSize: number;
-  search: string;
-}) {
-  return useQuery<ApiPaginatedUsersResponse<TUser>>({
-    enabled,
-    queryKey: queryKeys.adminUsers(page, pageSize, search),
-    queryFn: () => api.users<TUser>({ page, pageSize, search }),
-  });
-}
-
-export function useCatalogCandidatesQuery<TCandidate>({
-  enabled = true,
-  page,
-  pageSize,
-  platformId,
-  search,
-  sourceKind,
-  status,
-}: {
-  enabled?: boolean;
-  page: number;
-  pageSize: number;
-  platformId: string;
-  search: string;
-  sourceKind: ApiCatalogCandidateSourceKind | "";
-  status: ApiCatalogCandidateStatus;
-}) {
-  return useQuery<ApiPaginatedCatalogCandidatesResponse<TCandidate>>({
-    enabled,
-    queryKey: queryKeys.catalogCandidates(
-      page,
-      pageSize,
-      status,
-      sourceKind,
-      platformId,
-      search,
-    ),
-    queryFn: () =>
-      api.catalogCandidates<TCandidate>({
-        page,
-        pageSize,
-        platformId,
-        search,
-        sourceKind,
-        status,
-      }),
-  });
-}
-
-export function useGameSubmissionsQuery<TSubmission>({
-  enabled = true,
-  page,
-  pageSize,
-  search,
-  status,
-}: {
-  enabled?: boolean;
-  page: number;
-  pageSize: number;
-  search: string;
-  status: ApiGameSubmissionStatus;
-}) {
-  return useQuery<ApiPaginatedGameSubmissionsResponse<TSubmission>>({
-    enabled,
-    queryKey: queryKeys.gameSubmissions(page, pageSize, status, search),
-    queryFn: () =>
-      api.gameSubmissions<TSubmission>({
-        page,
-        pageSize,
-        search,
-        status,
-      }),
-  });
-}
 
 export function useAuthSessionQuery() {
   return useQuery({
     queryKey: queryKeys.authSession(),
     queryFn: getAuthSession,
+  });
+}
+
+export function useProfileActivityQuery({
+  enabled = true,
+  userId,
+}: {
+  enabled?: boolean;
+  userId: string | undefined;
+}) {
+  return useQuery({
+    enabled,
+    queryKey: queryKeys.profileActivity(userId),
+    queryFn: () => api.profileActivity(),
   });
 }
 
@@ -160,11 +63,20 @@ export function useFeaturedGamesQuery() {
   });
 }
 
+export function useCatalogFiltersQuery() {
+  return useQuery({
+    queryKey: queryKeys.catalogFilters(),
+    queryFn: api.catalogFilters,
+  });
+}
+
 export function useGameCatalogQuery({
   page,
   pageSize,
   platform = "",
   runtime = "all",
+  genre = "",
+  license = "",
   search,
   enabled = true,
 }: {
@@ -173,12 +85,23 @@ export function useGameCatalogQuery({
   pageSize: number;
   platform?: string;
   runtime?: "all" | "browser" | "desktop" | "unavailable";
+  genre?: string;
+  license?: string;
   search: string;
 }) {
   return useQuery({
     enabled,
-    queryKey: queryKeys.gameCatalog(page, pageSize, search, platform, runtime),
-    queryFn: () => api.games({ page, pageSize, platform, runtime, search }),
+    queryKey: queryKeys.gameCatalog(
+      page,
+      pageSize,
+      search,
+      platform,
+      runtime,
+      genre,
+      license,
+    ),
+    queryFn: () =>
+      api.games({ genre, license, page, pageSize, platform, runtime, search }),
   });
 }
 
@@ -227,6 +150,3 @@ export function useProfileQuery({ enabled = true }: { enabled?: boolean } = {}) 
     queryFn: api.profile,
   });
 }
-
-export type AccessLogsQueryResult<TLog> =
-  ApiPaginatedAccessLogsResponse<TLog>;

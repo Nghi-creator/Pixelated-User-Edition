@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080b14" />
+    <title>Pixelated is offline</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #080b14; color: #f8fafc; font: 16px system-ui, sans-serif; }
+      main { width: min(34rem, calc(100% - 3rem)); padding: 2rem; border: 1px solid #394056; border-radius: 1rem; background: #111827; }
+      h1 { margin-top: 0; }
+      p { color: #cbd5e1; line-height: 1.6; }
+      button { border: 0; border-radius: .6rem; padding: .75rem 1rem; background: #8b5cf6; color: white; font-weight: 800; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>You’re offline</h1>
+      <p>Pixelated could not reach the network. Previously cached application files and emulator cores remain on this device, but cloud library data and ROM downloads require a connection.</p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

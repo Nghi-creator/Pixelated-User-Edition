@@ -31,6 +31,13 @@ export type ApiSessionResponse = {
   boot: {
     artifactSha256: string | null;
     artifactSize: number | null;
+    browser: {
+      artifactUrlExpiresAt: string | null;
+      coreId: "fceumm" | "gambatte" | null;
+      eligible: boolean;
+      reason: string | null;
+      systemId: "nes" | "gb" | "gbc" | null;
+    };
     launchManifestId: string | null;
     romFilename: string | null;
     romUrl: string | null;
@@ -134,6 +141,11 @@ export type ApiPaginatedGamesResponse = {
   pageSize: number;
   total: number;
   totalPages: number;
+};
+
+export type ApiCatalogFiltersResponse = {
+  genres: string[];
+  licenses: string[];
 };
 
 export type ApiFeaturedGamesResponse = {
@@ -334,6 +346,7 @@ export type ApiGame = {
     verified_at: string | null;
   }[];
   id: string;
+  genre_slug?: string | null;
   play_count?: number | null;
   rom_filename?: string | null;
   rom_url?: string | null;
@@ -347,4 +360,17 @@ export type ApiProfile = {
   is_banned?: boolean;
   role: string;
   username: string | null;
+};
+
+export type ApiProfileActivityEntry = {
+  client_edition: "studio" | "user";
+  game: {
+    cover_url: string | null;
+    id: string;
+    title: string;
+  };
+  game_id: string;
+  last_played_at: string;
+  play_count: number;
+  runtime_kind: "wasm" | "webrtc" | "native";
 };

@@ -2,7 +2,8 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PixelIcon } from "../../../components/ui/PixelIcon";
 import type { ApiGame } from "../../../lib/api/apiClient";
-import type { WebRTCStatus } from "../../../lib/webrtc/webrtcSession";
+
+export type PlayerHeaderStatus = "idle" | "connecting" | "playing" | "error";
 
 type PlayerHeaderProps = {
   backRoute: string;
@@ -11,7 +12,7 @@ type PlayerHeaderProps = {
   gameTitle: string;
   layoutClassName?: string;
   showStreamTelemetry: boolean;
-  status: WebRTCStatus;
+  status: PlayerHeaderStatus;
   onToggleTelemetry: () => void;
   hideGameChrome?: boolean;
   statusLabelOverride?: string;

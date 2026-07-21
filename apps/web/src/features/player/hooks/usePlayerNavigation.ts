@@ -10,13 +10,9 @@ const isPlayerBackState = (state: unknown): state is PlayerBackState =>
   typeof state === "object" && state !== null;
 
 export function usePlayerNavigation(location: Location, gameId?: string) {
-  const isLocalGame = /\.(nes|gb|gbc|gba|sfc|smc|md|gen|sms|gg)$/i.test(
-    gameId || "",
-  );
-  const fallbackBackRoute = isLocalGame ? "/local" : "/home";
-  const fallbackBackText = isLocalGame
-    ? "Back to Local Vault"
-    : "Back to Cloud Library";
+  void gameId;
+  const fallbackBackRoute = "/home";
+  const fallbackBackText = "Back to Cloud Library";
   const backState = isPlayerBackState(location.state) ? location.state : null;
 
   return {

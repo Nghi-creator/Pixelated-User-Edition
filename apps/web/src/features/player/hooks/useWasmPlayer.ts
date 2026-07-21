@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../../lib/api/apiClient";
-import type { GameRuntimeSource } from "../../../lib/runtime/gameRuntime";
+import type {
+  GameRuntime,
+  GameRuntimeSource,
+} from "../../../lib/runtime/gameRuntime";
 import { getWasmBrowserSupport } from "../../../lib/runtime/wasm/browserSupport";
-import {
-  NostalgistWasmRuntime,
-  type WasmRuntimeProgress,
-} from "../../../lib/runtime/wasm/NostalgistWasmRuntime";
+import { resolveWasmCore } from "../../../lib/runtime/wasm/coreRegistry";
+import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/runtimeTypes";
+import { useWasmInputBindings } from "../input/useWasmInputBindings";
 
 export type WasmPlayerStatus =
   | "idle"
@@ -40,10 +42,9 @@ function getLaunchError(error: unknown) {
 export function useWasmPlayer(gameId: string | undefined) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const generationRef = useRef(0);
-  const runtimeRef = useRef<NostalgistWasmRuntime | null>(null);
+  const runtimeRef = useRef<GameRuntime | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [gamepadName, setGamepadName] = useState<string | null>(null);
   const [isMuted, setIsMutedState] = useState(false);
   const [progress, setProgress] = useState<WasmRuntimeProgress | null>(null);
   const [status, setStatus] = useState<WasmPlayerStatus>("idle");
@@ -84,31 +85,43 @@ export function useWasmPlayer(gameId: string | undefined) {
     setProgress(null);
     setStatus("preparing");
 
-    const runtime = new NostalgistWasmRuntime({
-      canvas: canvasRef.current,
-      onProgress(nextProgress) {
-        if (generation !== generationRef.current) return;
-        setProgress(nextProgress);
-        setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
-      },
-    });
-    runtimeRef.current = runtime;
-
     try {
       const backendSession = await api.createSession(gameId, createClientSessionId());
       if (generation !== generationRef.current) return;
-      sessionIdRef.current = backendSession.user.id ? backendSession.sessionId : null;
+      sessionIdRef.current = backendSession.sessionId;
       if (backendSession.boot.runtimeKind !== "libretro") {
         throw new Error("This game requires the native Studio runtime and cannot run in WASM.");
       }
       if (!backendSession.boot.romUrl) {
         throw new Error("This game does not have a browser-accessible ROM artifact.");
       }
-      if (!backendSession.boot.romFilename?.toLowerCase().endsWith(".nes")) {
-        throw new Error(
-          "This first WASM release supports NES games only. This catalog game needs a different emulator core.",
-        );
+      if (!backendSession.boot.romFilename) {
+        throw new Error("This game does not have a browser ROM filename.");
       }
+      if (!backendSession.boot.browser.eligible) {
+        throw new Error(backendSession.boot.browser.reason || "This game is not eligible for browser play.");
+      }
+      const core = resolveWasmCore(
+        backendSession.boot.browser.coreId,
+        backendSession.boot.browser.systemId,
+        backendSession.boot.romFilename,
+      );
+      if (!core) throw new Error("This browser build requires an unsupported emulator core.");
+
+      setStatus("loading-core");
+      const runtime = await core.loadRuntime({
+        canvas: canvasRef.current,
+        onProgress(nextProgress) {
+          if (generation !== generationRef.current) return;
+          setProgress(nextProgress);
+          setStatus(nextProgress.phase === "ready" ? "starting" : nextProgress.phase);
+        },
+      });
+      if (generation !== generationRef.current) {
+        runtime.stop();
+        return;
+      }
+      runtimeRef.current = runtime;
 
       const source: GameRuntimeSource = {
         expectedSha256: backendSession.boot.artifactSha256,
@@ -126,7 +139,7 @@ export function useWasmPlayer(gameId: string | undefined) {
       setStatus("playing");
     } catch (launchError) {
       if (generation !== generationRef.current) return;
-      runtime.stop();
+      runtimeRef.current?.stop();
       runtimeRef.current = null;
       releaseSession();
       setError(getLaunchError(launchError));
@@ -145,6 +158,20 @@ export function useWasmPlayer(gameId: string | undefined) {
   }, [status]);
 
   const reset = useCallback(() => runtimeRef.current?.reset(), []);
+  const captureState = useCallback(() => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before saving a state."));
+    return runtimeRef.current.captureState();
+  }, []);
+  const restoreState = useCallback((state: Blob) => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before loading a state."));
+    return runtimeRef.current.restoreState(state);
+  }, []);
+  const captureBatterySave = useCallback(() => {
+    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before backing up battery RAM."));
+    return runtimeRef.current.captureBatterySave();
+  }, []);
+  const pressInput = useCallback((button: string) => runtimeRef.current?.pressInput(button), []);
+  const releaseInput = useCallback((button: string) => runtimeRef.current?.releaseInput(button), []);
   const setMuted = useCallback((muted: boolean) => {
     runtimeRef.current?.setMuted(muted);
     setIsMutedState(muted);
@@ -153,20 +180,11 @@ export function useWasmPlayer(gameId: string | undefined) {
     runtimeRef.current?.setVolume(nextVolume);
     setVolumeState(nextVolume);
   }, []);
-
-  useEffect(() => {
-    const refreshGamepads = () => {
-      const gamepad = navigator.getGamepads?.().find(Boolean);
-      setGamepadName(gamepad?.id || null);
-    };
-    refreshGamepads();
-    window.addEventListener("gamepadconnected", refreshGamepads);
-    window.addEventListener("gamepaddisconnected", refreshGamepads);
-    return () => {
-      window.removeEventListener("gamepadconnected", refreshGamepads);
-      window.removeEventListener("gamepaddisconnected", refreshGamepads);
-    };
-  }, []);
+  const inputBindings = useWasmInputBindings({
+    active: status === "playing",
+    onPress: pressInput,
+    onRelease: releaseInput,
+  });
 
   useEffect(() => () => {
     generationRef.current += 1;
@@ -177,11 +195,17 @@ export function useWasmPlayer(gameId: string | undefined) {
 
   return {
     canvasRef,
+    captureBatterySave,
+    captureState,
     error,
-    gamepadName,
+    gamepadName: inputBindings.gamepadName,
+    inputBindings,
     isMuted,
     progress,
+    pressInput,
     reset,
+    releaseInput,
+    restoreState,
     setMuted,
     setVolume,
     start,
@@ -191,4 +215,3 @@ export function useWasmPlayer(gameId: string | undefined) {
     volume,
   };
 }
-

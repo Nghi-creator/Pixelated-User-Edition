@@ -1,5 +1,6 @@
 import type {
   ApiFeaturedGamesResponse,
+  ApiCatalogFiltersResponse,
   ApiGame,
   ApiPaginatedGamesResponse,
 } from "./apiTypes";
@@ -16,12 +17,19 @@ export function createCatalogApi({
   getFavoriteIds,
 }: CatalogApiDependencies) {
   return {
-    countPlay: (gameId: string) =>
+    countPlay: (gameId: string, playEventId: string) =>
       apiRequest<{ success: true }>(`/games/${gameId}/play-count`, {
+        body: JSON.stringify({ clientEdition: "user", playEventId, runtimeKind: "wasm" }),
         method: "POST",
       }),
     favoriteIds: () => getFavoriteIds(),
+    catalogFilters: () =>
+      apiRequest<ApiCatalogFiltersResponse>("/games/filters", {
+        authenticated: false,
+      }),
     games: ({
+      genre = "",
+      license = "",
       page = 1,
       pageSize = 15,
       platform = "",
@@ -30,6 +38,8 @@ export function createCatalogApi({
     }: {
       page?: number;
       pageSize?: number;
+      genre?: string;
+      license?: string;
       platform?: string;
       runtime?: "all" | "browser" | "desktop" | "unavailable";
       search?: string;
@@ -41,6 +51,8 @@ export function createCatalogApi({
       if (search.trim()) params.set("search", search.trim());
       if (platform) params.set("platform", platform);
       if (runtime !== "all") params.set("runtime", runtime);
+      if (genre) params.set("genre", genre);
+      if (license) params.set("license", license);
 
       return apiRequest<ApiPaginatedGamesResponse>(`/games?${params}`, {
         authenticated: false,

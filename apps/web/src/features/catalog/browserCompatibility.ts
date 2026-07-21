@@ -1,4 +1,5 @@
 import type { ApiGame } from "../../lib/api/apiTypes";
+import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry.ts";
 
 export type BrowserCompatibilityKind = "browser" | "desktop" | "unavailable";
 
@@ -68,13 +69,14 @@ export function getBrowserGameCompatibility(game: ApiGame | null | undefined): B
     };
   }
 
-  if (platformId === "nes" && build.artifact_filename?.toLowerCase().endsWith(".nes")) {
+  const core = findWasmCoreForArtifact(platformId, build.artifact_filename);
+  if (core) {
     return {
       kind: "browser",
       label: "Play in browser",
       platformId,
       platformLabel,
-      reason: "This verified NES build can run locally in your browser with WebAssembly.",
+      reason: `This verified ${core.systemLabel} build can run locally in your browser with ${core.label}.`,
     };
   }
 
@@ -83,6 +85,6 @@ export function getBrowserGameCompatibility(game: ApiGame | null | undefined): B
     label: "Desktop required",
     platformId,
     platformLabel,
-    reason: `${platformLabel} browser support is not included in the current NES-only WASM release.`,
+    reason: `${platformLabel} browser support is not included in the current WASM release.`,
   };
 }

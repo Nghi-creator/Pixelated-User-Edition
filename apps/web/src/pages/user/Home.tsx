@@ -3,6 +3,7 @@ import { Loader2, Search } from "lucide-react";
 import HeroBanner from "../../components/user/HeroBanner";
 import GameCard from "../../components/user/GameCard";
 import {
+  useCatalogFiltersQuery,
   useFeaturedGamesQuery,
   useGameCatalogQuery,
 } from "../../lib/api/apiQueries";
@@ -17,6 +18,7 @@ import {
   getBrowserGameCompatibility,
   PLATFORM_OPTIONS,
 } from "../../features/catalog/browserCompatibility";
+import { formatGenre } from "../../features/catalog/catalogMetadata";
 
 const GAMES_PER_PAGE = 15;
 const ZERO_PLAY_FEATURED_REFRESH_MS = 30_000;
@@ -42,15 +44,22 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [platformFilter, setPlatformFilter] = useState("");
   const [runtimeFilter, setRuntimeFilter] = useState<"all" | "browser" | "desktop" | "unavailable">("all");
+  const [genreFilter, setGenreFilter] = useState("");
+  const [licenseFilter, setLicenseFilter] = useState("");
 
   const catalogQuery = useGameCatalogQuery({
     page: currentPage,
     pageSize: GAMES_PER_PAGE,
+    genre: genreFilter,
+    license: licenseFilter,
     platform: platformFilter,
     runtime: runtimeFilter,
     search: searchQuery,
   });
   const featuredQuery = useFeaturedGamesQuery();
+  const filtersQuery = useCatalogFiltersQuery();
+  const availableGenres = filtersQuery.data?.genres || [];
+  const availableLicenses = filtersQuery.data?.licenses || [];
 
   const games = (catalogQuery.data?.games || []) as ApiGame[];
   const featuredGames = featuredQuery.data?.featuredGames.length
@@ -109,7 +118,7 @@ export default function Home() {
             All Games
           </h2>
 
-          <div className="grid w-full gap-3 sm:grid-cols-3 lg:max-w-3xl">
+          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-5 lg:max-w-5xl">
             <div className="relative sm:col-span-1">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -157,6 +166,38 @@ export default function Home() {
                 ))}
               </select>
             </label>
+            <label>
+              <span className="sr-only">Game genre</span>
+              <select
+                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
+                onChange={(event) => {
+                  setGenreFilter(event.target.value);
+                  setCurrentPage(1);
+                }}
+                value={genreFilter}
+              >
+                <option value="">All genres</option>
+                {availableGenres.map((genre) => (
+                  <option key={genre} value={genre}>{formatGenre(genre)}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">Game license</span>
+              <select
+                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
+                onChange={(event) => {
+                  setLicenseFilter(event.target.value);
+                  setCurrentPage(1);
+                }}
+                value={licenseFilter}
+              >
+                <option value="">All licenses</option>
+                {availableLicenses.map((license) => (
+                  <option key={license} value={license}>{license}</option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
@@ -181,7 +222,7 @@ export default function Home() {
             <p className="text-xl">
               {searchQuery
                 ? `No games found matching “${searchQuery}” with these filters.`
-                : "No games match the selected runtime and system filters."}
+                : "No games match the selected runtime, system, genre, and license filters."}
             </p>
           </div>
         ) : (

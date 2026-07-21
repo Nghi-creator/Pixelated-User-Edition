@@ -1,8 +1,0 @@
-TRUNCATE TABLE public.games CASCADE;
-
--- 2. UPDATE THE SCHEMA
-ALTER TABLE public.games 
-ADD COLUMN IF NOT EXISTS rom_url text;
-
-
-  

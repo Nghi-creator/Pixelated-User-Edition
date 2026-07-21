@@ -6,7 +6,6 @@ import {
 } from "./requestLifecycle";
 import { clearAuthScopedCache } from "../auth/authCache";
 import type { ApiPermissionsResponse } from "./apiTypes";
-import { createAdminApi } from "./adminApi";
 import { createCatalogApi } from "./catalogApi";
 import { createEngineApi } from "./engineApi";
 import { createProfileApi } from "./profileApi";
@@ -17,7 +16,7 @@ import { createTelemetryApi } from "./telemetryApi";
 export type * from "./apiTypes";
 
 const LOCAL_API_URL = "http://127.0.0.1:4000";
-const PRODUCTION_API_URL = "https://pixelated-api-services.onrender.com";
+const PRODUCTION_API_URL = "https://pixelated-api-services-6ovi.onrender.com";
 const DEFAULT_API_TIMEOUT_MS = 30_000;
 const CLIENT_CACHE_TTL_MS = 30_000;
 
@@ -218,7 +217,6 @@ async function getFavoriteIds(): Promise<Set<string>> {
 }
 
 export const api = {
-  ...createAdminApi({ apiRequest }),
   ...createCatalogApi({
     apiRequest,
     clearFavoritesCache,

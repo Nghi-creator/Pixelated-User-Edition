@@ -1,15 +1,22 @@
 import { lazy, Suspense, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { PlayerHeader } from "../../features/player/components/PlayerHeader";
+import {
+  PlayerHeader,
+  type PlayerHeaderStatus,
+} from "../../features/player/components/PlayerHeader";
 import { PlayerInstructions } from "../../features/player/components/PlayerControls";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
+import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
+import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
+import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
+import { WasmInputSettings } from "../../features/player/components/WasmInputSettings";
 import { useAuthUser } from "../../features/player/hooks/useAuthUser";
 import { useGameMetadata } from "../../features/player/hooks/useGameMetadata";
 import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNavigation";
 import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
-import type { WebRTCStatus } from "../../lib/webrtc/webrtcSession";
+import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
 import { getBrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
 
 const PlayerCommunitySection = lazy(() =>
@@ -41,12 +48,14 @@ export default function Player() {
   const { backRoute, backText } = usePlayerNavigation(location, id);
   const { authorName, game, gameRights, gameTitle, isError: metadataError, isLoading: metadataLoading } = useGameMetadata(id);
   const player = useWasmPlayer(id);
+  const gameKey = `catalog:${id || "unknown"}`;
+  const research = useWasmResearch({ error: player.error, gameKey, progress: player.progress, status: player.status });
   const compatibility = useMemo(() => getBrowserGameCompatibility(game), [game]);
   const canStart = !metadataLoading && !metadataError && compatibility.kind === "browser";
 
   usePlayCount(id, player.status === "playing");
 
-  const headerStatus = useMemo<WebRTCStatus>(() => {
+  const headerStatus = useMemo<PlayerHeaderStatus>(() => {
     if (player.status === "playing" || player.status === "paused") return "playing";
     if (player.status === "error") return "error";
     if (["preparing", "downloading", "verifying", "loading-core", "starting"].includes(player.status)) {
@@ -108,6 +117,30 @@ export default function Player() {
           status={player.status}
           volume={player.volume}
         />
+        <WasmInputSettings
+          disabled={!(["idle", "stopped", "error"] as string[]).includes(player.status)}
+          gamepadMapping={player.inputBindings.gamepadMapping}
+          gamepadName={player.inputBindings.gamepadName}
+          keyboardMapping={player.inputBindings.keyboardMapping}
+          onGamepadBindingChange={player.inputBindings.setGamepadBinding}
+          onKeyboardBindingChange={player.inputBindings.setKeyboardBinding}
+          onResetGamepad={player.inputBindings.resetGamepadMapping}
+          onResetKeyboard={player.inputBindings.resetKeyboardMapping}
+        />
+        <WasmTouchControls
+          gameKey={gameKey}
+          onPress={player.pressInput}
+          onRelease={player.releaseInput}
+          status={player.status}
+        />
+        <WasmSavePanel
+          captureBatterySave={player.captureBatterySave}
+          captureState={player.captureState}
+          gameKey={gameKey}
+          restoreState={player.restoreState}
+          status={player.status}
+        />
+        <WasmResearchPanel research={research} />
       </div>
 
       <div className="mt-3 flex w-full max-w-5xl justify-end">
