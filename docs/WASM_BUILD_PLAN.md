@@ -28,6 +28,7 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Runtime abstraction independent from WebRTC.
 - [x] Lazy-load the emulator package in a separate `wasm-runtime` bundle.
 - [x] NES support using Nostalgist and the `fceumm` libretro core.
+- [x] Game Boy and Game Boy Color support using the `gambatte` libretro core.
 - [x] User-gesture launch to satisfy browser audio restrictions.
 - [x] Stream ROM downloads and display progress.
 - [x] Enforce a 64 MB client safety limit.
@@ -38,7 +39,7 @@ The first release should prove one thing well: a user can choose an eligible gam
 - [x] Create and clean up authenticated backend sessions.
 - [x] Keep play-count behavior, but start its timer only after gameplay begins.
 - [x] Remove `/play/:id` from the desktop-engine route guard.
-- [x] Give unsupported systems a clear NES-only error instead of attempting a broken launch.
+- [x] Give unsupported systems a clear browser-core availability error instead of attempting a broken launch.
 - [ ] Test the supported browser matrix on current Chrome, Edge, Firefox, and Safari.
 - [ ] Measure first-play download, startup time, memory use, and bundle-cache behavior.
 

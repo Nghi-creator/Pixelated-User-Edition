@@ -33,10 +33,10 @@ export type ApiSessionResponse = {
     artifactSize: number | null;
     browser: {
       artifactUrlExpiresAt: string | null;
-      coreId: "fceumm" | null;
+      coreId: "fceumm" | "gambatte" | null;
       eligible: boolean;
       reason: string | null;
-      systemId: "nes" | null;
+      systemId: "nes" | "gb" | "gbc" | null;
     };
     launchManifestId: string | null;
     romFilename: string | null;

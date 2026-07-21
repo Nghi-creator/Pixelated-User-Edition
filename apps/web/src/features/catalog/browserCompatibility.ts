@@ -85,6 +85,6 @@ export function getBrowserGameCompatibility(game: ApiGame | null | undefined): B
     label: "Desktop required",
     platformId,
     platformLabel,
-    reason: `${platformLabel} browser support is not included in the current NES-only WASM release.`,
+    reason: `${platformLabel} browser support is not included in the current WASM release.`,
   };
 }

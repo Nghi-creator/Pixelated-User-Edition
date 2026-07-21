@@ -3,8 +3,8 @@ import type {
   WasmRuntimeFactoryOptions,
 } from "./runtimeTypes.ts";
 
-export type WasmCoreId = "fceumm";
-export type WasmSystemId = "nes";
+export type WasmCoreId = "fceumm" | "gambatte";
+export type WasmSystemId = "nes" | "gb" | "gbc";
 
 export type WasmCoreDefinition = {
   artifactExtensions: readonly string[];
@@ -15,11 +15,16 @@ export type WasmCoreDefinition = {
   systemLabel: string;
 };
 
-const loadFceummRuntime = async (options: WasmRuntimeFactoryOptions) => {
+const loadNostalgistRuntime = async (
+  coreId: WasmCoreId,
+  systemId: WasmSystemId,
+  options: WasmRuntimeFactoryOptions,
+) => {
   const { NostalgistWasmRuntime } = await import("./NostalgistWasmRuntime.ts");
   return new NostalgistWasmRuntime({
     ...options,
-    coreId: "fceumm",
+    coreId,
+    systemId,
   });
 };
 
@@ -28,9 +33,25 @@ export const WASM_CORE_REGISTRY: readonly WasmCoreDefinition[] = [
     artifactExtensions: [".nes"],
     coreId: "fceumm",
     label: "FCEUmm",
-    loadRuntime: loadFceummRuntime,
+    loadRuntime: (options) => loadNostalgistRuntime("fceumm", "nes", options),
     systemId: "nes",
     systemLabel: "NES",
+  },
+  {
+    artifactExtensions: [".gb"],
+    coreId: "gambatte",
+    label: "Gambatte",
+    loadRuntime: (options) => loadNostalgistRuntime("gambatte", "gb", options),
+    systemId: "gb",
+    systemLabel: "Game Boy",
+  },
+  {
+    artifactExtensions: [".gbc"],
+    coreId: "gambatte",
+    label: "Gambatte",
+    loadRuntime: (options) => loadNostalgistRuntime("gambatte", "gbc", options),
+    systemId: "gbc",
+    systemLabel: "Game Boy Color",
   },
 ];
 

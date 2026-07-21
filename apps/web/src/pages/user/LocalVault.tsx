@@ -230,7 +230,7 @@ export default function LocalVault() {
         />
         {isInspecting ? <Loader2 className="mb-4 h-12 w-12 animate-spin text-white" /> : <Upload className="mb-4 h-12 w-12 text-synth-secondary" />}
         <h2 className="text-xl font-bold text-white">{isInspecting ? "Inspecting locally…" : "Drop a ROM here or choose a file"}</h2>
-        <p className="mt-2 max-w-2xl text-sm text-gray-400">NES launches now. GB, GBC, GBA, SNES, Genesis, Master System, and Game Gear are detected for future cores.</p>
+        <p className="mt-2 max-w-2xl text-sm text-gray-400">NES, Game Boy, and Game Boy Color launch in this browser. GBA, SNES, Genesis, Master System, and Game Gear are detected for future cores.</p>
       </div>
 
       <section className="rounded-lg border border-synth-border bg-synth-surface p-5">

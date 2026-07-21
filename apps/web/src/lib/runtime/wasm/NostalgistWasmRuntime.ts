@@ -4,8 +4,9 @@ import {
   MAX_NES_ROM_BYTES,
   normalizeExpectedRomSize,
   normalizeSha256,
-  validateNesRom,
+  validateBrowserRom,
 } from "./romValidation.ts";
+import type { WasmCoreId, WasmSystemId } from "./coreRegistry.ts";
 import type { WasmRuntimeProgress } from "./runtimeTypes.ts";
 export type { WasmRuntimeProgress } from "./runtimeTypes.ts";
 
@@ -33,10 +34,11 @@ type NostalgistModule = {
 
 type RuntimeOptions = {
   canvas: HTMLCanvasElement;
-  coreId?: "fceumm";
+  coreId?: WasmCoreId;
   launchTimeoutMs?: number;
   loadNostalgist?: () => Promise<NostalgistModule>;
   onProgress?: (progress: WasmRuntimeProgress) => void;
+  systemId?: WasmSystemId;
 };
 
 const defaultLoader = () => import("nostalgist") as Promise<NostalgistModule>;
@@ -163,7 +165,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
       this.options.onProgress?.({ loadedBytes: 0, phase: "downloading", totalBytes: source.expectedSize || source.file?.size || null });
       const bytes = await downloadRom(source, signal, this.options.onProgress);
       this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "verifying", totalBytes: bytes.byteLength });
-      await validateNesRom(bytes, source);
+      await validateBrowserRom(this.options.systemId || "nes", bytes, source);
       if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
 
       this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "loading-core", totalBytes: bytes.byteLength });

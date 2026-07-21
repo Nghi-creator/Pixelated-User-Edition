@@ -5,9 +5,9 @@ export type BrowserSmokeSession = {
   artifactSha256: string;
   artifactSize: number;
   candidateId: string;
-  coreId: "fceumm";
+  coreId: "fceumm" | "gambatte";
   expiresAt: string;
-  systemId: "nes";
+  systemId: "nes" | "gb" | "gbc";
   title: string;
 };
 
@@ -43,8 +43,8 @@ export async function getBrowserSmokeArtifact(ticket: string) {
 export async function recordBrowserSmokeResult(
   ticket: string,
   result:
-    | { coreId: "fceumm"; status: "passed" }
-    | { coreId: "fceumm"; error: string; status: "failed" },
+    | { coreId: "fceumm" | "gambatte"; status: "passed" }
+    | { coreId: "fceumm" | "gambatte"; error: string; status: "failed" },
 ) {
   const response = await fetch(`${API_URL}/browser-smoke/result`, {
     body: JSON.stringify(result),

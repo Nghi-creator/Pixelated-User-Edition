@@ -1,4 +1,5 @@
 import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry.ts";
+import { assertGameBoyRom } from "../../lib/runtime/wasm/romValidation.ts";
 
 export const LOCAL_VAULT_EXTENSIONS = [
   ".nes",
@@ -93,6 +94,9 @@ export async function inspectLocalRomFile(
     ) {
       throw new Error("The selected file does not have a valid NES ROM header.");
     }
+  }
+  if (system.id === "gb" || system.id === "gbc") {
+    assertGameBoyRom(new Uint8Array(await file.arrayBuffer()));
   }
 
   return {

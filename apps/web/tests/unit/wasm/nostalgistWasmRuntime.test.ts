@@ -9,6 +9,19 @@ function validNesRom() {
   return bytes;
 }
 
+function validGameBoyRom() {
+  const bytes = new Uint8Array(0x150);
+  bytes.set([
+    0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b,
+    0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00, 0x0d,
+    0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e,
+    0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99,
+    0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc,
+    0xdd, 0xdc, 0x99, 0x9f, 0xbb, 0xb9, 0x33, 0x3e,
+  ], 0x104);
+  return bytes;
+}
+
 test("prepares the fceumm core and exposes runtime controls", async (context) => {
   const originalFetch = globalThis.fetch;
   context.after(() => {
@@ -113,6 +126,40 @@ test("prepares a local File source without making a network request", async (con
     fileName: "local.nes",
   });
   assert.equal(prepared, true);
+  runtime.stop();
+});
+
+test("prepares the Gambatte core for a Game Boy Color ROM", async () => {
+  let preparedCore = "";
+  const runtime = new NostalgistWasmRuntime({
+    canvas: {} as HTMLCanvasElement,
+    coreId: "gambatte",
+    systemId: "gbc",
+    loadNostalgist: async () => ({
+      Nostalgist: {
+        async prepare(options) {
+          preparedCore = String(options.core);
+          return {
+            exit: () => undefined,
+            getStatus: () => "initial" as const,
+            loadState: async () => undefined,
+            pause: () => undefined,
+            pressDown: () => undefined,
+            pressUp: () => undefined,
+            restart: () => undefined,
+            resume: () => undefined,
+            saveSRAM: async () => new Blob(),
+            saveState: async () => ({ state: new Blob(), thumbnail: undefined }),
+            sendCommand: () => undefined,
+            start: async () => undefined,
+          };
+        },
+      },
+    }),
+  });
+  const bytes = validGameBoyRom();
+  await runtime.prepare({ file: new Blob([bytes]), fileName: "pocket.gbc" });
+  assert.equal(preparedCore, "gambatte");
   runtime.stop();
 });
 

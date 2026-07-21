@@ -19,6 +19,7 @@ test("service worker caches only app assets and the pinned core host", () => {
   assert.match(worker, /url\.pathname\.startsWith\("\/assets\/"\)/);
   assert.match(worker, /cdn\.jsdelivr\.net/);
   assert.match(worker, /fceumm_libretro\.zip/);
+  assert.match(worker, /gambatte_libretro\.zip/);
   assert.match(worker, /@zip\.js\/zip\.js@2\.8\.11/);
   assert.match(worker, /request\.headers\.has\("Authorization"\)/);
   assert.doesNotMatch(worker, /supabase\.co/);

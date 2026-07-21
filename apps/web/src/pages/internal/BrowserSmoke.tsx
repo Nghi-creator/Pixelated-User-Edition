@@ -69,7 +69,7 @@ export default function BrowserSmoke() {
       });
       await runtime.start();
       await new Promise((resolve) => window.setTimeout(resolve, OBSERVATION_MS));
-      await recordBrowserSmokeResult(ticket, { coreId: "fceumm", status: "passed" });
+      await recordBrowserSmokeResult(ticket, { coreId: session.coreId, status: "passed" });
       setState("passed");
     } catch (reason) {
       launchError = reason instanceof Error ? reason.message : "The browser smoke test failed.";
@@ -77,7 +77,7 @@ export default function BrowserSmoke() {
       setState("failed");
       try {
         await recordBrowserSmokeResult(ticket, {
-          coreId: "fceumm",
+          coreId: session.coreId,
           error: launchError.slice(0, 1000),
           status: "failed",
         });
