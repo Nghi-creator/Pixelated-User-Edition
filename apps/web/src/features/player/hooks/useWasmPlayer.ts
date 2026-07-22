@@ -43,7 +43,7 @@ export function useWasmPlayer(gameId: string | undefined) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const generationRef = useRef(0);
   const runtimeRef = useRef<GameRuntime | null>(null);
-  const sessionIdRef = useRef<string | null>(null);
+  const sessionRef = useRef<{ id: string; token: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMutedState] = useState(false);
   const [progress, setProgress] = useState<WasmRuntimeProgress | null>(null);
@@ -51,10 +51,10 @@ export function useWasmPlayer(gameId: string | undefined) {
   const [volume, setVolumeState] = useState(1);
 
   const releaseSession = useCallback(() => {
-    const sessionId = sessionIdRef.current;
-    sessionIdRef.current = null;
-    if (sessionId) {
-      void api.stopSession(sessionId).catch((sessionError) => {
+    const session = sessionRef.current;
+    sessionRef.current = null;
+    if (session) {
+      void api.stopSession(session.id, session.token).catch((sessionError) => {
         console.warn("Failed to stop WASM backend session:", sessionError);
       });
     }
@@ -88,7 +88,10 @@ export function useWasmPlayer(gameId: string | undefined) {
     try {
       const backendSession = await api.createSession(gameId, createClientSessionId());
       if (generation !== generationRef.current) return;
-      sessionIdRef.current = backendSession.sessionId;
+      sessionRef.current = {
+        id: backendSession.sessionId,
+        token: backendSession.sessionToken,
+      };
       if (backendSession.boot.runtimeKind !== "libretro") {
         throw new Error("This game requires the native Studio runtime and cannot run in WASM.");
       }

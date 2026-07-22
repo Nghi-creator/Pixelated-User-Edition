@@ -53,7 +53,7 @@ export default function Player() {
   const compatibility = useMemo(() => getBrowserGameCompatibility(game), [game]);
   const canStart = !metadataLoading && !metadataError && compatibility.kind === "browser";
 
-  usePlayCount(id, player.status === "playing");
+  usePlayCount(id, Boolean(currentUser) && player.status === "playing");
 
   const headerStatus = useMemo<PlayerHeaderStatus>(() => {
     if (player.status === "playing" || player.status === "paused") return "playing";

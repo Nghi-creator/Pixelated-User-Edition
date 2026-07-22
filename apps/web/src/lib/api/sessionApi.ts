@@ -17,8 +17,9 @@ export function createSessionApi({ apiRequest }: SessionApiDependencies) {
         }),
         method: "POST",
       }),
-    stopSession: (sessionId: string) =>
+    stopSession: (sessionId: string, sessionToken: string) =>
       apiRequest<void>(`/sessions/${sessionId}`, {
+        body: JSON.stringify({ sessionToken }),
         method: "DELETE",
       }),
   };
