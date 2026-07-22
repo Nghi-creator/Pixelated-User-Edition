@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, RotateCcw, Search } from "lucide-react";
 import HeroBanner from "../../components/user/HeroBanner";
 import GameCard from "../../components/user/GameCard";
 import {
@@ -13,6 +13,7 @@ import {
   HeroSkeleton,
 } from "../../components/ui/Skeleton";
 import { Pagination } from "../../components/ui/Pagination";
+import { AdminSelect } from "../../components/ui/AdminSelect";
 import type { ApiGame } from "../../lib/api/apiTypes";
 import {
   getBrowserGameCompatibility,
@@ -93,12 +94,28 @@ export default function Home() {
   const catalogRefreshLabel = searchQuery
     ? "Searching games..."
     : "Loading games...";
+  const hasActiveFilters = Boolean(
+    searchQuery ||
+      platformFilter ||
+      runtimeFilter !== "all" ||
+      genreFilter ||
+      licenseFilter,
+  );
 
   const changePage = (page: number) => {
     setCurrentPage(page);
     document
       .getElementById("all-games")
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setPlatformFilter("");
+    setRuntimeFilter("all");
+    setGenreFilter("");
+    setLicenseFilter("");
+    setCurrentPage(1);
   };
 
   return (
@@ -110,96 +127,111 @@ export default function Home() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
-        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <h2
-            id="all-games"
-            className="scroll-mt-24 text-2xl font-bold text-white"
-          >
-            All Games
-          </h2>
+        {!showInitialCatalogSkeleton && (
+          <div className="mb-8 space-y-3">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <h2
+                id="all-games"
+                className="scroll-mt-24 text-2xl font-bold text-white"
+              >
+                All Games
+              </h2>
 
-          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-5 lg:max-w-5xl">
-            <div className="relative sm:col-span-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <Search className="h-4 w-4 text-gray-400" />
+              <div className="relative w-full xl:max-w-4xl">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search games..."
+                  value={searchQuery}
+                  onChange={(event) => {
+                    setSearchQuery(event.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="block w-full rounded-lg border border-synth-border bg-synth-bg py-2 pl-10 pr-3 leading-5 text-white placeholder:text-gray-500 transition-colors focus:border-synth-secondary focus:outline-none"
+                />
               </div>
-              <input
-                type="text"
-                placeholder="Search games..."
-                value={searchQuery}
-                onChange={(event) => {
-                  setSearchQuery(event.target.value);
-                  setCurrentPage(1);
-                }}
-                className="block w-full rounded-lg border border-synth-border bg-synth-bg py-2 pl-10 pr-3 leading-5 text-white placeholder:text-gray-500 transition-colors focus:border-synth-secondary focus:outline-none"
-              />
             </div>
-            <label>
-              <span className="sr-only">Runtime availability</span>
-              <select
-                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
-                onChange={(event) => {
-                  setRuntimeFilter(event.target.value as typeof runtimeFilter);
-                  setCurrentPage(1);
-                }}
-                value={runtimeFilter}
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <button
+                className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-lg border border-synth-secondary/40 bg-synth-bg px-4 text-sm font-semibold text-white transition-colors hover:border-synth-secondary hover:bg-synth-elevated disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-synth-bg"
+                disabled={!hasActiveFilters}
+                onClick={resetFilters}
+                type="button"
               >
-                <option value="all">All runtimes</option>
-                <option value="browser">Play in browser</option>
-                <option value="desktop">Desktop required</option>
-                <option value="unavailable">Currently unavailable</option>
-              </select>
-            </label>
-            <label>
-              <span className="sr-only">Game system</span>
-              <select
-                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
-                onChange={(event) => {
-                  setPlatformFilter(event.target.value);
-                  setCurrentPage(1);
-                }}
-                value={platformFilter}
-              >
-                <option value="">All systems</option>
-                {PLATFORM_OPTIONS.map((platform) => (
-                  <option key={platform.id} value={platform.id}>{platform.label}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className="sr-only">Game genre</span>
-              <select
-                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
-                onChange={(event) => {
-                  setGenreFilter(event.target.value);
-                  setCurrentPage(1);
-                }}
-                value={genreFilter}
-              >
-                <option value="">All genres</option>
-                {availableGenres.map((genre) => (
-                  <option key={genre} value={genre}>{formatGenre(genre)}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className="sr-only">Game license</span>
-              <select
-                className="block w-full rounded-lg border border-synth-border bg-synth-bg px-3 py-2 text-white focus:border-synth-secondary focus:outline-none"
-                onChange={(event) => {
-                  setLicenseFilter(event.target.value);
-                  setCurrentPage(1);
-                }}
-                value={licenseFilter}
-              >
-                <option value="">All licenses</option>
-                {availableLicenses.map((license) => (
-                  <option key={license} value={license}>{license}</option>
-                ))}
-              </select>
-            </label>
+                <RotateCcw className="h-4 w-4" />
+                Reset filters
+              </button>
+              <div className="grid w-full gap-3 sm:grid-cols-2 xl:max-w-4xl xl:grid-cols-4">
+                <AdminSelect
+                  ariaLabel="Runtime availability"
+                  className="w-full"
+                  onChange={(value) => {
+                    setRuntimeFilter(value as typeof runtimeFilter);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All runtimes", value: "all" },
+                    { label: "Play in browser", value: "browser" },
+                    { label: "Desktop required", value: "desktop" },
+                    { label: "Currently unavailable", value: "unavailable" },
+                  ]}
+                  value={runtimeFilter}
+                />
+                <AdminSelect
+                  ariaLabel="Game system"
+                  className="w-full"
+                  onChange={(value) => {
+                    setPlatformFilter(value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All systems", value: "" },
+                    ...PLATFORM_OPTIONS.map((platform) => ({
+                      label: platform.label,
+                      value: platform.id,
+                    })),
+                  ]}
+                  value={platformFilter}
+                />
+                <AdminSelect
+                  ariaLabel="Game genre"
+                  className="w-full"
+                  onChange={(value) => {
+                    setGenreFilter(value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All genres", value: "" },
+                    ...availableGenres.map((genre) => ({
+                      label: formatGenre(genre),
+                      value: genre,
+                    })),
+                  ]}
+                  value={genreFilter}
+                />
+                <AdminSelect
+                  ariaLabel="Game license"
+                  className="w-full"
+                  onChange={(value) => {
+                    setLicenseFilter(value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All licenses", value: "" },
+                    ...availableLicenses.map((license) => ({
+                      label: license,
+                      value: license,
+                    })),
+                  ]}
+                  value={licenseFilter}
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {showInitialCatalogSkeleton ? (
           <GamesCatalogSkeleton />
