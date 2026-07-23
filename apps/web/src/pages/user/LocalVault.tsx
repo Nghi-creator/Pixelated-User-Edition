@@ -162,18 +162,9 @@ export default function LocalVault() {
               Choose another ROM
             </button>
           </div>
-          <div ref={stageRef}>
-            <WasmStage
-              canvasRef={player.canvasRef}
-              error={player.error}
-              idleMessage="Press Start game to run this local ROM."
-              onStart={player.start}
-              pixelPerfect={pixelPerfect}
-              progress={player.progress}
-              status={player.status}
-            />
+          <div>
             <WasmPlayerControls
-              gamepadName={player.gamepadName}
+              gameTitle={selectedFile.name}
               isMuted={player.isMuted}
               onFullscreen={() => void stageRef.current?.requestFullscreen?.()}
               onMuteChange={player.setMuted}
@@ -185,6 +176,16 @@ export default function LocalVault() {
               pixelPerfect={pixelPerfect}
               status={player.status}
               volume={player.volume}
+            />
+            <WasmStage
+              canvasRef={player.canvasRef}
+              error={player.error}
+              idleMessage="Press Start game to run this local ROM."
+              onStart={player.start}
+              pixelPerfect={pixelPerfect}
+              progress={player.progress}
+              stageRef={stageRef}
+              status={player.status}
             />
             <WasmInputSettings
               disabled={!(["idle", "stopped", "error"] as string[]).includes(player.status)}

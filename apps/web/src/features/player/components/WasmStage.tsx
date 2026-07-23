@@ -12,6 +12,7 @@ type WasmStageProps = {
   pixelPerfect: boolean;
   progress: WasmRuntimeProgress | null;
   status: WasmPlayerStatus;
+  stageRef?: RefObject<HTMLDivElement | null>;
 };
 
 const loadingLabels: Partial<Record<WasmPlayerStatus, string>> = {
@@ -22,7 +23,7 @@ const loadingLabels: Partial<Record<WasmPlayerStatus, string>> = {
   starting: "Starting game…",
 };
 
-export function WasmStage({ canStart = true, canvasRef, error, idleMessage, onStart, pixelPerfect, progress, status }: WasmStageProps) {
+export function WasmStage({ canStart = true, canvasRef, error, idleMessage, onStart, pixelPerfect, progress, stageRef, status }: WasmStageProps) {
   const loadingLabel = loadingLabels[status];
   const progressPercent = progress?.phase === "downloading" && progress.totalBytes
     ? Math.min(100, Math.round((progress.loadedBytes / progress.totalBytes) * 100))
@@ -30,7 +31,7 @@ export function WasmStage({ canStart = true, canvasRef, error, idleMessage, onSt
   const showLaunch = status === "idle" || status === "stopped" || status === "error";
 
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden bg-black">
+    <div className="relative aspect-[4/3] w-full overflow-hidden bg-black fullscreen:h-screen fullscreen:w-screen fullscreen:aspect-auto" ref={stageRef}>
       <canvas
         aria-label="Browser game emulator"
         className={`h-full w-full object-contain ${pixelPerfect ? "[image-rendering:pixelated]" : ""}`}

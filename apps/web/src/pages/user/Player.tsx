@@ -86,7 +86,21 @@ export default function Player() {
         }
       />
 
-      <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-synth-border bg-synth-surface shadow-panel" ref={stageRef}>
+      <div className="w-full max-w-5xl overflow-visible rounded-lg border border-synth-border bg-synth-surface shadow-panel">
+        <WasmPlayerControls
+          gameTitle={gameTitle}
+          isMuted={player.isMuted}
+          onFullscreen={enterFullscreen}
+          onMuteChange={player.setMuted}
+          onPauseToggle={player.togglePause}
+          onPixelPerfectChange={setPixelPerfect}
+          onReset={player.reset}
+          onStop={player.stop}
+          onVolumeChange={player.setVolume}
+          pixelPerfect={pixelPerfect}
+          status={player.status}
+          volume={player.volume}
+        />
         <WasmStage
           canStart={canStart}
           canvasRef={player.canvasRef}
@@ -101,21 +115,8 @@ export default function Player() {
           onStart={player.start}
           pixelPerfect={pixelPerfect}
           progress={player.progress}
+          stageRef={stageRef}
           status={player.status}
-        />
-        <WasmPlayerControls
-          gamepadName={player.gamepadName}
-          isMuted={player.isMuted}
-          onFullscreen={enterFullscreen}
-          onMuteChange={player.setMuted}
-          onPauseToggle={player.togglePause}
-          onPixelPerfectChange={setPixelPerfect}
-          onReset={player.reset}
-          onStop={player.stop}
-          onVolumeChange={player.setVolume}
-          pixelPerfect={pixelPerfect}
-          status={player.status}
-          volume={player.volume}
         />
         <WasmInputSettings
           disabled={!(["idle", "stopped", "error"] as string[]).includes(player.status)}
