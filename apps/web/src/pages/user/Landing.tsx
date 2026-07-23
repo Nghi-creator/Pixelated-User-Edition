@@ -1,14 +1,11 @@
 import {
-  ArrowRight,
   Cloud,
   FlaskConical,
-  Gamepad2,
   HardDrive,
   MessageCircle,
   ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { PixelIcon } from "../../components/ui/PixelIcon";
 
 const featureCards = [
   {
@@ -74,17 +71,14 @@ export default function Landing() {
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-synth-border bg-synth-primary px-5 font-extrabold text-white transition-colors hover:bg-synth-primary-hover"
                 to="/home"
               >
-                <Gamepad2 className="h-5 w-5" />
-                Browse Games
-                <ArrowRight className="h-5 w-5" />
+                Go to Home Page
               </Link>
-              <Link
+              <a
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-synth-border bg-synth-surface px-5 font-extrabold text-white transition-colors hover:bg-synth-elevated"
-                to="/local"
+                href="https://pixelated-studio-edition.vercel.app/"
               >
-                <PixelIcon className="h-5 w-5" name="publish" />
-                Open Personal ROM
-              </Link>
+                Open Studio Edition
+              </a>
             </div>
           </div>
         </div>
