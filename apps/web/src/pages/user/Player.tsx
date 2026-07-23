@@ -38,6 +38,8 @@ const statusLabels = {
   error: "WASM Runtime Error",
 } as const;
 
+const PLAYER_LAYOUT_CLASS_NAME = "max-w-4xl";
+
 export default function Player() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
@@ -76,6 +78,7 @@ export default function Player() {
         gameRights={gameRights}
         gameTitle={gameTitle}
         hideGameChrome
+        layoutClassName={PLAYER_LAYOUT_CLASS_NAME}
         onToggleTelemetry={() => undefined}
         showStreamTelemetry={false}
         status={headerStatus}
@@ -86,7 +89,9 @@ export default function Player() {
         }
       />
 
-      <div className="w-full max-w-5xl overflow-visible rounded-lg border border-synth-border bg-synth-surface shadow-panel">
+      <div
+        className={`w-full ${PLAYER_LAYOUT_CLASS_NAME} overflow-visible rounded-lg border border-synth-border bg-synth-surface shadow-panel`}
+      >
         <WasmPlayerControls
           gameTitle={gameTitle}
           isMuted={player.isMuted}
@@ -144,11 +149,13 @@ export default function Player() {
         <WasmResearchPanel research={research} />
       </div>
 
-      <div className="mt-3 flex w-full max-w-5xl justify-end">
+      <div
+        className={`mt-3 flex w-full ${PLAYER_LAYOUT_CLASS_NAME} justify-end`}
+      >
         {authorName && <p className="text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
       </div>
 
-      <PlayerInstructions />
+      <PlayerInstructions layoutClassName={PLAYER_LAYOUT_CLASS_NAME} />
 
       <Suspense
         fallback={
