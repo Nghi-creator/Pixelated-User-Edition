@@ -1,5 +1,5 @@
 // Bump this value whenever the app shell or pinned emulator core changes.
-const CACHE_VERSION = "2026-07-20-1";
+const CACHE_VERSION = "2026-07-23-1";
 const CACHE_PREFIX = "pixelated-user-";
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `${CACHE_PREFIX}assets-${CACHE_VERSION}`;

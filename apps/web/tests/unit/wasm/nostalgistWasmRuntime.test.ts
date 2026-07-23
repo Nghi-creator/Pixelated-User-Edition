@@ -201,3 +201,22 @@ test("aborts a stalled hosted launch at its configured deadline", async (context
   );
   runtime.stop();
 });
+
+test("rejects when the emulator core loader ignores the abort signal", async () => {
+  const bytes = validNesRom();
+  const runtime = new NostalgistWasmRuntime({
+    canvas: {} as HTMLCanvasElement,
+    launchTimeoutMs: 5,
+    loadNostalgist: async () => ({
+      Nostalgist: {
+        prepare: async () => new Promise(() => undefined),
+      },
+    }),
+  });
+
+  await assert.rejects(
+    () => runtime.prepare({ file: new Blob([bytes]), fileName: "game.nes" }),
+    /safety deadline/,
+  );
+  runtime.stop();
+});

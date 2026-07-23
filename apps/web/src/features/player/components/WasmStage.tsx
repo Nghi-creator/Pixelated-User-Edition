@@ -24,7 +24,7 @@ const loadingLabels: Partial<Record<WasmPlayerStatus, string>> = {
 
 export function WasmStage({ canStart = true, canvasRef, error, idleMessage, onStart, pixelPerfect, progress, status }: WasmStageProps) {
   const loadingLabel = loadingLabels[status];
-  const progressPercent = progress?.totalBytes
+  const progressPercent = progress?.phase === "downloading" && progress.totalBytes
     ? Math.min(100, Math.round((progress.loadedBytes / progress.totalBytes) * 100))
     : null;
   const showLaunch = status === "idle" || status === "stopped" || status === "error";

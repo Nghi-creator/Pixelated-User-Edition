@@ -153,25 +153,32 @@ export class NostalgistWasmRuntime implements GameRuntime {
 
   async prepare(source: GameRuntimeSource) {
     this.stop();
-    this.abortController = new AbortController();
-    const signal = this.abortController.signal;
+    const abortController = new AbortController();
+    this.abortController = abortController;
+    const signal = abortController.signal;
     let launchTimedOut = false;
+    let rejectDeadline: ((reason: Error) => void) | null = null;
+    const deadline = new Promise<never>((_resolve, reject) => {
+      rejectDeadline = reject;
+    });
     const timeoutId = globalThis.setTimeout(() => {
       launchTimedOut = true;
-      this.abortController?.abort();
+      abortController.abort();
+      rejectDeadline?.(new Error("The browser emulator launch exceeded its safety deadline."));
     }, this.options.launchTimeoutMs || WASM_LAUNCH_TIMEOUT_MS);
+    const beforeDeadline = <T>(operation: Promise<T>) => Promise.race([operation, deadline]);
 
     try {
       this.options.onProgress?.({ loadedBytes: 0, phase: "downloading", totalBytes: source.expectedSize || source.file?.size || null });
-      const bytes = await downloadRom(source, signal, this.options.onProgress);
+      const bytes = await beforeDeadline(downloadRom(source, signal, this.options.onProgress));
       this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "verifying", totalBytes: bytes.byteLength });
-      await validateBrowserRom(this.options.systemId || "nes", bytes, source);
+      await beforeDeadline(validateBrowserRom(this.options.systemId || "nes", bytes, source));
       if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
 
-      this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "loading-core", totalBytes: bytes.byteLength });
-      const { Nostalgist: NostalgistApi } = await (this.options.loadNostalgist || defaultLoader)();
+      this.options.onProgress?.({ loadedBytes: 0, phase: "loading-core", totalBytes: null });
+      const { Nostalgist: NostalgistApi } = await beforeDeadline((this.options.loadNostalgist || defaultLoader)());
       if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
-      const instance = await NostalgistApi.prepare({
+      const instance = await beforeDeadline(NostalgistApi.prepare({
         cache: { core: true, rom: false },
         core: this.options.coreId || "fceumm",
         element: this.options.canvas,
@@ -189,7 +196,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
         runEmulatorManually: true,
         signal,
         size: "auto",
-      });
+      }));
       if (signal.aborted) {
         instance.exit({ removeCanvas: false });
         throw new DOMException("Launch cancelled", "AbortError");
@@ -198,7 +205,7 @@ export class NostalgistWasmRuntime implements GameRuntime {
       this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "ready", totalBytes: bytes.byteLength });
     } catch (error) {
       if (launchTimedOut) {
-        throw new Error("The browser emulator launch exceeded the 60-second safety deadline.");
+        throw new Error("The browser emulator launch exceeded its safety deadline.");
       }
       throw error;
     } finally {
