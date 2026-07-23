@@ -195,14 +195,14 @@ export default function Player() {
       )}
 
       <div
-        className={`mt-3 flex w-full ${playerLayoutClassName} justify-end`}
+        className={`mt-3 flex w-full ${playerLayoutClassName} justify-start`}
       >
-        {authorName && <p className="text-right text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
+        {authorName && <p className="text-left text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
       </div>
 
       <Suspense
         fallback={
-          <div className="mt-6 flex min-h-32 w-full max-w-5xl items-center justify-center rounded-lg border border-synth-border bg-synth-surface text-sm text-gray-300">
+          <div className={`mt-6 flex min-h-32 w-full ${playerLayoutClassName} items-center justify-center rounded-lg border border-synth-border bg-synth-surface text-sm text-gray-300`}>
             Loading community…
           </div>
         }
@@ -210,7 +210,7 @@ export default function Player() {
         <PlayerCommunitySection
           currentUser={currentUser}
           gameId={id}
-          layoutClassName="max-w-5xl"
+          layoutClassName={playerLayoutClassName}
           onSignIn={() => navigate("/login")}
         />
       </Suspense>

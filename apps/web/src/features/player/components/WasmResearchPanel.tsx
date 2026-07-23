@@ -1,4 +1,5 @@
-import { Download, FlaskConical, X } from "lucide-react";
+import { Download, X } from "lucide-react";
+import { PixelIcon } from "../../../components/ui/PixelIcon";
 import type { ReturnTypeOfUseWasmResearch } from "../research/wasmResearchTypes";
 
 type WasmResearchPanelProps = {
@@ -89,7 +90,7 @@ function ResearchPanelContent({
             </span>
           </div>
           <button
-            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-synth-border bg-synth-elevated px-3 py-2 text-sm font-bold text-white hover:border-synth-primary"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-synth-primary bg-synth-primary px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-synth-primary-hover"
             onClick={research.exportBundle}
             type="button"
           >
@@ -111,7 +112,7 @@ export function WasmResearchPanel({
       <aside className="rounded-lg border border-synth-border bg-synth-surface p-4 shadow-panel">
         <div className="flex items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-sm font-bold text-white">
-            <FlaskConical className="h-4 w-4" /> Browser measurements
+            <PixelIcon aria-hidden="true" className="h-4 w-4" name="logs" /> Browser measurements
           </h2>
           {onClose && (
             <button
@@ -133,7 +134,7 @@ export function WasmResearchPanel({
   return (
     <details className="border-t border-synth-border bg-synth-surface p-4">
       <summary className="cursor-pointer text-sm font-bold text-white">
-        <FlaskConical className="mr-2 inline h-4 w-4" />
+        <PixelIcon aria-hidden="true" className="mr-2 inline h-4 w-4" name="logs" />
         Browser research measurements
       </summary>
       <ResearchPanelContent research={research} sidebar={false} />
