@@ -6,7 +6,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; connect-src 'self' https://pixelated-api-services-6ovi.onrender.com https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://challenges.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; form-action 'self'; frame-ancestors 'none'; frame-src https://challenges.cloudflare.com; img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com; manifest-src 'self'; media-src 'self' blob:; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; worker-src 'self' blob: https://cdn.jsdelivr.net; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; connect-src 'self' https://pixelated-api-services-6ovi.onrender.com https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; form-action 'self'; frame-ancestors 'none'; frame-src https://challenges.cloudflare.com; img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com; manifest-src 'self'; media-src 'self' blob:; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' blob: https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; worker-src 'self' blob:; upgrade-insecure-requests"
         },
         {
           "key": "Referrer-Policy",

@@ -19,7 +19,8 @@ const headers = new Map(
 test("deployment CSP permits required WASM resources without broad network access", () => {
   const csp = headers.get("Content-Security-Policy") || "";
   assert.match(csp, /script-src[^;]*'wasm-unsafe-eval'/);
-  assert.match(csp, /worker-src 'self' blob: https:\/\/cdn\.jsdelivr\.net/);
+  assert.match(csp, /worker-src 'self' blob:/);
+  assert.doesNotMatch(csp, /cdn\.jsdelivr\.net/);
   assert.match(
     csp,
     /connect-src[^;]*pixelated-api-services-6ovi\.onrender\.com/,

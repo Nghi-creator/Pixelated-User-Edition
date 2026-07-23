@@ -1,5 +1,5 @@
 // Bump this value whenever the app shell or pinned emulator core changes.
-const CACHE_VERSION = "2026-07-23-1";
+const CACHE_VERSION = "2026-07-23-2";
 const CACHE_PREFIX = "pixelated-user-";
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `${CACHE_PREFIX}assets-${CACHE_VERSION}`;
@@ -14,13 +14,12 @@ const SHELL_URLS = [
 ];
 
 function isApprovedCoreAsset(url) {
-  return url.hostname === "cdn.jsdelivr.net" && (
-    url.pathname === "/npm/@zip.js/zip.js@2.8.11/+esm" ||
-    [
-      "/gh/arianrhodsandlot/retroarch-emscripten-build@v1.22.2/retroarch/fceumm_libretro.zip",
-      "/gh/arianrhodsandlot/retroarch-emscripten-build@v1.22.2/retroarch/gambatte_libretro.zip",
-    ].includes(url.pathname)
-  );
+  return url.origin === self.location.origin && [
+    "/emulator-cores/fceumm_libretro.js",
+    "/emulator-cores/fceumm_libretro.wasm",
+    "/emulator-cores/gambatte_libretro.js",
+    "/emulator-cores/gambatte_libretro.wasm",
+  ].includes(url.pathname);
 }
 
 self.addEventListener("install", (event) => {

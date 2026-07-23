@@ -44,6 +44,17 @@ type RuntimeOptions = {
 const defaultLoader = () => import("nostalgist") as Promise<NostalgistModule>;
 export const WASM_LAUNCH_TIMEOUT_MS = 60_000;
 
+export function resolveBundledCoreAsset(
+  core: unknown,
+  extension: "js" | "wasm",
+  baseUrl = globalThis.location.href,
+) {
+  if (typeof core !== "string") {
+    throw new TypeError("The browser emulator core name is invalid.");
+  }
+  return new URL(`/emulator-cores/${core}_libretro.${extension}`, baseUrl);
+}
+
 function requireHostedRomEvidence(source: GameRuntimeSource) {
   const expectedSize = normalizeExpectedRomSize(source.expectedSize);
   const expectedSha256 = normalizeSha256(source.expectedSha256);
@@ -183,6 +194,8 @@ export class NostalgistWasmRuntime implements GameRuntime {
         core: this.options.coreId || "fceumm",
         element: this.options.canvas,
         respondToGlobalEvents: false,
+        resolveCoreJs: (core) => resolveBundledCoreAsset(core, "js"),
+        resolveCoreWasm: (core) => resolveBundledCoreAsset(core, "wasm"),
         retroarchConfig: {
           audio_volume: 0,
           input_joypad_driver: "sdl2",

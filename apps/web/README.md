@@ -82,7 +82,7 @@ Set `VITE_TURNSTILE_SITE_KEY` only after enabling Cloudflare Turnstile CAPTCHA i
 
 Production builds register `public/sw.js` and can be installed as Pixelated User Edition.
 The service worker caches only the application shell, same-origin hashed assets, and the exact
-pinned FCEUmm/ZIP runtime artifacts. API responses, authenticated requests, Supabase traffic,
+pinned first-party FCEUmm/Gambatte runtime artifacts. API responses, authenticated requests, Supabase traffic,
 and ROM downloads are never cached. Personal ROM bytes remain memory-only.
 
 When the app shell changes or the pinned emulator core is upgraded, bump `CACHE_VERSION` in

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { NostalgistWasmRuntime } from "../../../src/lib/runtime/wasm/NostalgistWasmRuntime.ts";
+import {
+  NostalgistWasmRuntime,
+  resolveBundledCoreAsset,
+} from "../../../src/lib/runtime/wasm/NostalgistWasmRuntime.ts";
 import { sha256Hex } from "../../../src/lib/runtime/wasm/romValidation.ts";
 
 function validNesRom() {
@@ -22,6 +25,22 @@ function validGameBoyRom() {
   return bytes;
 }
 
+test("resolves pinned emulator cores from the app origin", () => {
+  const baseUrl = "https://pixelated.test/play/game-1";
+  assert.equal(
+    String(resolveBundledCoreAsset("fceumm", "js", baseUrl)),
+    "https://pixelated.test/emulator-cores/fceumm_libretro.js",
+  );
+  assert.equal(
+    String(resolveBundledCoreAsset("gambatte", "wasm", baseUrl)),
+    "https://pixelated.test/emulator-cores/gambatte_libretro.wasm",
+  );
+  assert.throws(
+    () => resolveBundledCoreAsset({ name: "fceumm" }, "js", baseUrl),
+    /core name is invalid/,
+  );
+});
+
 test("prepares the fceumm core and exposes runtime controls", async (context) => {
   const originalFetch = globalThis.fetch;
   context.after(() => {
@@ -38,6 +57,8 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
         async prepare(options) {
           assert.equal(options.core, "fceumm");
           assert.equal(options.respondToGlobalEvents, false);
+          assert.equal(typeof options.resolveCoreJs, "function");
+          assert.equal(typeof options.resolveCoreWasm, "function");
           return {
             exit: () => { status = "terminated"; actions.push("exit"); },
             getStatus: () => status,
