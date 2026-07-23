@@ -207,6 +207,7 @@ export default function LocalVault() {
         <WasmPlayerToolDrawer
           description="Customize the controls stored for this browser and connected gamepad."
           onClose={() => setActivePlayerTool(null)}
+          size="wide"
           title="Keyboard & gamepad mapping"
         >
           <WasmInputSettings

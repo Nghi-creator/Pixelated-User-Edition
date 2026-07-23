@@ -84,26 +84,28 @@ export function WasmSavePanel({ captureBatterySave, captureState, gameKey, resto
   };
 
   return (
-    <section className={variant === "inline" ? "border-t border-synth-border bg-synth-bg/60 p-4" : "rounded-lg border border-synth-border bg-synth-surface p-4"} aria-label="Browser save states">
+    <section className={variant === "inline" ? "border-t border-synth-border bg-synth-bg/60 p-4" : ""} aria-label="Browser save states">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="flex items-center gap-2 font-bold text-white"><Save className="h-4 w-4" /> Local save states</h2>
-          <p className="mt-1 text-xs text-gray-400">Stored only in this browser. A state must be loaded with the same game and emulator core.</p>
-        </div>
+        {variant === "inline" && (
+          <div>
+            <h2 className="flex items-center gap-2 font-bold text-white"><Save className="h-4 w-4" /> Local save states</h2>
+            <p className="mt-1 text-xs text-gray-400">Stored only in this browser. A state must be loaded with the same game and emulator core.</p>
+          </div>
+        )}
         {storage && (
-          <span className="flex items-center gap-1 text-xs text-gray-500" title="Overall browser storage usage">
+          <span className={`flex items-center gap-1 text-xs text-gray-500 ${variant === "drawer" ? "ml-auto" : ""}`} title="Overall browser storage usage">
             <HardDrive className="h-3.5 w-3.5" /> {formatBytes(storage.usage)} of {formatBytes(storage.quota)} used
           </span>
         )}
       </div>
 
       <input accept=".state,.savestate" className="sr-only" id={`state-import-${gameKey.replace(/[^a-z0-9]/gi, "-")}`} onChange={importState} type="file" />
-      <div className="grid gap-2 md:grid-cols-3">
+      <div className={`grid gap-2 ${variant === "inline" ? "md:grid-cols-3" : "grid-cols-1"}`}>
         {([1, 2, 3] as WasmSaveSlot[]).map((slot) => {
           const record = records.find((candidate) => candidate.slot === slot);
           const importingId = `state-import-${gameKey.replace(/[^a-z0-9]/gi, "-")}`;
           return (
-            <article className="rounded-md border border-synth-border bg-synth-surface p-3" key={slot}>
+            <article className="rounded-md border border-synth-border bg-synth-bg p-3" key={slot}>
               <div className="mb-3 flex items-start justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-white">Slot {slot}</h3>

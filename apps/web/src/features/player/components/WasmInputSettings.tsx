@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Gamepad2, Keyboard, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import {
   INPUT_ACTION_LABELS,
   WASM_INPUT_ACTIONS,
@@ -85,13 +85,13 @@ export function WasmInputSettings({
 
   const content = (
     <div data-ignore-game-input>
-      <div className={`grid gap-6 ${variant === "inline" ? "border-t border-synth-border p-4 lg:grid-cols-2" : "lg:grid-cols-2"}`}>
+      <div className={`grid gap-6 ${variant === "inline" ? "border-t border-synth-border p-4" : ""}`}>
         <section>
           <div className="flex items-center justify-between gap-3">
-            <h3 className="flex items-center gap-2 font-bold text-white"><Keyboard className="h-4 w-4" /> Keyboard</h3>
+            <h3 className="font-bold text-white">Keyboard</h3>
             <button className="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white disabled:opacity-50" disabled={disabled} onClick={onResetKeyboard} type="button"><RotateCcw className="h-3.5 w-3.5" /> Defaults</button>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {WASM_INPUT_ACTIONS.map((action) => (
               <label className="text-xs font-semibold text-gray-400" key={action}>
                 {INPUT_ACTION_LABELS[action]}
@@ -111,11 +111,11 @@ export function WasmInputSettings({
 
         <section>
           <div className="flex items-center justify-between gap-3">
-            <h3 className="flex min-w-0 items-center gap-2 font-bold text-white"><Gamepad2 className="h-4 w-4 shrink-0" /><span className="truncate">{gamepadName || "Gamepad"}</span></h3>
+            <h3 className="min-w-0 truncate font-bold text-white">{gamepadName || "Gamepad"}</h3>
             <button className="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white disabled:opacity-50" disabled={disabled || !gamepadName} onClick={onResetGamepad} type="button"><RotateCcw className="h-3.5 w-3.5" /> Defaults</button>
           </div>
           {gamepadName ? (
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {WASM_INPUT_ACTIONS.map((action) => (
                 <label className="text-xs font-semibold text-gray-400" key={action}>
                   {INPUT_ACTION_LABELS[action]}

@@ -1,10 +1,8 @@
 import {
   Blend,
-  Gamepad2,
   Maximize2,
   Pause,
   RotateCcw,
-  Save,
   ScanLine,
   Settings,
   Square,
@@ -155,10 +153,10 @@ export function WasmPlayerControls({
             <p className="relative mt-4 border-t border-synth-border pt-4 text-xs font-bold uppercase tracking-[0.16em] text-synth-secondary">Player tools</p>
             <div className="relative mt-2 grid grid-cols-2 gap-2">
               <button className={buttonClass} onClick={() => openPlayerTool(onOpenInputSettings)} type="button">
-                <Gamepad2 className="h-4 w-4" /> Keyboard &amp; gamepad
+                Keyboard
               </button>
               <button className={buttonClass} onClick={() => openPlayerTool(onOpenSaveStates)} type="button">
-                <Save className="h-4 w-4" /> Local save states
+                Local states
               </button>
             </div>
           </div>

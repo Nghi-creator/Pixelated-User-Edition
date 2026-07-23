@@ -5,6 +5,7 @@ type WasmPlayerToolDrawerProps = {
   children: ReactNode;
   description: string;
   onClose: () => void;
+  size?: "default" | "wide";
   title: string;
 };
 
@@ -12,6 +13,7 @@ export function WasmPlayerToolDrawer({
   children,
   description,
   onClose,
+  size = "default",
   title,
 }: WasmPlayerToolDrawerProps) {
   useEffect(() => {
@@ -39,7 +41,9 @@ export function WasmPlayerToolDrawer({
         aria-describedby="wasm-player-tool-description"
         aria-labelledby="wasm-player-tool-title"
         aria-modal="true"
-        className="absolute left-0 top-0 flex h-full w-full max-w-3xl flex-col border-r border-synth-border bg-synth-bg shadow-2xl"
+        className={`absolute left-0 top-0 flex h-full w-full flex-col border-r border-synth-border bg-synth-bg shadow-2xl ${
+          size === "wide" ? "max-w-3xl" : "max-w-md"
+        }`}
         role="dialog"
       >
         <div className="flex items-center justify-between border-b border-synth-border px-5 py-4">

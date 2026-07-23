@@ -4,7 +4,6 @@ import {
   PlayerHeader,
   type PlayerHeaderStatus,
 } from "../../features/player/components/PlayerHeader";
-import { PlayerInstructions } from "../../features/player/components/PlayerControls";
 import { PlayerStreamGrid } from "../../features/player/components/PlayerStreamGrid";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
 import { WasmPlayerToolDrawer } from "../../features/player/components/WasmPlayerToolDrawer";
@@ -161,6 +160,7 @@ export default function Player() {
         <WasmPlayerToolDrawer
           description="Customize the controls stored for this browser and connected gamepad."
           onClose={() => setActivePlayerTool(null)}
+          size="wide"
           title="Keyboard & gamepad mapping"
         >
           <WasmInputSettings
@@ -197,10 +197,8 @@ export default function Player() {
       <div
         className={`mt-3 flex w-full ${playerLayoutClassName} justify-end`}
       >
-        {authorName && <p className="text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
+        {authorName && <p className="text-right text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
       </div>
-
-      <PlayerInstructions layoutClassName={playerLayoutClassName} />
 
       <Suspense
         fallback={
