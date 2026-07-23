@@ -18,6 +18,7 @@ type Props = {
   onKeyboardBindingChange: (action: WasmInputAction, code: string) => string | null;
   onResetGamepad: () => void;
   onResetKeyboard: () => void;
+  variant?: "inline" | "drawer";
 };
 
 const bindingButtonClass =
@@ -32,6 +33,7 @@ export function WasmInputSettings({
   onKeyboardBindingChange,
   onResetGamepad,
   onResetKeyboard,
+  variant = "inline",
 }: Props) {
   const [capturingGamepad, setCapturingGamepad] = useState<WasmInputAction | null>(null);
   const [capturingKeyboard, setCapturingKeyboard] = useState<WasmInputAction | null>(null);
@@ -81,12 +83,9 @@ export function WasmInputSettings({
     setCapturingKeyboard(null);
   };
 
-  return (
-    <details className="border-t border-synth-border bg-synth-surface" data-ignore-game-input>
-      <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-white">
-        Keyboard &amp; gamepad mapping
-      </summary>
-      <div className="grid gap-6 border-t border-synth-border p-4 lg:grid-cols-2">
+  const content = (
+    <div data-ignore-game-input>
+      <div className={`grid gap-6 ${variant === "inline" ? "border-t border-synth-border p-4 lg:grid-cols-2" : "lg:grid-cols-2"}`}>
         <section>
           <div className="flex items-center justify-between gap-3">
             <h3 className="flex items-center gap-2 font-bold text-white"><Keyboard className="h-4 w-4" /> Keyboard</h3>
@@ -143,6 +142,17 @@ export function WasmInputSettings({
       <div className="border-t border-synth-border px-4 py-3 text-xs text-gray-400">
         {disabled ? "Stop the game before changing input mappings." : message || "Mappings are stored only in this browser. Duplicate keys or buttons are rejected."}
       </div>
+    </div>
+  );
+
+  if (variant === "drawer") return content;
+
+  return (
+    <details className="border-t border-synth-border bg-synth-surface">
+      <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-white">
+        Keyboard &amp; gamepad mapping
+      </summary>
+      {content}
     </details>
   );
 }

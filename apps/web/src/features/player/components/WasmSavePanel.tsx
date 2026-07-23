@@ -18,6 +18,7 @@ type Props = {
   gameKey: string;
   restoreState: (state: Blob) => Promise<void>;
   status: WasmPlayerStatus;
+  variant?: "inline" | "drawer";
 };
 
 function downloadBlob(blob: Blob, fileName: string) {
@@ -40,7 +41,7 @@ function SaveThumbnail({ blob }: { blob: Blob }) {
   return <img alt="Save-state preview" className="h-10 w-14 rounded object-cover" src={url} />;
 }
 
-export function WasmSavePanel({ captureBatterySave, captureState, gameKey, restoreState, status }: Props) {
+export function WasmSavePanel({ captureBatterySave, captureState, gameKey, restoreState, status, variant = "inline" }: Props) {
   const importSlot = useRef<WasmSaveSlot>(1);
   const [busySlot, setBusySlot] = useState<WasmSaveSlot | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export function WasmSavePanel({ captureBatterySave, captureState, gameKey, resto
   };
 
   return (
-    <section className="border-t border-synth-border bg-synth-bg/60 p-4" aria-label="Browser save states">
+    <section className={variant === "inline" ? "border-t border-synth-border bg-synth-bg/60 p-4" : "rounded-lg border border-synth-border bg-synth-surface p-4"} aria-label="Browser save states">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="flex items-center gap-2 font-bold text-white"><Save className="h-4 w-4" /> Local save states</h2>

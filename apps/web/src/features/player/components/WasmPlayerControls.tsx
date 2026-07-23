@@ -1,8 +1,10 @@
 import {
   Blend,
+  Gamepad2,
   Maximize2,
   Pause,
   RotateCcw,
+  Save,
   ScanLine,
   Settings,
   Square,
@@ -18,6 +20,8 @@ type WasmPlayerControlsProps = {
   isMuted: boolean;
   onFullscreen: () => void;
   onMuteChange: (muted: boolean) => void;
+  onOpenInputSettings: () => void;
+  onOpenSaveStates: () => void;
   onPauseToggle: () => void;
   onPixelPerfectChange: (enabled: boolean) => void;
   onReset: () => void;
@@ -40,6 +44,8 @@ export function WasmPlayerControls({
   isMuted,
   onFullscreen,
   onMuteChange,
+  onOpenInputSettings,
+  onOpenSaveStates,
   onPauseToggle,
   onPixelPerfectChange,
   onReset,
@@ -68,6 +74,10 @@ export function WasmPlayerControls({
       ? "border-synth-action-hover bg-synth-action text-white shadow-[0_0_0_2px_rgba(255,153,193,0.35)] hover:brightness-110"
       : "border-[#5D263A] bg-[#351B27] text-gray-400 hover:bg-[#2B1720] hover:text-white"
   }`;
+  const openPlayerTool = (openTool: () => void) => {
+    setIsSettingsOpen(false);
+    openTool();
+  };
 
   useEffect(() => {
     if (!isSettingsOpen) return;
@@ -141,6 +151,15 @@ export function WasmPlayerControls({
               </button>
               <button className={buttonClass} disabled={!isRunning} onClick={onReset} type="button"><RotateCcw className="h-4 w-4" /> Reset</button>
               <button className={buttonClass} disabled={!canStop} onClick={onStop} type="button"><Square className="h-4 w-4" /> Stop</button>
+            </div>
+            <p className="relative mt-4 border-t border-synth-border pt-4 text-xs font-bold uppercase tracking-[0.16em] text-synth-secondary">Player tools</p>
+            <div className="relative mt-2 grid grid-cols-2 gap-2">
+              <button className={buttonClass} onClick={() => openPlayerTool(onOpenInputSettings)} type="button">
+                <Gamepad2 className="h-4 w-4" /> Keyboard &amp; gamepad
+              </button>
+              <button className={buttonClass} onClick={() => openPlayerTool(onOpenSaveStates)} type="button">
+                <Save className="h-4 w-4" /> Local save states
+              </button>
             </div>
           </div>
         )}

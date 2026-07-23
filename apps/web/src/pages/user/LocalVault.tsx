@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
+import { WasmPlayerToolDrawer } from "../../features/player/components/WasmPlayerToolDrawer";
 import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
 import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
 import { WasmStage } from "../../features/player/components/WasmStage";
@@ -32,6 +33,7 @@ import { useLocalWasmPlayer } from "../../features/local-vault/useLocalWasmPlaye
 import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
 
 type SelectedSystem = { id: LocalRomSystemId; label: string };
+type PlayerTool = "input" | "saves";
 
 function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -39,6 +41,7 @@ function formatBytes(bytes: number) {
 }
 
 export default function LocalVault() {
+  const [activePlayerTool, setActivePlayerTool] = useState<PlayerTool | null>(null);
   const [fileInputVersion, setFileInputVersion] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isInspecting, setIsInspecting] = useState(false);
@@ -168,6 +171,8 @@ export default function LocalVault() {
               isMuted={player.isMuted}
               onFullscreen={() => void stageRef.current?.requestFullscreen?.()}
               onMuteChange={player.setMuted}
+              onOpenInputSettings={() => setActivePlayerTool("input")}
+              onOpenSaveStates={() => setActivePlayerTool("saves")}
               onPauseToggle={player.togglePause}
               onPixelPerfectChange={setPixelPerfect}
               onReset={player.reset}
@@ -187,32 +192,52 @@ export default function LocalVault() {
               stageRef={stageRef}
               status={player.status}
             />
-            <WasmInputSettings
-              disabled={!(["idle", "stopped", "error"] as string[]).includes(player.status)}
-              gamepadMapping={player.inputBindings.gamepadMapping}
-              gamepadName={player.inputBindings.gamepadName}
-              keyboardMapping={player.inputBindings.keyboardMapping}
-              onGamepadBindingChange={player.inputBindings.setGamepadBinding}
-              onKeyboardBindingChange={player.inputBindings.setKeyboardBinding}
-              onResetGamepad={player.inputBindings.resetGamepadMapping}
-              onResetKeyboard={player.inputBindings.resetKeyboardMapping}
-            />
             <WasmTouchControls
               gameKey={gameKey}
               onPress={player.pressInput}
               onRelease={player.releaseInput}
               status={player.status}
             />
-            <WasmSavePanel
-              captureBatterySave={player.captureBatterySave}
-              captureState={player.captureState}
-              gameKey={gameKey}
-              restoreState={player.restoreState}
-              status={player.status}
-            />
             <WasmResearchPanel research={research} />
           </div>
         </section>
+      )}
+
+      {selectedFile && activePlayerTool === "input" && (
+        <WasmPlayerToolDrawer
+          description="Customize the controls stored for this browser and connected gamepad."
+          onClose={() => setActivePlayerTool(null)}
+          title="Keyboard & gamepad mapping"
+        >
+          <WasmInputSettings
+            disabled={!(["idle", "stopped", "error"] as string[]).includes(player.status)}
+            gamepadMapping={player.inputBindings.gamepadMapping}
+            gamepadName={player.inputBindings.gamepadName}
+            keyboardMapping={player.inputBindings.keyboardMapping}
+            onGamepadBindingChange={player.inputBindings.setGamepadBinding}
+            onKeyboardBindingChange={player.inputBindings.setKeyboardBinding}
+            onResetGamepad={player.inputBindings.resetGamepadMapping}
+            onResetKeyboard={player.inputBindings.resetKeyboardMapping}
+            variant="drawer"
+          />
+        </WasmPlayerToolDrawer>
+      )}
+
+      {selectedFile && activePlayerTool === "saves" && (
+        <WasmPlayerToolDrawer
+          description="Manage save states stored only in this browser."
+          onClose={() => setActivePlayerTool(null)}
+          title="Local save states"
+        >
+          <WasmSavePanel
+            captureBatterySave={player.captureBatterySave}
+            captureState={player.captureState}
+            gameKey={gameKey}
+            restoreState={player.restoreState}
+            status={player.status}
+            variant="drawer"
+          />
+        </WasmPlayerToolDrawer>
       )}
 
       <div
