@@ -5,6 +5,7 @@ import {
   type PlayerHeaderStatus,
 } from "../../features/player/components/PlayerHeader";
 import { PlayerInstructions } from "../../features/player/components/PlayerControls";
+import { PlayerStreamGrid } from "../../features/player/components/PlayerStreamGrid";
 import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
 import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
 import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
@@ -46,6 +47,7 @@ export default function Player() {
   const navigate = useNavigate();
   const stageRef = useRef<HTMLDivElement>(null);
   const [pixelPerfect, setPixelPerfect] = useState(true);
+  const [showBrowserTelemetry, setShowBrowserTelemetry] = useState(false);
   const currentUser = useAuthUser();
   const { backRoute, backText } = usePlayerNavigation(location, id);
   const { authorName, game, gameRights, gameTitle, isError: metadataError, isLoading: metadataLoading } = useGameMetadata(id);
@@ -69,6 +71,9 @@ export default function Player() {
   const enterFullscreen = () => {
     void stageRef.current?.requestFullscreen?.();
   };
+  const playerLayoutClassName = showBrowserTelemetry
+    ? "max-w-7xl"
+    : PLAYER_LAYOUT_CLASS_NAME;
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 pb-24 pt-24">
@@ -78,9 +83,11 @@ export default function Player() {
         gameRights={gameRights}
         gameTitle={gameTitle}
         hideGameChrome
-        layoutClassName={PLAYER_LAYOUT_CLASS_NAME}
-        onToggleTelemetry={() => undefined}
-        showStreamTelemetry={false}
+        layoutClassName={playerLayoutClassName}
+        onToggleTelemetry={() =>
+          setShowBrowserTelemetry((isVisible) => !isVisible)
+        }
+        showStreamTelemetry={showBrowserTelemetry}
         status={headerStatus}
         statusLabelOverride={
           player.status === "idle" && !metadataLoading && compatibility.kind !== "browser"
@@ -89,9 +96,18 @@ export default function Player() {
         }
       />
 
-      <div
-        className={`w-full ${PLAYER_LAYOUT_CLASS_NAME} overflow-visible rounded-lg border border-synth-border bg-synth-surface shadow-panel`}
+      <PlayerStreamGrid
+        layoutClassName={playerLayoutClassName}
+        showStreamTelemetry={showBrowserTelemetry}
+        telemetryPanel={
+          <WasmResearchPanel
+            onClose={() => setShowBrowserTelemetry(false)}
+            research={research}
+            variant="sidebar"
+          />
+        }
       >
+        <div className="w-full overflow-visible rounded-lg border border-synth-border bg-synth-surface shadow-panel">
         <WasmPlayerControls
           gameTitle={gameTitle}
           isMuted={player.isMuted}
@@ -101,8 +117,12 @@ export default function Player() {
           onPixelPerfectChange={setPixelPerfect}
           onReset={player.reset}
           onStop={player.stop}
+          onToggleTelemetry={() =>
+            setShowBrowserTelemetry((isVisible) => !isVisible)
+          }
           onVolumeChange={player.setVolume}
           pixelPerfect={pixelPerfect}
+          showTelemetry={showBrowserTelemetry}
           status={player.status}
           volume={player.volume}
         />
@@ -146,16 +166,16 @@ export default function Player() {
           restoreState={player.restoreState}
           status={player.status}
         />
-        <WasmResearchPanel research={research} />
-      </div>
+        </div>
+      </PlayerStreamGrid>
 
       <div
-        className={`mt-3 flex w-full ${PLAYER_LAYOUT_CLASS_NAME} justify-end`}
+        className={`mt-3 flex w-full ${playerLayoutClassName} justify-end`}
       >
         {authorName && <p className="text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
       </div>
 
-      <PlayerInstructions layoutClassName={PLAYER_LAYOUT_CLASS_NAME} />
+      <PlayerInstructions layoutClassName={playerLayoutClassName} />
 
       <Suspense
         fallback={

@@ -1,14 +1,16 @@
 import {
-  Grid2X2,
+  Blend,
   Maximize2,
   Pause,
   RotateCcw,
+  ScanLine,
   Settings,
   Square,
   Volume2,
   VolumeX,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { PixelIcon } from "../../../components/ui/PixelIcon";
 import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
 
 type WasmPlayerControlsProps = {
@@ -20,8 +22,10 @@ type WasmPlayerControlsProps = {
   onPixelPerfectChange: (enabled: boolean) => void;
   onReset: () => void;
   onStop: () => void;
+  onToggleTelemetry?: () => void;
   onVolumeChange: (volume: number) => void;
   pixelPerfect: boolean;
+  showTelemetry?: boolean;
   status: WasmPlayerStatus;
   volume: number;
 };
@@ -40,8 +44,10 @@ export function WasmPlayerControls({
   onPixelPerfectChange,
   onReset,
   onStop,
+  onToggleTelemetry,
   onVolumeChange,
   pixelPerfect,
+  showTelemetry = false,
   status,
   volume,
 }: WasmPlayerControlsProps) {
@@ -57,6 +63,11 @@ export function WasmPlayerControls({
     "playing",
     "paused",
   ].includes(status);
+  const pixelButtonClass = `inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-synth-secondary ${
+    pixelPerfect
+      ? "border-synth-action-hover bg-synth-action text-white shadow-[0_0_0_2px_rgba(255,153,193,0.35)] hover:brightness-110"
+      : "border-[#5D263A] bg-[#351B27] text-gray-400 hover:bg-[#2B1720] hover:text-white"
+  }`;
 
   useEffect(() => {
     if (!isSettingsOpen) return;
@@ -81,19 +92,6 @@ export function WasmPlayerControls({
       <h1 className="min-w-0 flex-1 truncate text-lg font-extrabold text-white sm:text-xl">
         {gameTitle || "Loading Game..."}
       </h1>
-      <button aria-label="Fullscreen" className={iconButtonClass} onClick={onFullscreen} title="Fullscreen" type="button">
-        <Maximize2 className="h-5 w-5" />
-      </button>
-      <button
-        aria-label={pixelPerfect ? "Disable pixel rendering" : "Enable pixel rendering"}
-        aria-pressed={pixelPerfect}
-        className={iconButtonClass}
-        onClick={() => onPixelPerfectChange(!pixelPerfect)}
-        title={pixelPerfect ? "Pixel rendering on" : "Pixel rendering off"}
-        type="button"
-      >
-        <Grid2X2 className="h-5 w-5" />
-      </button>
       <div className="hidden h-10 items-center rounded-lg border border-[#5D263A] bg-[#351B27] sm:flex">
         <button aria-label={isMuted ? "Unmute game" : "Mute game"} className="inline-flex h-full w-10 items-center justify-center border-r border-[#5D263A] text-white hover:bg-[#2B1720]" onClick={() => onMuteChange(!isMuted)} type="button">
           {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
@@ -103,6 +101,31 @@ export function WasmPlayerControls({
           <input aria-label="Game volume" className="w-20 accent-synth-primary sm:w-24" max="1" min="0" onChange={(event) => onVolumeChange(Number(event.target.value))} step="0.05" type="range" value={volume} />
         </label>
       </div>
+      {onToggleTelemetry && (
+        <button
+          aria-label="Toggle browser measurements"
+          aria-pressed={showTelemetry}
+          className={iconButtonClass}
+          onClick={onToggleTelemetry}
+          title="Toggle browser measurements"
+          type="button"
+        >
+          <PixelIcon aria-hidden="true" className="h-5 w-5" name="logs" />
+        </button>
+      )}
+      <button aria-label="Fullscreen" className={iconButtonClass} onClick={onFullscreen} title="Fullscreen" type="button">
+        <Maximize2 className="h-5 w-5" />
+      </button>
+      <button
+        aria-label={pixelPerfect ? "Disable pixel rendering" : "Enable pixel rendering"}
+        aria-pressed={pixelPerfect}
+        className={pixelButtonClass}
+        onClick={() => onPixelPerfectChange(!pixelPerfect)}
+        title={pixelPerfect ? "Pixel rendering on" : "Pixel rendering off"}
+        type="button"
+      >
+        {pixelPerfect ? <ScanLine className="h-5 w-5" /> : <Blend className="h-5 w-5" />}
+      </button>
       <div className="relative">
         <button aria-controls="wasm-player-settings-panel" aria-expanded={isSettingsOpen} aria-label="Game settings" className={iconButtonClass} onClick={() => setIsSettingsOpen((open) => !open)} title="Game settings" type="button">
           <Settings className="h-5 w-5" />
