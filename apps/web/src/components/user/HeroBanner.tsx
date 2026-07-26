@@ -7,13 +7,14 @@ import {
   Loader2,
   Pause,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFavorite } from "../../features/favorites/useFavorite";
 import {
   GameArtworkFallback,
 } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
+import { useFeaturedCarousel } from "./useFeaturedCarousel";
 
 interface Game {
   id: string;
@@ -27,40 +28,18 @@ interface HeroBannerProps {
 }
 
 export default function HeroBanner({ featuredGames }: HeroBannerProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [failedArtworkIds, setFailedArtworkIds] = useState<Set<string>>(
     () => new Set(),
   );
   const [favoriteError, setFavoriteError] = useState("");
-  const [isPaused, setIsPaused] = useState(() =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
-  const [pageVisible, setPageVisible] = useState(() => !document.hidden);
+  const carousel = useFeaturedCarousel(featuredGames.length);
   const navigate = useNavigate();
-  const safeCurrentIndex = Math.min(
-    currentIndex,
-    Math.max(0, featuredGames.length - 1),
-  );
-  const currentGame = featuredGames[safeCurrentIndex];
+  const currentGame = featuredGames[carousel.currentIndex];
   const {
     isFavorited,
     isPending,
     toggleFavorite: toggleFavoriteState,
   } = useFavorite(currentGame?.id || "");
-
-  useEffect(() => {
-    const handleVisibilityChange = () => setPageVisible(!document.hidden);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
-
-  useEffect(() => {
-    if (featuredGames.length <= 1 || isPaused || !pageVisible) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % featuredGames.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [featuredGames, isPaused, pageVisible]);
 
   const toggleFavorite = async () => {
     if (!currentGame || isPending) return;
@@ -70,17 +49,6 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
     } catch {
       setFavoriteError("Could not update your library. Try again.");
     }
-  };
-
-  // Manual Navigation Handlers
-  const handlePrev = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? featuredGames.length - 1 : prev - 1,
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % featuredGames.length);
   };
 
   const markArtworkFailed = (gameId: string) => {
@@ -125,7 +93,7 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
         <>
           <button
             aria-label="Previous featured game"
-            onClick={handlePrev}
+            onClick={carousel.previous}
             type="button"
             className="absolute left-4 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-synth-border bg-synth-surface text-white opacity-0 transition-colors hover:bg-synth-elevated group-hover:opacity-100"
           >
@@ -133,20 +101,20 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
           </button>
           <button
             aria-label="Next featured game"
-            onClick={handleNext}
+            onClick={carousel.next}
             type="button"
             className="absolute right-4 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-synth-border bg-synth-surface text-white opacity-0 transition-colors hover:bg-synth-elevated group-hover:opacity-100"
           >
             <ChevronRight className="h-6 w-6" />
           </button>
           <button
-            aria-label={isPaused ? "Resume featured games" : "Pause featured games"}
-            aria-pressed={isPaused}
+            aria-label={carousel.isPaused ? "Resume featured games" : "Pause featured games"}
+            aria-pressed={carousel.isPaused}
             className="absolute bottom-4 right-4 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full border border-synth-border bg-synth-surface text-white"
-            onClick={() => setIsPaused((paused) => !paused)}
+            onClick={carousel.togglePaused}
             type="button"
           >
-            {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+            {carousel.isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
           </button>
         </>
       )}
@@ -203,9 +171,9 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
                 <button
                   aria-label={`Show ${game.title}`}
                   key={game.id}
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={() => carousel.select(idx)}
                   type="button"
-                  className={`h-1.5 rounded-full cursor-pointer transition-all duration-300 ${idx === safeCurrentIndex ? "w-8 bg-synth-secondary" : "w-4 bg-synth-border hover:bg-synth-primary"}`}
+                  className={`h-1.5 rounded-full cursor-pointer transition-all duration-300 ${idx === carousel.currentIndex ? "w-8 bg-synth-secondary" : "w-4 bg-synth-border hover:bg-synth-primary"}`}
                 />
               ))}
             </div>
