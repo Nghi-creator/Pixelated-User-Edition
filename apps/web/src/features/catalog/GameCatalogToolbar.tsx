@@ -1,5 +1,5 @@
 import { RotateCcw, Search } from "lucide-react";
-import { AdminSelect } from "../../components/ui/AdminSelect";
+import { SelectMenu } from "../../components/ui/SelectMenu";
 import { PLATFORM_OPTIONS } from "./browserCompatibility";
 import { formatGenre } from "./catalogMetadata";
 
@@ -21,10 +21,10 @@ export function GameCatalogToolbar(props: Props) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <button className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-lg border border-synth-secondary/40 bg-synth-bg px-4 text-sm font-semibold text-white disabled:opacity-40" disabled={!props.hasActiveFilters} onClick={props.onReset} type="button"><RotateCcw className="h-4 w-4" />Reset filters</button>
         <div className="grid w-full gap-3 sm:grid-cols-2 xl:max-w-4xl xl:grid-cols-4">
-          <AdminSelect ariaLabel="Runtime availability" className="w-full" onChange={(value) => props.onRuntimeChange(value as RuntimeFilter)} options={[{ label: "All runtimes", value: "all" }, { label: "Play in browser", value: "browser" }, { label: "Desktop required", value: "desktop" }, { label: "Currently unavailable", value: "unavailable" }]} value={props.runtime} />
-          <AdminSelect ariaLabel="Game system" className="w-full" onChange={props.onPlatformChange} options={[{ label: "All systems", value: "" }, ...PLATFORM_OPTIONS.map((item) => ({ label: item.label, value: item.id }))]} value={props.platform} />
-          <AdminSelect ariaLabel="Game genre" className="w-full" onChange={props.onGenreChange} options={[{ label: "All genres", value: "" }, ...props.availableGenres.map((value) => ({ label: formatGenre(value), value }))]} value={props.genre} />
-          <AdminSelect ariaLabel="Game license" className="w-full" onChange={props.onLicenseChange} options={[{ label: "All licenses", value: "" }, ...props.availableLicenses.map((value) => ({ label: value, value }))]} value={props.license} />
+          <SelectMenu ariaLabel="Runtime availability" className="w-full" onChange={(value) => props.onRuntimeChange(value as RuntimeFilter)} options={[{ label: "All runtimes", value: "all" }, { label: "Play in browser", value: "browser" }, { label: "Desktop required", value: "desktop" }, { label: "Currently unavailable", value: "unavailable" }]} value={props.runtime} />
+          <SelectMenu ariaLabel="Game system" className="w-full" onChange={props.onPlatformChange} options={[{ label: "All systems", value: "" }, ...PLATFORM_OPTIONS.map((item) => ({ label: item.label, value: item.id }))]} value={props.platform} />
+          <SelectMenu ariaLabel="Game genre" className="w-full" onChange={props.onGenreChange} options={[{ label: "All genres", value: "" }, ...props.availableGenres.map((value) => ({ label: formatGenre(value), value }))]} value={props.genre} />
+          <SelectMenu ariaLabel="Game license" className="w-full" onChange={props.onLicenseChange} options={[{ label: "All licenses", value: "" }, ...props.availableLicenses.map((value) => ({ label: value, value }))]} value={props.license} />
         </div>
       </div>
     </div>

@@ -29,7 +29,6 @@ test("query keys are stable and scoped by API concern", () => {
     queryKeys.gameCatalog(2, 15, "mario", "nes", "browser", "action", "MIT"),
     queryKeys.gameCatalog(2, 15, "mario", "nes", "browser", "puzzle", "MIT"),
   );
-  assert.deepEqual(queryKeys.localMultiplayerGames(), ["localMultiplayerGames"]);
 });
 
 test("shared invalidation helpers target exact and root query scopes", async () => {

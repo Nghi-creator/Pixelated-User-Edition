@@ -5,7 +5,6 @@ import {
   Routes,
   Route,
   Outlet,
-  Navigate,
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -87,10 +86,6 @@ export default function App() {
           <Route path="/play/:id" element={lazyRoute(Player)} />
           <Route path="/local" element={lazyRoute(LocalVault)} />
           <Route path="/storage" element={lazyRoute(DeviceStorage)} />
-          <Route path="/engine" element={<Navigate replace to="/home" />} />
-          <Route path="/multiplayer" element={<Navigate replace to="/home" />} />
-          <Route path="/publish" element={<Navigate replace to="/home" />} />
-          <Route path="/admin/*" element={<Navigate replace to="/home" />} />
           <Route path="*" element={lazyRoute(NotFound)} />
         </Route>
       </Routes>

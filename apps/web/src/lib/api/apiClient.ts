@@ -7,7 +7,6 @@ import {
 import { clearAuthScopedCache } from "../auth/authCache";
 import type { ApiPermissionsResponse } from "./apiTypes";
 import { createCatalogApi } from "./catalogApi";
-import { createEngineApi } from "./engineApi";
 import { createProfileApi } from "./profileApi";
 import { createSessionApi } from "./sessionApi";
 import { createSocialApi } from "./socialApi";
@@ -248,7 +247,6 @@ export const api = {
     clearFavoritesCache,
     getFavoriteIds,
   }),
-  ...createEngineApi({ apiRequest }),
   ...createProfileApi({
     apiRequest,
     clearPermissionsCache,

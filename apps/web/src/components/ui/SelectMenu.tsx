@@ -1,23 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 
-type AdminSelectOption<TValue extends string> = {
+type SelectMenuOption<TValue extends string> = {
   label: string;
   value: TValue;
 };
 
-type AdminSelectProps<TValue extends string> = {
+type SelectMenuProps<TValue extends string> = {
   ariaLabel: string;
   buttonClassName?: string;
   className?: string;
   iconClassName?: string;
   menuClassName?: string;
   onChange: (value: TValue) => void;
-  options: AdminSelectOption<TValue>[];
+  options: SelectMenuOption<TValue>[];
   value: TValue;
 };
 
-export function AdminSelect<TValue extends string>({
+export function SelectMenu<TValue extends string>({
   ariaLabel,
   buttonClassName = "flex h-10 w-full min-w-44 items-center justify-between gap-4 rounded-lg border border-synth-secondary/40 bg-synth-bg pl-3 pr-4 text-left text-sm font-semibold text-white outline-none transition-colors hover:border-synth-secondary focus:border-synth-secondary",
   className = "",
@@ -26,7 +26,7 @@ export function AdminSelect<TValue extends string>({
   onChange,
   options,
   value,
-}: AdminSelectProps<TValue>) {
+}: SelectMenuProps<TValue>) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const selectedOption = options.find((option) => option.value === value);
