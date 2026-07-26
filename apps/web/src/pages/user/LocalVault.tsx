@@ -233,8 +233,8 @@ export default function LocalVault() {
     return (
       <div className="flex min-h-screen flex-col items-center px-4 pb-24 pt-24">
         <PlayerHeader
-          backRoute="/home"
-          backText="Back to Library"
+          backRoute="/local"
+          backText="Personal ROMs"
           gameTitle={selectedFile.name}
           hideGameChrome
           layoutClassName={playerLayoutClassName}
@@ -403,13 +403,13 @@ export default function LocalVault() {
             <h2 className="flex items-center gap-2 text-xl font-bold text-white">
               <Clock3 className="h-5 w-5" /> Recent local files
             </h2>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-white">
               Metadata only. Select the original file again to play it.
             </p>
           </div>
           {recents.length > 0 && (
             <button
-              className="text-sm font-bold text-gray-400 hover:text-red-300"
+              className="text-sm font-bold text-white hover:text-red-300"
               onClick={async () => {
                 await clearLocalRomRecents();
                 await refreshRecents();
