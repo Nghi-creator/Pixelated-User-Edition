@@ -35,9 +35,7 @@ export default function GameCard({
     !coverFailed &&
     !isGeneratedCatalogArtworkUrl(coverUrl);
 
-  const toggleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const toggleFavorite = async () => {
     if (isPending) return;
 
     setFavoriteError("");
@@ -50,15 +48,15 @@ export default function GameCard({
   };
 
   return (
-    <Link
-      to={`/play/${id}`}
-      className="group relative block overflow-hidden rounded-lg border border-synth-border bg-synth-surface transition-colors hover:bg-synth-elevated"
-    >
-      <div className="overflow-hidden bg-synth-bg">
+    <article className="group relative overflow-hidden rounded-lg border border-synth-border bg-synth-surface transition-colors hover:bg-synth-elevated">
+      <Link to={`/play/${id}`} className="block">
+        <div className="overflow-hidden bg-synth-bg">
         {showCover ? (
           <img
             src={coverUrl}
             alt={title}
+            decoding="async"
+            loading="lazy"
             onError={() => setCoverFailed(true)}
             className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-72"
           />
@@ -68,7 +66,7 @@ export default function GameCard({
             title={title}
           />
         )}
-      </div>
+        </div>
 
       {compatibility && (
         <div
@@ -84,6 +82,16 @@ export default function GameCard({
           {compatibility.label}
         </div>
       )}
+
+        <div className="border-t border-synth-border p-3">
+          <h3 className="truncate text-lg font-bold text-white">{title}</h3>
+          {compatibility && (
+            <p className="mt-1 truncate text-xs font-semibold text-gray-400">
+              {compatibility.platformLabel}
+            </p>
+          )}
+        </div>
+      </Link>
 
       <button
         onClick={toggleFavorite}
@@ -101,14 +109,6 @@ export default function GameCard({
         )}
       </button>
 
-      <div className="border-t border-synth-border p-3">
-        <h3 className="font-bold text-lg truncate text-white">{title}</h3>
-        {compatibility && (
-          <p className="mt-1 truncate text-xs font-semibold text-gray-400">
-            {compatibility.platformLabel}
-          </p>
-        )}
-      </div>
-    </Link>
+    </article>
   );
 }

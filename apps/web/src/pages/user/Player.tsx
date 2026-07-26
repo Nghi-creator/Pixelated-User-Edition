@@ -19,6 +19,7 @@ import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
 import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
 import { getBrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
+import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
 
 const PlayerCommunitySection = lazy(() =>
   import("../../features/player/components/PlayerCommunitySection").then(
@@ -55,8 +56,15 @@ export default function Player() {
   const { authorName, game, gameRights, gameTitle, isError: metadataError, isLoading: metadataLoading } = useGameMetadata(id);
   const player = useWasmPlayer(id);
   const gameKey = `catalog:${id || "unknown"}`;
-  const research = useWasmResearch({ error: player.error, gameKey, progress: player.progress, status: player.status });
   const compatibility = useMemo(() => getBrowserGameCompatibility(game), [game]);
+  const runtimeMetadata = useMemo(() => {
+    const build = game?.game_builds?.find((candidate) => candidate.enabled);
+    const core = findWasmCoreForArtifact(build?.platform_id, build?.artifact_filename);
+    return core
+      ? { core: core.coreId, system: core.systemId }
+      : { core: "fceumm" as const, system: "nes" as const };
+  }, [game]);
+  const research = useWasmResearch({ error: player.error, gameKey, progress: player.progress, runtime: runtimeMetadata, status: player.status });
   const canStart = !metadataLoading && !metadataError && compatibility.kind === "browser";
 
   usePlayCount(id, Boolean(currentUser) && player.status === "playing");
@@ -188,6 +196,7 @@ export default function Player() {
             captureState={player.captureState}
             gameKey={gameKey}
             restoreState={player.restoreState}
+            runtime={runtimeMetadata}
             status={player.status}
             variant="drawer"
           />

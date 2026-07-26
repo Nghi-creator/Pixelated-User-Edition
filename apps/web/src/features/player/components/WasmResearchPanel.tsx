@@ -1,3 +1,4 @@
+import { useEffect, useReducer } from "react";
 import { Download, X } from "lucide-react";
 import { PixelIcon } from "../../../components/ui/PixelIcon";
 import type { ReturnTypeOfUseWasmResearch } from "../research/wasmResearchTypes";
@@ -15,6 +16,12 @@ function ResearchPanelContent({
   research: ReturnTypeOfUseWasmResearch;
   sidebar: boolean;
 }) {
+  const [, refresh] = useReducer((value) => value + 1, 0);
+  useEffect(() => {
+    if (!research.consented) return;
+    const timer = window.setInterval(refresh, 1000);
+    return () => window.clearInterval(timer);
+  }, [research.consented]);
   const metrics = research.getMetrics();
   const formatMs = (value: number | null) =>
     value === null ? "—" : `${Math.round(value)} ms`;

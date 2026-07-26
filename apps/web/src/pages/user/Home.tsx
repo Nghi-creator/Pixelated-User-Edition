@@ -41,6 +41,7 @@ function CatalogRefreshPanel({ label }: { label: string }) {
 }
 
 export default function Home() {
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [platformFilter, setPlatformFilter] = useState("");
@@ -76,6 +77,14 @@ export default function Home() {
   const refetchFeaturedGames = featuredQuery.refetch;
 
   useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setSearchQuery(searchInput);
+      setCurrentPage(1);
+    }, 300);
+    return () => window.clearTimeout(timeoutId);
+  }, [searchInput]);
+
+  useEffect(() => {
     if (!shouldRefreshFeatured) return;
 
     const interval = window.setInterval(() => {
@@ -95,7 +104,7 @@ export default function Home() {
     ? "Searching games..."
     : "Loading games...";
   const hasActiveFilters = Boolean(
-    searchQuery ||
+    searchInput ||
       platformFilter ||
       runtimeFilter !== "all" ||
       genreFilter ||
@@ -110,6 +119,7 @@ export default function Home() {
   };
 
   const resetFilters = () => {
+    setSearchInput("");
     setSearchQuery("");
     setPlatformFilter("");
     setRuntimeFilter("all");
@@ -145,11 +155,8 @@ export default function Home() {
                   <input
                     type="text"
                     placeholder="Search games..."
-                    value={searchQuery}
-                    onChange={(event) => {
-                      setSearchQuery(event.target.value);
-                      setCurrentPage(1);
-                    }}
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
                     className="block w-full rounded-lg border border-synth-border bg-synth-bg py-2 pl-10 pr-3 leading-5 text-white placeholder:text-gray-500 transition-colors focus:border-synth-secondary focus:outline-none"
                   />
                 </div>

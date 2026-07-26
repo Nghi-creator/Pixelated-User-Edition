@@ -13,6 +13,7 @@ import {
   type WasmRuntimeError,
 } from "../research/wasmResearch";
 import type { WasmPlayerStatus } from "./useWasmPlayer";
+import type { WasmCoreId, WasmSystemId } from "../../../lib/runtime/wasm/coreRegistry";
 
 const emptyLaunchMetrics = (): WasmLaunchMetrics => ({
   coreLoadMs: null,
@@ -20,6 +21,14 @@ const emptyLaunchMetrics = (): WasmLaunchMetrics => ({
   romDownloadMs: null,
   romVerificationMs: null,
 });
+
+const MAX_FRAME_SAMPLES = 18_000;
+const MAX_LONG_TASKS = 2_000;
+
+function orderedFrameSamples(samples: WasmFrameSample[], cursor: number) {
+  if (samples.length < MAX_FRAME_SAMPLES || cursor === 0) return samples;
+  return [...samples.slice(cursor), ...samples.slice(0, cursor)];
+}
 
 function downloadBlob(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
@@ -40,19 +49,21 @@ export function useWasmResearch({
   error,
   gameKey,
   progress,
+  runtime,
   status,
 }: {
   error: string | null;
   gameKey: string;
   progress: WasmRuntimeProgress | null;
+  runtime: { core: WasmCoreId; system: WasmSystemId };
   status: WasmPlayerStatus;
 }) {
   const [capabilities, setCapabilities] = useState<WasmCapabilitySnapshot | null>(null);
   const [consented, setConsentedState] = useState(false);
-  const [, setRefreshVersion] = useState(0);
   const consentedRef = useRef(false);
   const errorsRef = useRef<WasmRuntimeError[]>([]);
   const framesRef = useRef<WasmFrameSample[]>([]);
+  const frameCursorRef = useRef(0);
   const launchRef = useRef<WasmLaunchMetrics>(emptyLaunchMetrics());
   const launchStartedAtRef = useRef<number | null>(null);
   const longTasksRef = useRef<WasmLongTask[]>([]);
@@ -72,6 +83,7 @@ export function useWasmResearch({
       setCapabilities(null);
       errorsRef.current = [];
       framesRef.current = [];
+      frameCursorRef.current = 0;
       longTasksRef.current = [];
     }
   }, []);
@@ -83,6 +95,7 @@ export function useWasmResearch({
     phaseRef.current = null;
     phaseStartedAtRef.current = null;
     framesRef.current = [];
+    frameCursorRef.current = 0;
     longTasksRef.current = [];
     errorsRef.current = [];
     runIdRef.current = `wasm-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -118,8 +131,13 @@ export function useWasmResearch({
     let previous = performance.now();
     let frameId = 0;
     const sample = (now: number) => {
-      framesRef.current.push({ capturedAtMs: now, deltaMs: now - previous });
-      if (framesRef.current.length > 18_000) framesRef.current.shift();
+      const nextSample = { capturedAtMs: now, deltaMs: now - previous };
+      if (framesRef.current.length < MAX_FRAME_SAMPLES) {
+        framesRef.current.push(nextSample);
+      } else {
+        framesRef.current[frameCursorRef.current] = nextSample;
+        frameCursorRef.current = (frameCursorRef.current + 1) % MAX_FRAME_SAMPLES;
+      }
       previous = now;
       frameId = requestAnimationFrame(sample);
     };
@@ -133,16 +151,13 @@ export function useWasmResearch({
       list.getEntries().forEach((entry) => {
         longTasksRef.current.push({ durationMs: entry.duration, startedAtMs: entry.startTime });
       });
+      if (longTasksRef.current.length > MAX_LONG_TASKS) {
+        longTasksRef.current.splice(0, longTasksRef.current.length - MAX_LONG_TASKS);
+      }
     });
     observer.observe({ entryTypes: ["longtask"] });
     return () => observer.disconnect();
   }, [consented]);
-
-  useEffect(() => {
-    if (!consented || status !== "playing") return;
-    const timer = window.setInterval(() => setRefreshVersion((version) => version + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [consented, status]);
 
   useEffect(() => {
     if (!consented || !error) return;
@@ -167,23 +182,24 @@ export function useWasmResearch({
     const bytes = createWasmResearchBundle({
       capabilities,
       errors: errorsRef.current,
-      frameSamples: framesRef.current,
+      frameSamples: orderedFrameSamples(framesRef.current, frameCursorRef.current),
       gameKey,
       launch: launchRef.current,
       longTasks: longTasksRef.current,
       memory: getWasmMemoryEstimate(),
       recordedAt,
       runId: runIdRef.current,
+      runtime,
     });
     downloadBlob(new Blob([bytes], { type: "application/x-tar" }), createWasmResearchBundleFilename(gameKey, runIdRef.current, recordedAt));
-  }, [capabilities, gameKey]);
+  }, [capabilities, gameKey, runtime]);
 
   return {
     consented,
     exportBundle,
     getMetrics: () => ({
       errors: errorsRef.current.length,
-      frames: summarizeWasmFrames(framesRef.current),
+      frames: summarizeWasmFrames(orderedFrameSamples(framesRef.current, frameCursorRef.current)),
       launch: launchRef.current,
       longTasks: longTasksRef.current.length,
     }),

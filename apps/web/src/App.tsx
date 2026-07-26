@@ -10,6 +10,7 @@ import {
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import { useSessionTracker } from "./lib/session/useSessionTracker";
+import { SUPABASE_CONFIGURATION_ERROR } from "./lib/auth/supabaseClient";
 
 const Auth = lazy(() => import("./pages/user/Auth"));
 const Favorites = lazy(() => import("./pages/user/Favorites"));
@@ -21,6 +22,7 @@ const Profile = lazy(() => import("./pages/user/Profile"));
 const ResetPassword = lazy(() => import("./pages/user/ResetPassword"));
 const DeviceStorage = lazy(() => import("./pages/user/DeviceStorage"));
 const BrowserSmoke = lazy(() => import("./pages/internal/BrowserSmoke"));
+const NotFound = lazy(() => import("./pages/user/NotFound"));
 
 function RouteLoading() {
   return (
@@ -51,6 +53,11 @@ const StandardLayout = () => {
     <div className="min-h-screen bg-synth-bg text-white font-sans antialiased flex flex-col relative">
       <Navbar />
       <main className="flex-grow pt-16">
+        {SUPABASE_CONFIGURATION_ERROR && (
+          <div className="border-b border-amber-500/40 bg-amber-950/60 px-4 py-2 text-center text-sm text-amber-100" role="alert">
+            Authentication is unavailable because this deployment is missing its Supabase configuration.
+          </div>
+        )}
         <Outlet />
       </main>
       <Footer />
@@ -84,6 +91,7 @@ export default function App() {
           <Route path="/multiplayer" element={<Navigate replace to="/home" />} />
           <Route path="/publish" element={<Navigate replace to="/home" />} />
           <Route path="/admin/*" element={<Navigate replace to="/home" />} />
+          <Route path="*" element={lazyRoute(NotFound)} />
         </Route>
       </Routes>
     </Router>

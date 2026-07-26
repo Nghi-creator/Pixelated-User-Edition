@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getAuthSession, api } from "./apiClient";
 import { queryKeys } from "./queryClient";
 import type {
@@ -100,8 +100,9 @@ export function useGameCatalogQuery({
       genre,
       license,
     ),
-    queryFn: () =>
-      api.games({ genre, license, page, pageSize, platform, runtime, search }),
+    placeholderData: keepPreviousData,
+    queryFn: ({ signal }) =>
+      api.games({ genre, license, page, pageSize, platform, runtime, search }, signal),
   });
 }
 

@@ -12,6 +12,7 @@ import { createProfileApi } from "./profileApi";
 import { createSessionApi } from "./sessionApi";
 import { createSocialApi } from "./socialApi";
 import { createTelemetryApi } from "./telemetryApi";
+import { queryClient } from "./queryClient";
 
 export type * from "./apiTypes";
 
@@ -73,6 +74,9 @@ const authScopedCache = {
 
 supabase.auth.onAuthStateChange(() => {
   clearAuthScopedCache(authScopedCache);
+  // Private queries must never survive an account change in the same SPA.
+  // Clearing also forces mounted public queries to refetch with a clean state.
+  queryClient.clear();
 });
 
 export async function getAuthSession() {
@@ -158,7 +162,29 @@ export async function apiRequest<T>(
     cleanup();
   }
 
-  const payload = await response.json().catch(() => null);
+  if (response.status === 204) return undefined as T;
+
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().includes("application/json")) {
+    throw new ApiError(response.status, {
+      error: "The API returned an unsupported response format.",
+    });
+  }
+
+  let payload: unknown;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new ApiError(response.status, {
+      error: "The API returned malformed JSON.",
+    });
+  }
+
+  if (payload === null || typeof payload !== "object") {
+    throw new ApiError(response.status, {
+      error: "The API returned an invalid payload shape.",
+    });
+  }
 
   if (!response.ok) {
     throw new ApiError(response.status, payload);

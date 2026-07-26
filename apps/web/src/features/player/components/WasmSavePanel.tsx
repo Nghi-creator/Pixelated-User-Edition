@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { Download, HardDrive, Save, Trash2, Upload } from "lucide-react";
 import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
+import type { WasmCoreId, WasmSystemId } from "../../../lib/runtime/wasm/coreRegistry";
 import {
   createWasmSaveRecord,
   deleteWasmSaveRecord,
@@ -17,6 +18,7 @@ type Props = {
   captureState: () => Promise<{ state: Blob; thumbnail?: Blob }>;
   gameKey: string;
   restoreState: (state: Blob) => Promise<void>;
+  runtime: { core: WasmCoreId; system: WasmSystemId };
   status: WasmPlayerStatus;
   variant?: "inline" | "drawer";
 };
@@ -41,7 +43,7 @@ function SaveThumbnail({ blob }: { blob: Blob }) {
   return <img alt="Save-state preview" className="h-10 w-14 rounded object-cover" src={url} />;
 }
 
-export function WasmSavePanel({ captureBatterySave, captureState, gameKey, restoreState, status, variant = "inline" }: Props) {
+export function WasmSavePanel({ captureBatterySave, captureState, gameKey, restoreState, runtime, status, variant = "inline" }: Props) {
   const importSlot = useRef<WasmSaveSlot>(1);
   const [busySlot, setBusySlot] = useState<WasmSaveSlot | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -78,7 +80,7 @@ export function WasmSavePanel({ captureBatterySave, captureState, gameKey, resto
     const slot = importSlot.current;
     void run(slot, async () => {
       validateImportedState(file);
-      await putWasmSaveRecord(createWasmSaveRecord(gameKey, slot, file));
+      await putWasmSaveRecord(createWasmSaveRecord(gameKey, slot, file, runtime));
       setMessage(`Imported into slot ${slot}. Start the same game before loading it.`);
     });
   };
@@ -114,8 +116,8 @@ export function WasmSavePanel({ captureBatterySave, captureState, gameKey, resto
                 {record?.thumbnail && <SaveThumbnail blob={record.thumbnail} />}
               </div>
               <div className="flex flex-wrap gap-1.5">
-                <button className="rounded border border-synth-border px-2 py-1 text-xs font-bold text-white disabled:opacity-40" disabled={!isRunning || busySlot !== null} onClick={() => void run(slot, async () => { const saved = await captureState(); await putWasmSaveRecord(createWasmSaveRecord(gameKey, slot, saved.state, saved.thumbnail)); setMessage(`Saved slot ${slot}.`); })} type="button">Save</button>
-                <button className="rounded border border-synth-border px-2 py-1 text-xs font-bold text-white disabled:opacity-40" disabled={!record || !isRunning || busySlot !== null} onClick={() => record && void run(slot, async () => { await restoreState(record.state); setMessage(`Loaded slot ${slot}.`); })} type="button">Load</button>
+                <button className="rounded border border-synth-border px-2 py-1 text-xs font-bold text-white disabled:opacity-40" disabled={!isRunning || busySlot !== null} onClick={() => void run(slot, async () => { const saved = await captureState(); await putWasmSaveRecord(createWasmSaveRecord(gameKey, slot, saved.state, runtime, saved.thumbnail)); setMessage(`Saved slot ${slot}.`); })} type="button">Save</button>
+                <button className="rounded border border-synth-border px-2 py-1 text-xs font-bold text-white disabled:opacity-40" disabled={!record || record.core !== runtime.core || record.system !== runtime.system || !isRunning || busySlot !== null} onClick={() => record && void run(slot, async () => { if (record.core !== runtime.core || record.system !== runtime.system) throw new Error("This save was created by a different emulator core."); await restoreState(record.state); setMessage(`Loaded slot ${slot}.`); })} type="button">Load</button>
                 <label className="cursor-pointer rounded border border-synth-border px-2 py-1 text-xs font-bold text-gray-300" htmlFor={importingId} onClick={() => { importSlot.current = slot; }}><Upload className="mr-1 inline h-3 w-3" />Import</label>
                 <button aria-label={`Export slot ${slot}`} className="rounded border border-synth-border p-1 text-gray-300 disabled:opacity-40" disabled={!record} onClick={() => record && downloadBlob(record.state, `pixelated-slot-${slot}.state`)} type="button"><Download className="h-3.5 w-3.5" /></button>
                 <button aria-label={`Delete slot ${slot}`} className="rounded border border-synth-border p-1 text-gray-400 disabled:opacity-40" disabled={!record || busySlot !== null} onClick={() => void run(slot, async () => { await deleteWasmSaveRecord(gameKey, slot); setMessage(`Deleted slot ${slot}.`); })} type="button"><Trash2 className="h-3.5 w-3.5" /></button>

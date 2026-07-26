@@ -19,6 +19,16 @@ type PlayerHeaderProps = {
   statusLabelOverride?: string;
 };
 
+function safeExternalUrl(value: string | null | undefined) {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
 export function PlayerHeader({
   backRoute,
   backText,
@@ -33,13 +43,13 @@ export function PlayerHeader({
   statusLabelOverride,
 }: PlayerHeaderProps) {
   const statusLabel = statusLabelOverride ||
-    status === "connecting"
+    (status === "connecting"
       ? "Connecting to Edge Node..."
       : status === "playing"
         ? "Live Stream Active"
         : status === "error"
           ? "Stream Error"
-          : "Idle";
+          : "Idle");
   const statusDotClass =
     status === "playing"
       ? "bg-[#9B0048]"
@@ -55,6 +65,8 @@ export function PlayerHeader({
     </div>
   );
   const primaryRights = gameRights[0] || null;
+  const licenseUrl = safeExternalUrl(primaryRights?.license_url);
+  const sourceUrl = safeExternalUrl(primaryRights?.source_url);
   const rightsLinks = primaryRights ? (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
       {(primaryRights.code_license_spdx || primaryRights.asset_license_spdx) && (
@@ -63,20 +75,20 @@ export function PlayerHeader({
           {primaryRights.code_license_spdx || primaryRights.asset_license_spdx}
         </span>
       )}
-      {primaryRights.license_url && (
+      {licenseUrl && (
         <a
           className="text-[#e6abc0] hover:text-white"
-          href={primaryRights.license_url}
+          href={licenseUrl}
           rel="noreferrer"
           target="_blank"
         >
           Copyright
         </a>
       )}
-      {primaryRights.source_url && (
+      {sourceUrl && (
         <a
           className="text-[#e6abc0] hover:text-white"
-          href={primaryRights.source_url}
+          href={sourceUrl}
           rel="noreferrer"
           target="_blank"
         >

@@ -37,9 +37,10 @@ test("local vault ROM validation rejects missing, unsupported, and oversized fil
 
 test("local ROM inspection detects systems and validates NES headers", async () => {
   const file = (name: string, bytes: number[]) => ({
-    arrayBuffer: async () => Uint8Array.from(bytes).buffer,
+    ...new Blob([Uint8Array.from(bytes)]),
     name,
     size: bytes.length,
+    slice: (start?: number, end?: number) => new Blob([Uint8Array.from(bytes).slice(start, end)]),
   }) as File;
 
   assert.equal(detectLocalRomSystem("demo.SMC")?.id, "snes");

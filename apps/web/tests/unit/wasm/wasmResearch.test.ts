@@ -50,6 +50,7 @@ test("creates an edition-tagged research tar and safe filename", () => {
     memory: null,
     recordedAt: new Date("2026-07-16T12:00:00Z"),
     runId: "run-1",
+    runtime: { core: "gambatte", system: "gb" },
   });
   const archiveText = new TextDecoder().decode(archive);
   assert.match(archiveText, /summary\.json/);

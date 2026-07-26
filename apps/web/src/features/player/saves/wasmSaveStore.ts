@@ -6,13 +6,14 @@ export const MAX_IMPORTED_STATE_BYTES = 16 * 1024 * 1024;
 export type WasmSaveSlot = 1 | 2 | 3;
 
 export type WasmSaveRecord = {
-  core: "fceumm";
+  core: "fceumm" | "gambatte";
   createdAt: string;
   gameKey: string;
   id: string;
   slot: WasmSaveSlot;
   state: Blob;
   thumbnail?: Blob;
+  system: "nes" | "gb" | "gbc";
   version: 1;
 };
 
@@ -20,16 +21,18 @@ export function createWasmSaveRecord(
   gameKey: string,
   slot: WasmSaveSlot,
   state: Blob,
+  runtime: Pick<WasmSaveRecord, "core" | "system">,
   thumbnail?: Blob,
   now = new Date(),
 ): WasmSaveRecord {
   return {
-    core: "fceumm",
+    core: runtime.core,
     createdAt: now.toISOString(),
     gameKey,
     id: `${gameKey}:${slot}`,
     slot,
     state,
+    system: runtime.system,
     thumbnail,
     version: 1,
   };

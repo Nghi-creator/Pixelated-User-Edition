@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Pause,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +32,10 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
     () => new Set(),
   );
   const [favoriteError, setFavoriteError] = useState("");
+  const [isPaused, setIsPaused] = useState(() =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const navigate = useNavigate();
   const safeCurrentIndex = Math.min(
     currentIndex,
@@ -43,14 +48,19 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
     toggleFavorite: toggleFavoriteState,
   } = useFavorite(currentGame?.id || "");
 
-  // Automatically rotate the banner every 5 seconds
   useEffect(() => {
-    if (featuredGames.length <= 1) return;
+    const handleVisibilityChange = () => setPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    if (featuredGames.length <= 1 || isPaused || !pageVisible) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % featuredGames.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [featuredGames]);
+  }, [featuredGames, isPaused, pageVisible]);
 
   const toggleFavorite = async () => {
     if (!currentGame || isPending) return;
@@ -89,31 +99,25 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
 
   return (
     <div className="relative h-[380px] w-full overflow-hidden border-b border-synth-border bg-synth-bg transition-all duration-700 group md:h-[460px]">
-      {featuredGames.map((game, index) => {
-        const artworkUrl = game.backdrop_url || game.cover_url;
-        const isActive = index === safeCurrentIndex;
-        const artworkFailed =
-          failedArtworkIds.has(game.id) ||
-          isGeneratedCatalogArtworkUrl(artworkUrl);
-
-        return artworkUrl && !artworkFailed ? (
-          <img
-            key={game.id}
-            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${isActive ? "opacity-70" : "opacity-0"}`}
-            src={artworkUrl}
-            alt={game.title}
-            onError={() => markArtworkFailed(game.id)}
-          />
-        ) : (
-          <GameArtworkFallback
-            key={game.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${isActive ? "opacity-70" : "opacity-0"}`}
-            label="Featured game"
-            title={game.title}
-            variant="backdrop"
-          />
-        );
-      })}
+      {(currentGame.backdrop_url || currentGame.cover_url) &&
+      !failedArtworkIds.has(currentGame.id) &&
+      !isGeneratedCatalogArtworkUrl(currentGame.backdrop_url || currentGame.cover_url) ? (
+        <img
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-70"
+          src={currentGame.backdrop_url || currentGame.cover_url}
+          alt={currentGame.title}
+          decoding="async"
+          fetchPriority="high"
+          onError={() => markArtworkFailed(currentGame.id)}
+        />
+      ) : (
+        <GameArtworkFallback
+          className="absolute inset-0 opacity-70"
+          label="Featured game"
+          title={currentGame.title}
+          variant="backdrop"
+        />
+      )}
       <div className="absolute inset-0 bg-black/52" />
       <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-synth-bg via-synth-bg/80 to-transparent md:w-3/4" />
 
@@ -134,6 +138,15 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
             className="absolute right-4 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-synth-border bg-synth-surface text-white opacity-0 transition-colors hover:bg-synth-elevated group-hover:opacity-100"
           >
             <ChevronRight className="h-6 w-6" />
+          </button>
+          <button
+            aria-label={isPaused ? "Resume featured games" : "Pause featured games"}
+            aria-pressed={isPaused}
+            className="absolute bottom-4 right-4 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full border border-synth-border bg-synth-surface text-white"
+            onClick={() => setIsPaused((paused) => !paused)}
+            type="button"
+          >
+            {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
           </button>
         </>
       )}

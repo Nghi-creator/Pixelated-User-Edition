@@ -43,7 +43,7 @@ export function createCatalogApi({
       platform?: string;
       runtime?: "all" | "browser" | "desktop" | "unavailable";
       search?: string;
-    } = {}) => {
+    } = {}, signal?: AbortSignal) => {
       const params = new URLSearchParams({
         page: String(page),
         pageSize: String(pageSize),
@@ -56,6 +56,7 @@ export function createCatalogApi({
 
       return apiRequest<ApiPaginatedGamesResponse>(`/games?${params}`, {
         authenticated: false,
+        signal,
       });
     },
     featuredGames: () =>

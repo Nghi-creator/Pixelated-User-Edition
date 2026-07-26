@@ -54,9 +54,10 @@ export function CommentItem({
             </span>
           </div>
 
-          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
             {currentUser?.id === comment.user_id ? (
               <button
+                aria-label="Delete comment"
                 onClick={() => onDeleteComment(comment.id)}
                 disabled={pending}
                 className="text-gray-500 hover:text-red-400 transition-colors disabled:cursor-wait disabled:opacity-50"
@@ -67,6 +68,7 @@ export function CommentItem({
             ) : (
               currentUser && (
                 <button
+                  aria-label="Report comment"
                   onClick={() => onReportComment(comment.id)}
                   disabled={pending}
                   className="text-gray-500 hover:text-synth-secondary transition-colors disabled:cursor-wait disabled:opacity-50"
@@ -85,6 +87,7 @@ export function CommentItem({
 
         <div className="flex items-center gap-3">
           <button
+            aria-label="Like comment"
             onClick={() => onCommentReaction(comment.id, true)}
             disabled={currentUser?.id === comment.user_id || pending}
             className={`flex items-center gap-1.5 text-xs font-medium transition-all ${
@@ -102,6 +105,7 @@ export function CommentItem({
           </button>
 
           <button
+            aria-label="Dislike comment"
             onClick={() => onCommentReaction(comment.id, false)}
             disabled={currentUser?.id === comment.user_id || pending}
             className={`flex items-center gap-1.5 text-xs font-medium transition-all ${

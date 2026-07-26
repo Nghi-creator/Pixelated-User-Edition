@@ -8,9 +8,17 @@ import {
 
 test("creates a versioned game-specific save record", () => {
   const state = new Blob(["state"]);
-  const record = createWasmSaveRecord("catalog:game-1", 2, state, undefined, new Date("2026-07-16T12:00:00Z"));
+  const record = createWasmSaveRecord(
+    "catalog:game-1",
+    2,
+    state,
+    { core: "gambatte", system: "gb" },
+    undefined,
+    new Date("2026-07-16T12:00:00Z"),
+  );
   assert.equal(record.id, "catalog:game-1:2");
-  assert.equal(record.core, "fceumm");
+  assert.equal(record.core, "gambatte");
+  assert.equal(record.system, "gb");
   assert.equal(record.version, 1);
   assert.equal(record.createdAt, "2026-07-16T12:00:00.000Z");
   assert.equal(record.state, state);

@@ -76,7 +76,7 @@ export function detectLocalRomSystem(filename: string) {
 }
 
 export async function inspectLocalRomFile(
-  file: Pick<File, "arrayBuffer" | "name" | "size">,
+  file: Pick<File, "name" | "size" | "slice">,
 ) {
   const validationError = validateLocalRomFile(file as File);
   if (validationError) throw new Error(validationError);
@@ -84,7 +84,7 @@ export async function inspectLocalRomFile(
   if (!system) throw new Error("Could not identify this ROM system.");
 
   if (system.id === "nes") {
-    const header = new Uint8Array((await file.arrayBuffer()).slice(0, 16));
+    const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
     if (
       header.byteLength < 16 ||
       header[0] !== 0x4e ||
@@ -96,7 +96,7 @@ export async function inspectLocalRomFile(
     }
   }
   if (system.id === "gb" || system.id === "gbc") {
-    assertGameBoyRom(new Uint8Array(await file.arrayBuffer()));
+    assertGameBoyRom(new Uint8Array(await file.slice(0, 0x150).arrayBuffer()));
   }
 
   return {

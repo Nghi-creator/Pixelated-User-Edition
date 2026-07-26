@@ -241,3 +241,41 @@ test("rejects when the emulator core loader ignores the abort signal", async () 
   );
   runtime.stop();
 });
+
+test("exits an emulator instance that resolves after the launch deadline", async () => {
+  const bytes = validNesRom();
+  let exited = false;
+  const lateInstance = {
+    exit: () => { exited = true; },
+    getStatus: () => "initial" as const,
+    loadState: async () => undefined,
+    pause: () => undefined,
+    pressDown: () => undefined,
+    pressUp: () => undefined,
+    restart: () => undefined,
+    resume: () => undefined,
+    saveSRAM: async () => new Blob(),
+    saveState: async () => ({ state: new Blob(), thumbnail: undefined }),
+    sendCommand: () => undefined,
+    start: async () => undefined,
+  };
+  let resolvePrepare!: (instance: typeof lateInstance) => void;
+  const preparePromise = new Promise<typeof lateInstance>((resolve) => {
+    resolvePrepare = resolve;
+  });
+  const runtime = new NostalgistWasmRuntime({
+    canvas: {} as HTMLCanvasElement,
+    launchTimeoutMs: 5,
+    loadNostalgist: async () => ({
+      Nostalgist: { prepare: async () => preparePromise },
+    }),
+  });
+
+  await assert.rejects(
+    () => runtime.prepare({ file: new Blob([bytes]), fileName: "late.nes" }),
+    /safety deadline while preparing the emulator/,
+  );
+  resolvePrepare(lateInstance);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(exited, true);
+});

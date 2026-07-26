@@ -105,6 +105,7 @@ export function createWasmResearchBundle({
   memory,
   recordedAt = new Date(),
   runId,
+  runtime,
 }: {
   capabilities: WasmCapabilitySnapshot;
   errors: WasmRuntimeError[];
@@ -115,6 +116,7 @@ export function createWasmResearchBundle({
   memory: ReturnType<typeof getWasmMemoryEstimate>;
   recordedAt?: Date;
   runId: string;
+  runtime: { core: "fceumm" | "gambatte"; system: "nes" | "gb" | "gbc" };
 }) {
   const summary = {
     capabilities,
@@ -130,7 +132,7 @@ export function createWasmResearchBundle({
     },
     memory,
     runId,
-    runtime: { core: "fceumm", kind: "libretro-wasm", library: "nostalgist", system: "nes" },
+    runtime: { ...runtime, kind: "libretro-wasm", library: "nostalgist" },
     schemaVersion: 1,
   };
   return createResearchRunBundleTar([

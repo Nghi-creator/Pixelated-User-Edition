@@ -1,5 +1,5 @@
 // Bump this value whenever the app shell or pinned emulator core changes.
-const CACHE_VERSION = "2026-07-23-2";
+const CACHE_VERSION = "2026-07-26-1";
 const CACHE_PREFIX = "pixelated-user-";
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `${CACHE_PREFIX}assets-${CACHE_VERSION}`;
@@ -38,13 +38,13 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-async function cacheFirst(request, cacheName) {
-  const cached = await caches.match(request);
+async function cacheFirst(request, cacheName, event) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
   if (cached) return cached;
   const response = await fetch(request);
   if (response.ok || response.type === "opaque") {
-    const cache = await caches.open(cacheName);
-    await cache.put(request, response.clone());
+    event.waitUntil(cache.put(request, response.clone()));
   }
   return response;
 }
@@ -73,11 +73,11 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (url.origin === self.location.origin && url.pathname.startsWith("/assets/")) {
-    event.respondWith(cacheFirst(request, ASSET_CACHE));
+    event.respondWith(cacheFirst(request, ASSET_CACHE, event));
     return;
   }
 
   if (isApprovedCoreAsset(url)) {
-    event.respondWith(cacheFirst(request, CORE_CACHE));
+    event.respondWith(cacheFirst(request, CORE_CACHE, event));
   }
 });
