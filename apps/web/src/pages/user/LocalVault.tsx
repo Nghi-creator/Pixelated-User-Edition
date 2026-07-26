@@ -238,6 +238,13 @@ export default function LocalVault() {
           gameTitle={selectedFile.name}
           hideGameChrome
           layoutClassName={playerLayoutClassName}
+          onBack={() => {
+            player.resetForFile();
+            setActivePlayerTool(null);
+            setSelectedFile(null);
+            setSelectedSystem(null);
+            setShowBrowserTelemetry(false);
+          }}
           onToggleTelemetry={() =>
             setShowBrowserTelemetry((isVisible) => !isVisible)
           }

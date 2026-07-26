@@ -13,6 +13,7 @@ type PlayerHeaderProps = {
   layoutClassName?: string;
   showStreamTelemetry: boolean;
   status: PlayerHeaderStatus;
+  onBack?: () => void;
   onToggleTelemetry: () => void;
   hideGameChrome?: boolean;
   statusLabelOverride?: string;
@@ -25,6 +26,7 @@ export function PlayerHeader({
   gameTitle,
   hideGameChrome = false,
   layoutClassName = "max-w-5xl",
+  onBack,
   onToggleTelemetry,
   showStreamTelemetry,
   status,
@@ -90,6 +92,7 @@ export function PlayerHeader({
         <div className="flex min-h-10 items-center px-1 py-1 pr-44 sm:pr-64">
           <Link
             to={backRoute}
+            onClick={onBack}
             className="inline-flex min-w-0 items-center gap-2 text-gray-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-5 w-5 shrink-0" />
@@ -109,6 +112,7 @@ export function PlayerHeader({
       <div className="flex items-center gap-4 justify-start p-4">
         <Link
           to={backRoute}
+          onClick={onBack}
           className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
