@@ -1,84 +1,215 @@
-<p align="center">
-  <img src="assets/banner.png" alt="PIXELATED Banner" width="100%">
-</p>
+<img src="assets/banner.png" alt="PIXELATED User Edition" width="100%" />
 
-# PIXELATED User
+# PIXELATED User Edition
 
-<p align="center">
-  <a href="https://github.com/Nghi-creator/Pixelated/blob/publishing/LICENSE.txt"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License: MIT"></a>
-  <a href="https://www.linkedin.com/in/nicholas-nguyen-3bb17a335/"><img src="https://img.shields.io/badge/Built%20by-Nicholas Nguyen%20-blueviolet?style=for-the-badge" alt="Built by Nicholas Nguyen"></a>
-  <a href="https://dev.to/dashboard"><img src="https://img.shields.io/badge/Dev-Post-green?style=for-the-badge" alt="Dev Post"></a>
-</p>
+[![License: MIT](https://img.shields.io/badge/License-MIT-f06292.svg)](LICENSE)
+[![Live app](https://img.shields.io/badge/Live-pixelated--user--edition.vercel.app-c2185b)](https://pixelated-user-edition.vercel.app/)
+[![Creator](https://img.shields.io/badge/Creator-Nghi--creator-ff6f61)](https://github.com/Nghi-creator)
 
-## ⚖️ Acknowledgments & copyright disclaimer
+PIXELATED User Edition is the browser-native edition of PIXELATED. It runs
+supported retro games directly in the current tab through WebAssembly, with no
+desktop engine, Docker container, or WebRTC stream required.
 
-**PIXELATED Studio does not claim ownership of any third-party games featured in the public library.** The 8-bit games provided on this platform are works created by indie homebrew developers within the retro gaming community (many of which are sourced from itch.io). These titles are included strictly for educational, demonstrative, and testing purposes to showcase the capabilities of the platform's web emulation and cloud infrastructure.
+It shares accounts, catalog data, favorites, comments, reactions, and other
+community state with
+[PIXELATED Studio Edition](https://github.com/Nghi-creator/Pixelated-Studio-Edition),
+while keeping the gameplay runtime deliberately separate.
 
-Full credit, copyright, and intellectual property rights remain entirely with the original authors. We have attached the original authors' names to their respective titles, and we highly encourage all players to support the creators by searching for them, playing their other games, and supporting their work directly.
+> [!IMPORTANT]
+> PIXELATED celebrates homebrew and independently published games. Game files,
+> artwork, emulator cores, and other third-party material remain subject to
+> their respective authors' licenses. Only use personal ROM files that you are
+> legally permitted to use.
 
-_If you are the original developer of a featured game and would like it removed from the PIXELATED public library, please open a GitHub Issue or contact the repository owner, and it will be handled immediately._
+## Try it
 
-## 🌟 Overview
+Open the deployed app at
+[pixelated-user-edition.vercel.app](https://pixelated-user-edition.vercel.app/).
 
-**A frictionless 8-bit gaming platform built for the web.** PIXELATED User edition is the accessible, consumer-facing sibling to PIXELATED Studio. The purpose of this edition is to provide pure, instant playability, and act as an alternative of the true cloud-gaming infrastructure, allowing developers to test and compare the two versions directly and providing understandings on the pros and cons of each architecture.
+You can browse the shared catalog or open a supported personal ROM locally.
+Personal ROM bytes are kept in memory and are never uploaded by the User
+Edition.
 
-Powered by WebAssembly (WASM), PIXELATED User brings compiled C++ emulation cores directly into the browser. There will be no need to install any desktop apps, or boot any Docker containers. The games run via compiled Libretro cores natively within your modern web browser using WebAssembly. You only need to open the link, and play directly on the web app.
+## What is included
 
----
+| Area | Current capabilities |
+| --- | --- |
+| Browser gameplay | Lazy-loaded Libretro WebAssembly cores, download and verification progress, pause/resume, reset, stop, volume, mute, fullscreen, and pixel rendering |
+| Catalog | Search, pagination, browser-availability, system, genre, and license filters, artwork, author and license information, and runtime eligibility badges |
+| Accounts and community | Supabase authentication, profiles, avatars, favorites, likes/dislikes, comments, reactions, reports, and shared play activity |
+| Personal ROMs | Drag-and-drop or file selection, format/header validation, in-memory playback, and a metadata-only recent-files list |
+| Input | Remappable keyboard controls, per-controller gamepad mappings, conflict detection, and touch-control presets |
+| Local saves | Three versioned save-state slots per game, plus import, export, overwrite, load, and delete controls stored in IndexedDB |
+| PWA and storage | Installable app shell, offline caching for static runtime assets, storage usage, persistence requests, and local-data cleanup |
+| Research tools | Explicitly opt-in local browser measurements and exportable research bundles |
 
-## 🚀 Play Now
+## Supported systems
 
-Because PIXELATED is a fully managed web application, there is no installation required for players.
+| System | Extensions | Core | Status |
+| --- | --- | --- | --- |
+| Nintendo Entertainment System | `.nes` | FCEUmm | Playable |
+| Game Boy | `.gb` | Gambatte | Playable |
+| Game Boy Color | `.gbc` | Gambatte | Playable |
 
-Simply visit the live application at **[PIXELATED](https://pixelated-user-edition.vercel.app/)** to create an account and start using immediately.
+Game Boy Advance, Super Nintendo, Genesis / Mega Drive, Master System, and Game
+Gear files can be identified by the Local Vault, but they are not playable
+until compatible browser cores are added.
 
----
+The emulator builds are pinned and served from the same origin. Their source
+and checksums are documented in
+[`apps/web/public/emulator-cores/README.md`](apps/web/public/emulator-cores/README.md).
 
-## 🌟 Core Features
+## User Edition and Studio Edition
 
-### Game player
+The two editions are alternative clients for the same PIXELATED ecosystem:
 
-The web player is good enough to handle keyboard controls, and real-time play tracking. So the playing experience will be frictionless, fast, but still satisfying.
+| User Edition | Studio Edition |
+| --- | --- |
+| Runs supported games locally in the browser with WebAssembly | Runs games in a native Linux engine and streams them with WebRTC |
+| Requires no paired desktop engine | Uses the Electron desktop orchestrator and containerized runtime |
+| Focuses on solo browser play and local tools | Supports the streaming, lobby, multiplayer, publishing, and administration workflows |
+| Keeps personal ROM bytes in the current browser session | Can use native runtime capabilities unavailable to a browser |
 
-### Game library
+This repository intentionally contains the User Edition frontend only. The
+shared API and Supabase migrations are owned and deployed from the Studio
+Edition repository so that there is one backend contract and one migration
+authority.
 
-You can also add one of your favorite games from our game database to your favorite-game library.
+## Runtime flow
 
-### Social Hub
+For a catalog game:
 
-You can engage with the creators and the community. Every game in the public library features built-in social tools. You can leave feedback on projects via the commenting system, use the Like/Dislike to express your opinions, and join the conversation surrounding the games.
+1. The browser requests a gameplay session from the shared API.
+2. The API checks browser eligibility and returns a short-lived artifact URL.
+3. The client downloads the ROM with a strict size limit and verifies its
+   format and SHA-256 digest.
+4. The matching pinned WebAssembly core is loaded on demand.
+5. The game runs locally in the tab; controls, measurements, and save states
+   remain browser-side.
 
-### Local Vault
+For a personal ROM, the file is read directly from the browser file picker.
+Only filename, size, detected system, and last-opened time may be saved in the
+recent-files list. Refreshing or closing the page removes the playable ROM
+bytes from memory, so the original file must be selected again.
 
-Upload your own ROM games to the local vault to play it if you find the experience with our public library still lacking. Your games uploaded here are completely private and personal.
+## Project structure
 
----
+```text
+Pixelated-User-Edition/
+├── apps/
+│   └── web/                 # React, TypeScript, and Vite application
+├── assets/                  # Repository artwork
+├── docs/
+│   ├── WASM_BUILD_PLAN.md   # Implementation record and roadmap
+│   └── WASM_SECURITY.md     # Browser runtime security model
+├── LICENSE
+└── README.md
+```
 
-## The vision & the greater purpose
+Important browser routes:
 
-This version's goal is to serve people who love to experience 8-bit games without much friction. But more importantly, it acts as a direct counterpart to PIXELATED Studio in a greater ecosystem.
+| Route | Purpose |
+| --- | --- |
+| `/` | Product landing page |
+| `/home` | Shared game catalog |
+| `/play/:id` | Catalog gameplay |
+| `/local` | Personal ROM picker and local gameplay |
+| `/storage` | Browser storage management |
+| `/favorites` | Signed-in user's saved games |
+| `/profile` | Account and profile settings |
 
-**1. User-friendly features**
+## Local development
 
-As a much more frictionless product than the Studio edition, The User edition allows everyone to access, play, and test modern 8-bit games easily on a polished-UI web application, connecting more people to obscure games and celebrating the effort of indie game developers.
+Prerequisites:
 
-**2. Experimentation purposes (for developers)**
+- A current Node.js LTS release and npm
+- Access to a compatible PIXELATED API and Supabase project
 
-This version not supposed to be a robust cloud-gaming architecture. It's lightweight and usable, but won't have the same capacity to handle anything more than 8-bit games. However, it is still highly valuable when combined with the Studio version since now you can easily test, benchmark, and document the advantages of each version. Web emulators won't be able to run AAA games even with the strongest GPUs, but if you are a developer, use it smartly as a threshold to understand the advantages of using the Studio version's infrastructure.
+```bash
+cd apps/web
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
----
+The local app is served by Vite, normally at `http://localhost:5173`.
+
+Configure these public browser variables in `apps/web/.env.local`:
+
+```dotenv
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-publishable-key
+VITE_PUBLIC_APP_URL=http://localhost:5173
+VITE_API_URL=http://127.0.0.1:4000
+VITE_TURNSTILE_SITE_KEY=
+```
+
+All `VITE_*` values are bundled into client code. Never place a Supabase secret
+or service-role key, database password, Redis token, or other server credential
+in this file.
+
+Useful checks:
+
+```bash
+cd apps/web
+npm run lint
+npm test
+npm run build
+```
+
+## Deployment
+
+The production frontend is a Vite single-page application deployed on Vercel.
+For a monorepo import, use:
+
+- **Root Directory:** `apps/web`
+- **Framework Preset:** Vite
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+
+Set the five public environment variables above for the intended deployment
+environment. The Supabase project used by the frontend must match the project
+used by its configured API.
+
+The deployment also applies the security headers and SPA rewrite defined in
+[`apps/web/vercel.json`](apps/web/vercel.json).
+
+## Privacy and security
+
+- Personal ROM bytes are never sent to the PIXELATED API.
+- Catalog artifacts use short-lived URLs and are validated before launch.
+- Browser downloads are bounded to protect memory.
+- Emulator cores are version-pinned instead of loaded from an arbitrary CDN at
+  runtime.
+- Save states, mappings, recent-file metadata, and optional measurements stay
+  in browser storage unless the user explicitly exports them.
+- The PWA caches the application shell and pinned runtime assets, not API,
+  authentication, or ROM responses.
+
+See [`docs/WASM_SECURITY.md`](docs/WASM_SECURITY.md) for the complete browser
+threat model and [`docs/WASM_BUILD_PLAN.md`](docs/WASM_BUILD_PLAN.md) for the
+implementation history and deferred work.
+
+## Current boundaries
+
+- Browser play currently supports NES, Game Boy, and Game Boy Color.
+- Personal ROM persistence is intentionally opt-in/deferred; ROM bytes are
+  memory-only today.
+- Native executables, Studio publishing and administration, WebRTC streaming,
+  LAN pairing, and multiplayer are outside the User Edition.
+- Browser storage can still be cleared by the browser or operating system, so
+  important save states should be exported.
 
 ## Community
 
-- **Link to the Studio edition:** [PIXELATED Studio edtion](https://github.com/Nghi-creator/Pixelated-Studio-Edition)
-- **Dev post:** [Dev.to Nicholas](https://dev.to/nicholasthegreat)
-- **LinkedIn:** [Linkedin Nicholas](https://www.linkedin.com/in/nicholas-nguyen-3bb17a335/)
-- **Email:** [Mail Nicholas](mailto:gianghi30032005@gmail.com)
-
----
+- [Report a bug or request a feature](https://github.com/Nghi-creator/Pixelated-User-Edition/issues)
+- [PIXELATED Studio Edition](https://github.com/Nghi-creator/Pixelated-Studio-Edition)
+- [Creator profile](https://github.com/Nghi-creator)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+The original PIXELATED User Edition source code is licensed under the
+[MIT License](LICENSE).
 
-Built by [Nicholas Nguyen](https://www.linkedin.com/in/nicholas-nguyen-3bb17a335/).
+This license does not relicense emulator cores, games, artwork, fonts, or other
+third-party materials. Those components retain their own licenses and notices.
