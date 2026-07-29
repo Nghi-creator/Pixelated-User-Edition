@@ -57,6 +57,7 @@ export function WasmPlayerControls({
 }: WasmPlayerControlsProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const controlsRef = useRef<HTMLDivElement>(null);
+  const lastAudibleVolumeRef = useRef(volume > 0 ? volume : 1);
   const isRunning = status === "playing" || status === "paused";
   const canStop = [
     "preparing",
@@ -95,18 +96,37 @@ export function WasmPlayerControls({
     };
   }, [isSettingsOpen]);
 
+  useEffect(() => {
+    if (volume > 0) lastAudibleVolumeRef.current = volume;
+  }, [volume]);
+
+  const handleMuteChange = () => {
+    if (isMuted && volume === 0) {
+      onVolumeChange(lastAudibleVolumeRef.current);
+    }
+    onMuteChange(!isMuted);
+  };
+  const handleVolumeChange = (nextVolume: number) => {
+    onVolumeChange(nextVolume);
+    if (nextVolume === 0 && !isMuted) {
+      onMuteChange(true);
+    } else if (nextVolume > 0 && isMuted) {
+      onMuteChange(false);
+    }
+  };
+
   return (
     <div ref={controlsRef} className="relative z-30 flex min-h-14 w-full items-center gap-2 border-b border-synth-border bg-synth-surface px-3 py-2">
       <h1 className="min-w-0 flex-1 truncate text-lg font-extrabold text-white sm:text-xl">
         {gameTitle || "Loading Game..."}
       </h1>
       <div className="hidden h-10 items-center rounded-lg border border-[#5D263A] bg-[#351B27] sm:flex">
-        <button aria-label={isMuted ? "Unmute game" : "Mute game"} className="inline-flex h-full w-10 items-center justify-center border-r border-[#5D263A] text-white hover:bg-[#2B1720]" onClick={() => onMuteChange(!isMuted)} type="button">
+        <button aria-label={isMuted ? "Unmute game" : "Mute game"} className="inline-flex h-full w-10 items-center justify-center border-r border-[#5D263A] text-white hover:bg-[#2B1720]" onClick={handleMuteChange} type="button">
           {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
         </button>
         <label className="flex h-full items-center px-3">
           <span className="sr-only">Game volume</span>
-          <input aria-label="Game volume" className="w-20 accent-synth-primary sm:w-24" max="1" min="0" onChange={(event) => onVolumeChange(Number(event.target.value))} step="0.05" type="range" value={volume} />
+          <input aria-label="Game volume" className="w-20 accent-synth-primary sm:w-24" max="1" min="0" onChange={(event) => handleVolumeChange(Number(event.target.value))} step="0.05" type="range" value={volume} />
         </label>
       </div>
       {onToggleTelemetry && (
