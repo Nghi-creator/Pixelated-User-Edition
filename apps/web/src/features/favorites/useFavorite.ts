@@ -4,18 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { api, getAuthSession } from "../../lib/api/apiClient";
 import { useFavoriteIdsQuery } from "../../lib/api/apiQueries";
 import { invalidateFavoriteQueries } from "../../lib/api/queryClient";
-import { supabase } from "../../lib/auth/supabaseClient";
 import {
   getFavoriteSnapshot,
   mutateFavorite,
   replaceFavoriteIds,
-  resetFavoriteState,
   subscribeToFavorites,
 } from "./favoriteState";
-
-supabase.auth.onAuthStateChange(() => {
-  resetFavoriteState();
-});
 
 export function useFavorite(gameId: string) {
   const navigate = useNavigate();

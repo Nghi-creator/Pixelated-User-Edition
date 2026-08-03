@@ -11,7 +11,6 @@ import { createProfileApi } from "./profileApi";
 import { createSessionApi } from "./sessionApi";
 import { createSocialApi } from "./socialApi";
 import { createTelemetryApi } from "./telemetryApi";
-import { queryClient } from "./queryClient";
 
 export type * from "./apiTypes";
 
@@ -71,12 +70,9 @@ const authScopedCache = {
     | null,
 };
 
-supabase.auth.onAuthStateChange(() => {
+export function clearApiAuthScopedCache() {
   clearAuthScopedCache(authScopedCache);
-  // Private queries must never survive an account change in the same SPA.
-  // Clearing also forces mounted public queries to refetch with a clean state.
-  queryClient.clear();
-});
+}
 
 export async function getAuthSession() {
   if (!authScopedCache.session) {

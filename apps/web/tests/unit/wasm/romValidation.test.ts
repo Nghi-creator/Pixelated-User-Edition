@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   MAX_NES_ROM_BYTES,
+  getRomDigestSource,
   normalizeExpectedRomSize,
   sha256Hex,
   validateBrowserRom,
@@ -33,6 +34,19 @@ test("accepts a NES ROM with matching size and checksum", async () => {
     expectedSha256: await sha256Hex(bytes),
     expectedSize: bytes.byteLength,
   });
+});
+
+test("hashes complete ROM views without making another full-size buffer", () => {
+  const bytes = validNesRom();
+  assert.equal(getRomDigestSource(bytes), bytes.buffer);
+
+  const partialView = bytes.subarray(4, 12);
+  const partialSource = getRomDigestSource(partialView);
+  assert.notEqual(partialSource, bytes.buffer);
+  assert.deepEqual(
+    new Uint8Array(partialSource),
+    bytes.slice(4, 12),
+  );
 });
 
 test("rejects a file without a NES header", async () => {

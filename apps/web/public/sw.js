@@ -1,12 +1,13 @@
-// Bump this value whenever the app shell or pinned emulator core changes.
-const CACHE_VERSION = "2026-07-26-1";
+// Change only when the cache schema changes. Core files revalidate on every launch.
+const CACHE_VERSION = "2";
 const CACHE_PREFIX = "pixelated-user-";
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `${CACHE_PREFIX}assets-${CACHE_VERSION}`;
-const CORE_CACHE = `${CACHE_PREFIX}cores-${CACHE_VERSION}`;
+const CORE_CACHE = `${CACHE_PREFIX}cores`;
 const SHELL_URLS = [
   "/",
   "/offline.html",
+  "/offline.js",
   "/manifest.webmanifest",
   "/pixelated-icon.svg",
   "/pixelated-icon-192.png",
@@ -49,10 +50,33 @@ async function cacheFirst(request, cacheName, event) {
   return response;
 }
 
-async function networkFirstNavigation(request) {
+async function networkFirstCached(request, cacheName, event) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
   try {
     const response = await fetch(request);
     if (response.ok) {
+      event.waitUntil(cache.put(request, response.clone()));
+      return response;
+    }
+    return cached || response;
+  } catch (error) {
+    if (cached) return cached;
+    throw error;
+  }
+}
+
+async function networkFirstNavigation(request) {
+  try {
+    const response = await fetch(request);
+    const url = new URL(request.url);
+    const contentType = response.headers.get("content-type") || "";
+    const finalPathSegment = url.pathname.split("/").pop() || "";
+    const isAppRoute =
+      url.origin === self.location.origin &&
+      !finalPathSegment.includes(".") &&
+      contentType.toLowerCase().includes("text/html");
+    if (response.ok && isAppRoute) {
       const cache = await caches.open(SHELL_CACHE);
       await cache.put("/", response.clone());
     }
@@ -78,6 +102,6 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (isApprovedCoreAsset(url)) {
-    event.respondWith(cacheFirst(request, CORE_CACHE, event));
+    event.respondWith(networkFirstCached(request, CORE_CACHE, event));
   }
 });

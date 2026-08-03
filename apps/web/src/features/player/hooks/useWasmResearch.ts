@@ -24,10 +24,26 @@ const emptyLaunchMetrics = (): WasmLaunchMetrics => ({
 
 const MAX_FRAME_SAMPLES = 18_000;
 const MAX_LONG_TASKS = 2_000;
+const LIVE_METRIC_FRAME_SAMPLES = 600;
 
 function orderedFrameSamples(samples: WasmFrameSample[], cursor: number) {
   if (samples.length < MAX_FRAME_SAMPLES || cursor === 0) return samples;
   return [...samples.slice(cursor), ...samples.slice(0, cursor)];
+}
+
+function recentFrameSamples(samples: WasmFrameSample[], cursor: number) {
+  const sampleCount = Math.min(samples.length, LIVE_METRIC_FRAME_SAMPLES);
+  if (samples.length < MAX_FRAME_SAMPLES) {
+    return samples.slice(-sampleCount);
+  }
+
+  const recent: WasmFrameSample[] = [];
+  const start = (cursor - sampleCount + MAX_FRAME_SAMPLES) % MAX_FRAME_SAMPLES;
+  for (let offset = 0; offset < sampleCount; offset += 1) {
+    const sample = samples[(start + offset) % MAX_FRAME_SAMPLES];
+    if (sample) recent.push(sample);
+  }
+  return recent;
 }
 
 function downloadBlob(blob: Blob, fileName: string) {
@@ -199,7 +215,9 @@ export function useWasmResearch({
     exportBundle,
     getMetrics: () => ({
       errors: errorsRef.current.length,
-      frames: summarizeWasmFrames(orderedFrameSamples(framesRef.current, frameCursorRef.current)),
+      frames: summarizeWasmFrames(
+        recentFrameSamples(framesRef.current, frameCursorRef.current),
+      ),
       launch: launchRef.current,
       longTasks: longTasksRef.current.length,
     }),

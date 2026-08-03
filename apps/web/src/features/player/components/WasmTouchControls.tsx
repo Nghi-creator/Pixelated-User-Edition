@@ -1,7 +1,11 @@
 import { useEffect, useState, type PointerEvent } from "react";
 import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
+import {
+  readTouchControlPreferences,
+  writeTouchControlPreference,
+  type TouchControlPreset,
+} from "../input/touchControlPreferences";
 
-type Preset = "compact" | "large" | "contrast";
 type Props = {
   gameKey: string;
   onPress: (button: string) => void;
@@ -9,7 +13,7 @@ type Props = {
   status: WasmPlayerStatus;
 };
 
-const presets: Record<Preset, string> = {
+const presets: Record<TouchControlPreset, string> = {
   compact: "Compact",
   large: "Large targets",
   contrast: "High contrast",
@@ -17,12 +21,19 @@ const presets: Record<Preset, string> = {
 
 export function WasmTouchControls({ gameKey, onPress, onRelease, status }: Props) {
   const preferenceKey = `pixelated:touch-controls:${gameKey}`;
-  const [preset, setPreset] = useState<Preset>(() => (localStorage.getItem(`${preferenceKey}:preset`) as Preset) || "large");
-  const [swapButtons, setSwapButtons] = useState(() => localStorage.getItem(`${preferenceKey}:swap`) === "true");
+  const [initialPreferences] = useState(() =>
+    readTouchControlPreferences(preferenceKey),
+  );
+  const [preset, setPreset] = useState<TouchControlPreset>(initialPreferences.preset);
+  const [swapButtons, setSwapButtons] = useState(initialPreferences.swapButtons);
   const enabled = status === "playing" || status === "paused";
 
-  useEffect(() => localStorage.setItem(`${preferenceKey}:preset`, preset), [preferenceKey, preset]);
-  useEffect(() => localStorage.setItem(`${preferenceKey}:swap`, String(swapButtons)), [preferenceKey, swapButtons]);
+  useEffect(() => {
+    writeTouchControlPreference(preferenceKey, "preset", preset);
+  }, [preferenceKey, preset]);
+  useEffect(() => {
+    writeTouchControlPreference(preferenceKey, "swap", String(swapButtons));
+  }, [preferenceKey, swapButtons]);
 
   const size = preset === "compact" ? "h-11 min-w-11" : "h-14 min-w-14";
   const tone = preset === "contrast" ? "border-yellow-300 bg-black text-yellow-200" : "border-synth-border bg-synth-elevated text-white";
@@ -44,7 +55,7 @@ export function WasmTouchControls({ gameKey, onPress, onRelease, status }: Props
     <details className="border-t border-synth-border bg-synth-surface p-3 md:hidden">
       <summary className="cursor-pointer text-sm font-bold text-white">Touch controls & accessibility</summary>
       <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-300">
-        <label>Preset <select className="ml-1 rounded border border-synth-border bg-synth-bg p-1.5" onChange={(event) => setPreset(event.target.value as Preset)} value={preset}>{Object.entries(presets).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+        <label>Preset <select className="ml-1 rounded border border-synth-border bg-synth-bg p-1.5" onChange={(event) => setPreset(event.target.value as TouchControlPreset)} value={preset}>{Object.entries(presets).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
         <label className="flex items-center gap-1.5"><input checked={swapButtons} onChange={(event) => setSwapButtons(event.target.checked)} type="checkbox" /> Swap A/B layout for this game</label>
       </div>
       <div className="mt-4 flex items-center justify-between gap-4">

@@ -10,6 +10,7 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import { useSessionTracker } from "./lib/session/useSessionTracker";
 import { SUPABASE_CONFIGURATION_ERROR } from "./lib/auth/supabaseClient";
+import { AuthSessionProvider } from "./lib/auth/AuthSessionProvider";
 
 const Auth = lazy(() => import("./pages/user/Auth"));
 const Favorites = lazy(() => import("./pages/user/Favorites"));
@@ -71,24 +72,26 @@ const SessionTracker = () => {
 
 export default function App() {
   return (
-    <Router>
-      <SessionTracker />
-      <Routes>
-        <Route path="/internal/browser-smoke" element={lazyRoute(BrowserSmoke)} />
-        {/* STANDARD ROUTES */}
-        <Route element={<StandardLayout />}>
-          <Route path="/" element={lazyRoute(Landing)} />
-          <Route path="/home" element={lazyRoute(Home)} />
-          <Route path="/login" element={lazyRoute(Auth)} />
-          <Route path="/reset-password" element={lazyRoute(ResetPassword)} />
-          <Route path="/favorites" element={lazyRoute(Favorites)} />
-          <Route path="/profile" element={lazyRoute(Profile)} />
-          <Route path="/play/:id" element={lazyRoute(Player)} />
-          <Route path="/local" element={lazyRoute(LocalVault)} />
-          <Route path="/storage" element={lazyRoute(DeviceStorage)} />
-          <Route path="*" element={lazyRoute(NotFound)} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthSessionProvider>
+      <Router>
+        <SessionTracker />
+        <Routes>
+          <Route path="/internal/browser-smoke" element={lazyRoute(BrowserSmoke)} />
+          {/* STANDARD ROUTES */}
+          <Route element={<StandardLayout />}>
+            <Route path="/" element={lazyRoute(Landing)} />
+            <Route path="/home" element={lazyRoute(Home)} />
+            <Route path="/login" element={lazyRoute(Auth)} />
+            <Route path="/reset-password" element={lazyRoute(ResetPassword)} />
+            <Route path="/favorites" element={lazyRoute(Favorites)} />
+            <Route path="/profile" element={lazyRoute(Profile)} />
+            <Route path="/play/:id" element={lazyRoute(Player)} />
+            <Route path="/local" element={lazyRoute(LocalVault)} />
+            <Route path="/storage" element={lazyRoute(DeviceStorage)} />
+            <Route path="*" element={lazyRoute(NotFound)} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthSessionProvider>
   );
 }
