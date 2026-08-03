@@ -7,6 +7,7 @@ const CORE_CACHE = `${CACHE_PREFIX}cores-${CACHE_VERSION}`;
 const SHELL_URLS = [
   "/",
   "/offline.html",
+  "/offline.js",
   "/manifest.webmanifest",
   "/pixelated-icon.svg",
   "/pixelated-icon-192.png",
@@ -52,7 +53,14 @@ async function cacheFirst(request, cacheName, event) {
 async function networkFirstNavigation(request) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    const url = new URL(request.url);
+    const contentType = response.headers.get("content-type") || "";
+    const finalPathSegment = url.pathname.split("/").pop() || "";
+    const isAppRoute =
+      url.origin === self.location.origin &&
+      !finalPathSegment.includes(".") &&
+      contentType.toLowerCase().includes("text/html");
+    if (response.ok && isAppRoute) {
       const cache = await caches.open(SHELL_CACHE);
       await cache.put("/", response.clone());
     }

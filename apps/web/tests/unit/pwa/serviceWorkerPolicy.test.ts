@@ -8,6 +8,8 @@ const manifest = JSON.parse(readFileSync("public/manifest.webmanifest", "utf8"))
   start_url: string;
 };
 const worker = readFileSync("public/sw.js", "utf8");
+const offlinePage = readFileSync("public/offline.html", "utf8");
+const offlineScript = readFileSync("public/offline.js", "utf8");
 
 test("PWA manifest installs User Edition at the library", () => {
   assert.equal(manifest.name, "Pixelated User Edition");
@@ -26,4 +28,17 @@ test("service worker caches only app assets and pinned first-party cores", () =>
   assert.doesNotMatch(worker, /cdn\.jsdelivr\.net/);
   assert.doesNotMatch(worker, /supabase\.co/);
   assert.doesNotMatch(worker, /pixelated-api-services/);
+});
+
+test("service worker refreshes the app shell only from extensionless HTML routes", () => {
+  assert.match(worker, /!finalPathSegment\.includes\("\."\)/);
+  assert.match(worker, /contentType\.toLowerCase\(\)\.includes\("text\/html"\)/);
+  assert.match(worker, /response\.ok && isAppRoute/);
+});
+
+test("offline retry is CSP-safe and available from the shell cache", () => {
+  assert.match(worker, /"\/offline\.js"/);
+  assert.doesNotMatch(offlinePage, /onclick=/);
+  assert.match(offlinePage, /<script src="\/offline\.js"><\/script>/);
+  assert.match(offlineScript, /addEventListener\("click"/);
 });

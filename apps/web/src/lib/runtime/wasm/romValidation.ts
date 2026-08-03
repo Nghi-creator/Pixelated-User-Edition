@@ -53,9 +53,23 @@ export function bytesToHex(bytes: Uint8Array) {
   return Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
 }
 
+export function getRomDigestSource(bytes: Uint8Array): ArrayBuffer {
+  if (
+    bytes.buffer instanceof ArrayBuffer &&
+    bytes.byteOffset === 0 &&
+    bytes.byteLength === bytes.buffer.byteLength
+  ) {
+    return bytes.buffer;
+  }
+
+  return bytes.slice().buffer;
+}
+
 export async function sha256Hex(bytes: Uint8Array) {
-  const digestBytes = Uint8Array.from(bytes);
-  const digest = await globalThis.crypto.subtle.digest("SHA-256", digestBytes.buffer);
+  const digest = await globalThis.crypto.subtle.digest(
+    "SHA-256",
+    getRomDigestSource(bytes),
+  );
   return bytesToHex(new Uint8Array(digest));
 }
 

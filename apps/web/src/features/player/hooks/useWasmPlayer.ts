@@ -8,6 +8,10 @@ import { getWasmBrowserSupport } from "../../../lib/runtime/wasm/browserSupport"
 import { resolveWasmCore } from "../../../lib/runtime/wasm/coreRegistry";
 import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/runtimeTypes";
 import { useWasmInputBindings } from "../input/useWasmInputBindings";
+import {
+  claimCreatedBackendSession,
+  type BackendSession,
+} from "./backendSessionLifecycle";
 
 export type WasmPlayerStatus =
   | "idle"
@@ -20,6 +24,12 @@ export type WasmPlayerStatus =
   | "paused"
   | "stopped"
   | "error";
+
+function stopBackendSession(session: BackendSession) {
+  return api.stopSession(session.id, session.token).catch((sessionError) => {
+    console.warn("Failed to stop WASM backend session:", sessionError);
+  });
+}
 
 function createClientSessionId() {
   const randomPart = globalThis.crypto.randomUUID
@@ -43,7 +53,7 @@ export function useWasmPlayer(gameId: string | undefined) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const generationRef = useRef(0);
   const runtimeRef = useRef<GameRuntime | null>(null);
-  const sessionRef = useRef<{ id: string; token: string } | null>(null);
+  const sessionRef = useRef<BackendSession | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMutedState] = useState(false);
   const [progress, setProgress] = useState<WasmRuntimeProgress | null>(null);
@@ -54,9 +64,7 @@ export function useWasmPlayer(gameId: string | undefined) {
     const session = sessionRef.current;
     sessionRef.current = null;
     if (session) {
-      void api.stopSession(session.id, session.token).catch((sessionError) => {
-        console.warn("Failed to stop WASM backend session:", sessionError);
-      });
+      void stopBackendSession(session);
     }
   }, []);
 
@@ -87,11 +95,13 @@ export function useWasmPlayer(gameId: string | undefined) {
 
     try {
       const backendSession = await api.createSession(gameId, createClientSessionId());
-      if (generation !== generationRef.current) return;
-      sessionRef.current = {
-        id: backendSession.sessionId,
-        token: backendSession.sessionToken,
-      };
+      const claimedSession = claimCreatedBackendSession(
+        backendSession,
+        generation === generationRef.current,
+        (session) => void stopBackendSession(session),
+      );
+      if (!claimedSession) return;
+      sessionRef.current = claimedSession;
       if (backendSession.boot.runtimeKind !== "libretro") {
         throw new Error("This game requires the native Studio runtime and cannot run in WASM.");
       }
