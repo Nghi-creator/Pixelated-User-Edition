@@ -3,10 +3,6 @@ import test from "node:test";
 import {
   getLocalGamePlayPath,
   getLocalGameTitle,
-  getLocalVaultErrorMessage,
-  InvalidEngineTokenError,
-  normalizeLocalGameFilenames,
-  toLocalVaultGames,
   validateLocalRomFile,
   detectLocalRomSystem,
   inspectLocalRomFile,
@@ -72,67 +68,17 @@ test("local ROM inspection detects systems and validates NES headers", async () 
   );
 });
 
-test("local vault filenames normalize to playable local game cards", () => {
-  const filenames = normalizeLocalGameFilenames([
-    "new-game.nes",
-    "pocket.gbc",
-    "advance.gba",
-    "super.sfc",
-    "headered.smc",
-    "drive.md",
-    "mega.gen",
-    "master.sms",
-    "gear.gg",
-    "notes.txt",
-    null,
-    "OLDER.NES",
-  ]);
-
-  assert.deepEqual(filenames, [
-    "new-game.nes",
-    "pocket.gbc",
-    "advance.gba",
-    "super.sfc",
-    "headered.smc",
-    "drive.md",
-    "mega.gen",
-    "master.sms",
-    "gear.gg",
-    "OLDER.NES",
-  ]);
+test("local vault derives display titles without retaining ROM bytes", () => {
   assert.equal(getLocalGameTitle("new-game.nes"), "new-game");
   assert.equal(getLocalGameTitle("pocket.gbc"), "pocket");
   assert.equal(getLocalGameTitle("super.sfc"), "super");
   assert.equal(getLocalGameTitle("drive.md"), "drive");
   assert.equal(getLocalGameTitle("master.sms"), "master");
-  assert.deepEqual(toLocalVaultGames(filenames), [
-    { id: "new-game.nes", title: "new-game" },
-    { id: "pocket.gbc", title: "pocket" },
-    { id: "advance.gba", title: "advance" },
-    { id: "super.sfc", title: "super" },
-    { id: "headered.smc", title: "headered" },
-    { id: "drive.md", title: "drive" },
-    { id: "mega.gen", title: "mega" },
-    { id: "master.sms", title: "master" },
-    { id: "gear.gg", title: "gear" },
-    { id: "OLDER.NES", title: "OLDER" },
-  ]);
 });
 
 test("local vault play paths encode route-sensitive filenames", () => {
   assert.equal(
     getLocalGamePlayPath("demo #1?rev=2%.gba"),
     "/play/demo%20%231%3Frev%3D2%25.gba",
-  );
-});
-
-test("local vault errors preserve invalid-token recovery guidance", () => {
-  assert.equal(
-    getLocalVaultErrorMessage(new InvalidEngineTokenError(), "fallback"),
-    "The saved pairing token was rejected. Enter the current desktop token to reconnect.",
-  );
-  assert.equal(
-    getLocalVaultErrorMessage(new Error("Engine offline"), "fallback"),
-    "Engine offline",
   );
 });

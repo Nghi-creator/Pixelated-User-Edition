@@ -38,23 +38,6 @@ export const LOCAL_ROM_SYSTEMS: readonly {
   { extensions: [".sms"], id: "sms", label: "Master System" },
   { extensions: [".gg"], id: "game_gear", label: "Game Gear" },
 ];
-export const INVALID_ENGINE_TOKEN_MESSAGE =
-  "The saved pairing token was rejected. Enter the current desktop token to reconnect.";
-export const LOCAL_ENGINE_UNREACHABLE_MESSAGE =
-  "Local engine is unreachable. Check the desktop app and engine URL.";
-
-export type LocalVaultGame = {
-  id: string;
-  title: string;
-};
-
-export class InvalidEngineTokenError extends Error {
-  constructor() {
-    super(INVALID_ENGINE_TOKEN_MESSAGE);
-    this.name = "InvalidEngineTokenError";
-  }
-}
-
 export function validateLocalRomFile(file: Pick<File, "name" | "size"> | null) {
   if (!file) return "Choose a supported ROM file first.";
   if (file.size <= 0) return "The selected ROM file is empty.";
@@ -111,36 +94,4 @@ export function getLocalGameTitle(filename: string) {
 
 export function getLocalGamePlayPath(filename: string) {
   return `/play/${encodeURIComponent(filename)}`;
-}
-
-export function normalizeLocalGameFilenames(payload: unknown) {
-  if (!Array.isArray(payload)) return [];
-
-  return payload
-    .filter((filename): filename is string => typeof filename === "string")
-    .filter((filename) => {
-      const lowerFilename = filename.toLowerCase();
-      return LOCAL_VAULT_EXTENSIONS.some((extension) =>
-        lowerFilename.endsWith(extension),
-      );
-    });
-}
-
-export function toLocalVaultGames(filenames: string[]): LocalVaultGame[] {
-  return filenames.map((filename) => ({
-    id: filename,
-    title: getLocalGameTitle(filename),
-  }));
-}
-
-export function getLocalVaultErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof InvalidEngineTokenError) return error.message;
-  if (error instanceof Error && error.message.trim()) return error.message;
-  return fallback;
-}
-
-export function isInvalidEngineTokenError(
-  error: unknown,
-): error is InvalidEngineTokenError {
-  return error instanceof InvalidEngineTokenError;
 }

@@ -30,6 +30,13 @@ test("service worker caches only app assets and pinned first-party cores", () =>
   assert.doesNotMatch(worker, /pixelated-api-services/);
 });
 
+test("pinned cores revalidate automatically and retain an offline fallback", () => {
+  assert.match(worker, /networkFirstCached\(request, CORE_CACHE, event\)/);
+  assert.match(worker, /return cached \|\| response/);
+  assert.match(worker, /if \(cached\) return cached/);
+  assert.doesNotMatch(worker, /core changes/);
+});
+
 test("service worker refreshes the app shell only from extensionless HTML routes", () => {
   assert.match(worker, /!finalPathSegment\.includes\("\."\)/);
   assert.match(worker, /contentType\.toLowerCase\(\)\.includes\("text\/html"\)/);

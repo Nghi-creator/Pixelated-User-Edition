@@ -145,8 +145,8 @@ export function PlayerHeader({
             type="button"
             onClick={onToggleTelemetry}
             aria-pressed={showStreamTelemetry}
-            aria-label="Toggle stream telemetry"
-            title="Toggle stream telemetry"
+            aria-label="Toggle browser telemetry"
+            title="Toggle browser telemetry"
             className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${
               showStreamTelemetry
                 ? "border-synth-border bg-synth-elevated text-white"

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { supabase } from "../auth/supabaseClient";
-import { api, getAuthSession } from "../api/apiClient";
+import { api } from "../api/apiClient";
+import { useAuthSession } from "../auth/authSessionContext";
 
 const SESSION_ID_KEY = "pixelated_access_session_id";
 const LOGGED_STATE_PREFIX = "pixelated_logged_user_";
@@ -18,8 +18,11 @@ function getAccessSessionId() {
 }
 
 export function useSessionTracker() {
+  const { loading, session } = useAuthSession();
+  const userId = session?.user.id || null;
+
   useEffect(() => {
-    let isSubscribed = true;
+    if (loading) return;
     const accessSessionId = getAccessSessionId();
 
     const logSession = async (user_id: string | null = null) => {
@@ -39,27 +42,6 @@ export function useSessionTracker() {
       }
     };
 
-    // First attempt to grab the user payload locally
-    getAuthSession().then((session) => {
-      if (isSubscribed) {
-        logSession(session?.user?.id || null);
-      }
-    });
-
-    // Also fire off if the user transitions locally
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_IN") {
-          logSession(session?.user?.id);
-        } else if (event === "SIGNED_OUT") {
-          logSession(null);
-        }
-      }
-    );
-
-    return () => {
-      isSubscribed = false;
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+    void logSession(userId);
+  }, [loading, userId]);
 }

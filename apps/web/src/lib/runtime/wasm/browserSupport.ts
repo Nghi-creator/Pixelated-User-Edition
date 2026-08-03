@@ -10,7 +10,7 @@ export function getWasmBrowserSupport(): WasmBrowserSupport {
   if (typeof fetch !== "function" || typeof ReadableStream !== "function") {
     return {
       supported: false,
-      reason: "This browser is missing the streaming APIs required to load games.",
+      reason: "This browser is missing the download APIs required to load games.",
     };
   }
   if (!globalThis.crypto?.subtle) {
@@ -31,4 +31,3 @@ export function getWasmBrowserSupport(): WasmBrowserSupport {
   }
   return { supported: true, reason: null };
 }
-

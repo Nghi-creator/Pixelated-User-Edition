@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "../../lib/auth/supabaseClient";
+import { useAuthSession } from "../../lib/auth/authSessionContext";
 import {
   getPasswordPolicyError,
   PASSWORD_MIN_LENGTH,
@@ -11,6 +12,7 @@ import { PixelIcon } from "../../components/ui/PixelIcon";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { loading: authLoading, session } = useAuthSession();
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,7 +20,6 @@ export default function ResetPassword() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
     const hasAuthHash =
       window.location.hash.includes("access_token") ||
       window.location.hash.includes("type=recovery");
@@ -28,30 +29,13 @@ export default function ResetPassword() {
       }
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!isMounted) return;
-      if (session) {
-        clearAuthHash();
-        return;
-      }
-      if (!hasAuthHash) {
-        navigate("/login");
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        clearAuthHash();
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
+    if (authLoading) return;
+    if (session) {
+      clearAuthHash();
+      return;
+    }
+    if (!hasAuthHash) navigate("/login");
+  }, [authLoading, navigate, session]);
 
   const handlePasswordReset = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
