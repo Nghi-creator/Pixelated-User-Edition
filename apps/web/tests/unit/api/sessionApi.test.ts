@@ -15,7 +15,7 @@ test("User Edition creates WASM sessions and stops them with the opaque token", 
   });
 
   await api.createSession("game-1", "session-1");
-  await api.stopSession("session-1", "opaque-session-token");
+  await api.stopSession("session/with?route", "opaque-session-token");
 
   assert.deepEqual(requests, [
     {
@@ -36,7 +36,7 @@ test("User Edition creates WASM sessions and stops them with the opaque token", 
         body: JSON.stringify({ sessionToken: "opaque-session-token" }),
         method: "DELETE",
       },
-      path: "/sessions/session-1",
+      path: "/sessions/session%2Fwith%3Froute",
     },
   ]);
 });

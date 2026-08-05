@@ -47,39 +47,55 @@ export default function DeviceStorage() {
 
   useEffect(() => {
     let active = true;
-    void readStorageState().then((value) => {
-      if (active) setStorage(value);
-    });
+    void readStorageState()
+      .then((value) => {
+        if (active) setStorage(value);
+      })
+      .catch(() => {
+        if (active) setMessage("Browser storage information is unavailable.");
+      });
     return () => {
       active = false;
     };
   }, []);
 
-  const requestPersistence = async () => {
+  const runStorageAction = async (
+    action: () => Promise<void>,
+    failureMessage: string,
+  ) => {
+    if (busy) return;
     setBusy(true);
+    setMessage("");
+    try {
+      await action();
+    } catch {
+      setMessage(failureMessage);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const requestPersistence = () => runStorageAction(async () => {
     const granted = await navigator.storage?.persist?.() || false;
     setMessage(granted
       ? "This browser will protect Pixelated saves from automatic storage cleanup when possible."
       : "This browser did not grant protected storage. Export important saves regularly.");
     await refresh();
-    setBusy(false);
-  };
+  }, "Could not update browser storage protection. Try again.");
 
-  const clearCaches = async () => {
-    setBusy(true);
+  const clearCaches = () => runStorageAction(async () => {
     await clearOfflineCaches();
     setMessage("Cached application files and emulator cores were cleared. They will download again when needed.");
     await refresh();
-    setBusy(false);
-  };
+  }, "Could not clear the offline application cache. Try again.");
 
   const clearPersonalData = async () => {
     if (!window.confirm("Delete all browser save states and recent local-file metadata on this device?")) return;
-    setBusy(true);
-    await Promise.all([clearAllWasmSaveRecords(), clearLocalRomRecents()]);
-    setMessage("Browser save states and local-file history were deleted from this device.");
-    await refresh();
-    setBusy(false);
+    await runStorageAction(async () => {
+      await Promise.all([clearAllWasmSaveRecords(), clearLocalRomRecents()]);
+      setMessage("Browser save states and local-file history were deleted from this device.");
+      await refresh();
+    }, "Could not delete all local gameplay data. Try again.");
   };
 
   return (

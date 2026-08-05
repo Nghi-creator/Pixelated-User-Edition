@@ -11,7 +11,7 @@ type PlayerHeaderProps = {
   gameRights?: NonNullable<ApiGame["game_rights"]>;
   gameTitle: string;
   layoutClassName?: string;
-  showStreamTelemetry: boolean;
+  showTelemetry: boolean;
   status: PlayerHeaderStatus;
   onBack?: () => void;
   onToggleTelemetry: () => void;
@@ -38,17 +38,17 @@ export function PlayerHeader({
   layoutClassName = "max-w-5xl",
   onBack,
   onToggleTelemetry,
-  showStreamTelemetry,
+  showTelemetry,
   status,
   statusLabelOverride,
 }: PlayerHeaderProps) {
   const statusLabel = statusLabelOverride ||
     (status === "connecting"
-      ? "Connecting to Edge Node..."
+      ? "Preparing Browser Runtime..."
       : status === "playing"
-        ? "Live Stream Active"
+        ? "Browser Runtime Active"
         : status === "error"
-          ? "Stream Error"
+          ? "Browser Runtime Error"
           : "Idle");
   const statusDotClass =
     status === "playing"
@@ -144,11 +144,11 @@ export function PlayerHeader({
           <button
             type="button"
             onClick={onToggleTelemetry}
-            aria-pressed={showStreamTelemetry}
+            aria-pressed={showTelemetry}
             aria-label="Toggle browser telemetry"
             title="Toggle browser telemetry"
             className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${
-              showStreamTelemetry
+              showTelemetry
                 ? "border-synth-border bg-synth-elevated text-white"
                 : "border-synth-border bg-synth-surface text-gray-400 hover:text-white"
             }`}

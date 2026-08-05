@@ -72,7 +72,6 @@ export function useCommentReporting(currentUser: User | null) {
     reportMessage,
     reportReason,
     reportingCommentId,
-    setReportingCommentId,
     setReportReason,
   };
 }

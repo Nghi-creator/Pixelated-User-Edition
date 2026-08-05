@@ -4,8 +4,6 @@ import { ProfileSkeleton } from "../../components/ui/Skeleton";
 export { PublicProfileSection } from "./PublicProfileSection";
 export { RecentActivitySection } from "./RecentActivitySection";
 export { SecuritySection } from "./SecuritySection";
-export type { ProfileSettingsState } from "./ProfileSettingsState";
-
 export function ProfileLoadingState() {
   return <div className="flex min-h-screen flex-col"><ProfileSkeleton /></div>;
 }

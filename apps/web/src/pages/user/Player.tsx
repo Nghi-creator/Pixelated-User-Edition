@@ -97,7 +97,7 @@ export default function Player() {
         onToggleTelemetry={() =>
           setShowBrowserTelemetry((isVisible) => !isVisible)
         }
-        showStreamTelemetry={showBrowserTelemetry}
+        showTelemetry={showBrowserTelemetry}
         status={headerStatus}
         statusLabelOverride={
           player.status === "idle" && !metadataLoading && compatibility.kind !== "browser"
@@ -108,7 +108,7 @@ export default function Player() {
 
       <PlayerStreamGrid
         layoutClassName={playerLayoutClassName}
-        showStreamTelemetry={showBrowserTelemetry}
+        showTelemetry={showBrowserTelemetry}
         telemetryPanel={
           <WasmResearchPanel
             onClose={() => setShowBrowserTelemetry(false)}

@@ -5,3 +5,6 @@ export const getPublicAppUrl = () => {
   if (typeof window === "undefined") return "";
   return window.location.origin;
 };
+
+export const getGamePlayPath = (gameId: string) =>
+  `/play/${encodeURIComponent(gameId)}`;
