@@ -1,11 +1,11 @@
 import { useEffect, useReducer } from "react";
 import { Download, X } from "lucide-react";
-import { PixelIcon } from "../../../components/ui/PixelIcon";
-import type { ReturnTypeOfUseWasmResearch } from "../research/wasmResearchTypes";
+import { PixelIcon } from "../ui/PixelIcon";
+import type { WasmResearch } from "../../hooks/wasm/useWasmResearch";
 
 type WasmResearchPanelProps = {
   onClose?: () => void;
-  research: ReturnTypeOfUseWasmResearch;
+  research: WasmResearch;
   variant?: "inline" | "sidebar";
 };
 
@@ -13,7 +13,7 @@ function ResearchPanelContent({
   research,
   sidebar,
 }: {
-  research: ReturnTypeOfUseWasmResearch;
+  research: WasmResearch;
   sidebar: boolean;
 }) {
   const [, refresh] = useReducer((value) => value + 1, 0);

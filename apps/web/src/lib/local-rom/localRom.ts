@@ -1,5 +1,5 @@
-import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry.ts";
-import { assertGameBoyRom } from "../../lib/runtime/wasm/romValidation.ts";
+import { findWasmCoreForArtifact } from "../runtime/wasm/coreRegistry.ts";
+import { assertGameBoyRom } from "../runtime/wasm/romValidation.ts";
 
 export const LOCAL_VAULT_EXTENSIONS = [
   ".nes",

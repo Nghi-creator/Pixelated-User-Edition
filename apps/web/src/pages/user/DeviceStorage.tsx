@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Database, HardDrive, ShieldCheck, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { clearLocalRomRecents } from "../../features/local-vault/localRomRecents";
+import { clearLocalRomRecents } from "../../lib/local-rom/localRomRecents";
 import {
   clearAllWasmSaveRecords,
   getSaveStorageEstimate,
-} from "../../features/player/saves/wasmSaveStore";
+} from "../../lib/runtime/wasm/wasmSaveStore";
 
 type StorageState = {
   persisted: boolean;

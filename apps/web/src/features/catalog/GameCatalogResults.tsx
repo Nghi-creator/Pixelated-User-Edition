@@ -3,7 +3,7 @@ import GameCard from "../../components/user/GameCard";
 import { GameGridSkeleton, GamesCatalogSkeleton } from "../../components/ui/Skeleton";
 import { Pagination } from "../../components/ui/Pagination";
 import type { ApiGame } from "../../lib/api/apiTypes";
-import { getBrowserGameCompatibility } from "./browserCompatibility";
+import { getBrowserGameCompatibility } from "../../lib/browserCompatibility";
 
 type Props = {
   currentPage: number; games: ApiGame[]; isError: boolean; isFetching: boolean; isLoading: boolean;

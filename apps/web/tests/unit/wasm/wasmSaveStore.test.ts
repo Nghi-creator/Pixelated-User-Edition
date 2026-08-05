@@ -4,7 +4,7 @@ import {
   createWasmSaveRecord,
   MAX_IMPORTED_STATE_BYTES,
   validateImportedState,
-} from "../../../src/features/player/saves/wasmSaveStore.ts";
+} from "../../../src/lib/runtime/wasm/wasmSaveStore.ts";
 
 test("creates a versioned game-specific save record", () => {
   const state = new Blob(["state"]);

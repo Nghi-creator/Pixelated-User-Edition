@@ -6,7 +6,7 @@ import {
   validateLocalRomFile,
   detectLocalRomSystem,
   inspectLocalRomFile,
-} from "../../../src/features/local-vault/localVaultState.ts";
+} from "../../../src/lib/local-rom/localRom.ts";
 
 function fileLike(name: string, size: number) {
   return { name, size } as File;

@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   readTouchControlPreferences,
   writeTouchControlPreference,
-} from "../../../src/features/player/input/touchControlPreferences.ts";
+} from "../../../src/lib/runtime/wasm/touchControlPreferences.ts";
 
 function memoryStorage(initial: Record<string, string> = {}) {
   const values = new Map(Object.entries(initial));

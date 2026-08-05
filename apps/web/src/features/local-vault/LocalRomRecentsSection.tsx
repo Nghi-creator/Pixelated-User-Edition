@@ -3,7 +3,7 @@ import {
   clearLocalRomRecents,
   removeLocalRomRecent,
   type LocalRomRecent,
-} from "./localRomRecents";
+} from "../../lib/local-rom/localRomRecents";
 
 type Props = {
   onChanged: () => Promise<void>;

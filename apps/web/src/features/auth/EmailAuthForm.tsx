@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_HINT } from "../../lib/auth/passwordPolicy";
-import { AuthCaptcha } from "./AuthCaptcha";
+import { AuthCaptcha } from "../../components/auth/AuthCaptcha";
 import { AuthSocialActions } from "./AuthSocialActions";
 
 type Props = { captchaResetKey: number; captchaToken: string; confirmPassword: string; email: string; isAuthCaptchaEnabled: boolean; isLogin: boolean; loading: boolean; onConfirmPasswordChange: (value: string) => void; onEmailChange: (value: string) => void; onGithubAuth: () => void; onGoogleAuth: () => void; onGuestContinue: () => void; onPasswordChange: (value: string) => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onTokenChange: (value: string) => void; onToggleAuthMode: () => void; password: string; setShowConfirmPassword: (updater: (visible: boolean) => boolean) => void; setShowPassword: (updater: (visible: boolean) => boolean) => void; showConfirmPassword: boolean; showForgotPassword: () => void; showPassword: boolean };

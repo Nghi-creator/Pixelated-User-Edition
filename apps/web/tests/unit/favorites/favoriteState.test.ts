@@ -5,7 +5,7 @@ import {
   mutateFavorite,
   replaceFavoriteIds,
   resetFavoriteState,
-} from "../../../src/features/favorites/favoriteState.ts";
+} from "../../../src/lib/favoriteState.ts";
 
 test("favorite state serializes duplicate mutations", async () => {
   resetFavoriteState();

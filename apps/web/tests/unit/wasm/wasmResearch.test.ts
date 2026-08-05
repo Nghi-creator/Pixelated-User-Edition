@@ -7,7 +7,7 @@ import {
   wasmFrameSamplesToCsv,
   wasmLongTasksToCsv,
   type WasmCapabilitySnapshot,
-} from "../../../src/features/player/research/wasmResearch.ts";
+} from "../../../src/lib/runtime/wasm/wasmResearch.ts";
 
 const capabilities: WasmCapabilitySnapshot = {
   crossOriginIsolated: false,

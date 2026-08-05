@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/auth/supabaseClient";
 import { getPublicAppUrl } from "../../lib/navigation/appUrl";
 import { getPasswordPolicyError } from "../../lib/auth/passwordPolicy";
-import { isAuthCaptchaEnabled } from "./captchaConfig";
+import { isAuthCaptchaEnabled } from "../../lib/auth/captchaConfig";
 
 export type HostedAuthOptions = {
   captchaToken?: string;

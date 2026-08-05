@@ -3,8 +3,8 @@ import type { GameRuntime } from "../../lib/runtime/gameRuntime";
 import { getWasmBrowserSupport } from "../../lib/runtime/wasm/browserSupport";
 import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
 import type { WasmRuntimeProgress } from "../../lib/runtime/wasm/runtimeTypes";
-import type { WasmPlayerStatus } from "../player/hooks/useWasmPlayer";
-import { useWasmInputBindings } from "../player/input/useWasmInputBindings";
+import type { WasmPlayerStatus } from "../../lib/runtime/wasm/runtimeTypes";
+import { useWasmInputBindings } from "../../hooks/wasm/useWasmInputBindings";
 
 function getLocalLaunchError(error: unknown) {
   if (error instanceof Error) {

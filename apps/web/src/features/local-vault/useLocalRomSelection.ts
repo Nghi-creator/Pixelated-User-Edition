@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { inspectLocalRomFile, type LocalRomSystemId } from "./localVaultState";
+import {
+  inspectLocalRomFile,
+  type LocalRomSystemId,
+} from "../../lib/local-rom/localRom";
 import {
   createLocalRomRecent,
   listLocalRomRecents,
   saveLocalRomRecent,
   type LocalRomRecent,
-} from "./localRomRecents";
+} from "../../lib/local-rom/localRomRecents";
 
 export type SelectedLocalRomSystem = { id: LocalRomSystemId; label: string };
 export type LocalRomSelectionMessage = { text: string; tone: "error" | "info" };

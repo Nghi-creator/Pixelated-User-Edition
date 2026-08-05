@@ -1,9 +1,9 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { HardDrive, Save } from "lucide-react";
-import type { WasmCoreId, WasmSystemId } from "../../../lib/runtime/wasm/coreRegistry";
-import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
-import { useWasmSaveSlots } from "../saves/useWasmSaveSlots";
-import type { WasmSaveSlot } from "../saves/wasmSaveStore";
+import type { WasmCoreId, WasmSystemId } from "../../lib/runtime/wasm/coreRegistry";
+import type { WasmPlayerStatus } from "../../lib/runtime/wasm/runtimeTypes";
+import { useWasmSaveSlots } from "../../hooks/wasm/useWasmSaveSlots";
+import type { WasmSaveSlot } from "../../lib/runtime/wasm/wasmSaveStore";
 import { WasmSaveSlotCard } from "./WasmSaveSlotCard";
 
 type Props = { captureBatterySave: () => Promise<Blob>; captureState: () => Promise<{ state: Blob; thumbnail?: Blob }>; gameKey: string; restoreState: (state: Blob) => Promise<void>; runtime: { core: WasmCoreId; system: WasmSystemId }; status: WasmPlayerStatus; variant?: "inline" | "drawer" };

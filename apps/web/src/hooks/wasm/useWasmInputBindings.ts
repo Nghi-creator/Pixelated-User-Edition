@@ -11,7 +11,7 @@ import {
   type GamepadInputMapping,
   type WasmInputAction,
   type WasmInputPreferences,
-} from "./inputMappings";
+} from "../../lib/runtime/wasm/inputMappings";
 
 type Options = {
   active: boolean;

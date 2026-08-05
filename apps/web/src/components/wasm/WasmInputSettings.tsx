@@ -7,7 +7,7 @@ import {
   type GamepadInputMapping,
   type KeyboardInputMapping,
   type WasmInputAction,
-} from "../input/inputMappings";
+} from "../../lib/runtime/wasm/inputMappings";
 
 type Props = {
   disabled: boolean;

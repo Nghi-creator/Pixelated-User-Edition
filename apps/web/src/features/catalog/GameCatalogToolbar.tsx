@@ -1,6 +1,6 @@
 import { RotateCcw, Search } from "lucide-react";
 import { SelectMenu } from "../../components/ui/SelectMenu";
-import { PLATFORM_OPTIONS } from "./browserCompatibility";
+import { PLATFORM_OPTIONS } from "../../lib/browserCompatibility";
 import { formatGenre } from "./catalogMetadata";
 
 type RuntimeFilter = "all" | "browser" | "desktop" | "unavailable";
