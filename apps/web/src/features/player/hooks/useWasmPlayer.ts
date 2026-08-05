@@ -7,23 +7,12 @@ import type {
 import { getWasmBrowserSupport } from "../../../lib/runtime/wasm/browserSupport";
 import { resolveWasmCore } from "../../../lib/runtime/wasm/coreRegistry";
 import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/runtimeTypes";
-import { useWasmInputBindings } from "../input/useWasmInputBindings";
+import type { WasmPlayerStatus } from "../../../lib/runtime/wasm/runtimeTypes";
+import { useWasmInputBindings } from "../../../hooks/wasm/useWasmInputBindings";
 import {
   claimCreatedBackendSession,
   type BackendSession,
 } from "./backendSessionLifecycle";
-
-export type WasmPlayerStatus =
-  | "idle"
-  | "preparing"
-  | "downloading"
-  | "verifying"
-  | "loading-core"
-  | "starting"
-  | "playing"
-  | "paused"
-  | "stopped"
-  | "error";
 
 function stopBackendSession(session: BackendSession) {
   return api.stopSession(session.id, session.token).catch((sessionError) => {

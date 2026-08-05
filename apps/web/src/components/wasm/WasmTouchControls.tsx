@@ -1,10 +1,10 @@
 import { useEffect, useState, type PointerEvent } from "react";
-import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
+import type { WasmPlayerStatus } from "../../lib/runtime/wasm/runtimeTypes";
 import {
   readTouchControlPreferences,
   writeTouchControlPreference,
   type TouchControlPreset,
-} from "../input/touchControlPreferences";
+} from "../../lib/runtime/wasm/touchControlPreferences";
 
 type Props = {
   gameKey: string;

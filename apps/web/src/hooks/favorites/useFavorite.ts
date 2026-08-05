@@ -2,14 +2,14 @@ import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { api, getAuthSession } from "../../lib/api/apiClient";
-import { useFavoriteIdsQuery } from "../../lib/api/apiQueries";
+import { useFavoriteIdsQuery } from "../api/queryHooks";
 import { invalidateFavoriteQueries } from "../../lib/api/queryClient";
 import {
   getFavoriteSnapshot,
   mutateFavorite,
   replaceFavoriteIds,
   subscribeToFavorites,
-} from "./favoriteState";
+} from "../../lib/favorites/favoriteState";
 
 export function useFavorite(gameId: string) {
   const navigate = useNavigate();

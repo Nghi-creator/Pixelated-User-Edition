@@ -5,7 +5,7 @@ import { api } from "../../lib/api/apiClient";
 import { queryKeys } from "../../lib/api/queryClient";
 import { GameArtworkFallback } from "../../components/user/GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "../../components/user/gameArtworkUtils";
-import { useFavorite } from "./useFavorite";
+import { useFavorite } from "../../hooks/favorites/useFavorite";
 
 const PAGE_SIZE = 10;
 export type SavedGame = { id: string; title: string; cover_url: string };

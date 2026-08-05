@@ -8,9 +8,9 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
-import { useSessionTracker } from "./lib/session/useSessionTracker";
+import { useSessionTracker } from "./hooks/session/useSessionTracker";
 import { SUPABASE_CONFIGURATION_ERROR } from "./lib/auth/supabaseClient";
-import { AuthSessionProvider } from "./lib/auth/AuthSessionProvider";
+import { AuthSessionProvider } from "./components/auth/AuthSessionProvider";
 
 const Auth = lazy(() => import("./pages/user/Auth"));
 const Favorites = lazy(() => import("./pages/user/Favorites"));

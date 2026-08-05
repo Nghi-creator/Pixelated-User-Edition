@@ -10,8 +10,8 @@ import {
   VolumeX,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { PixelIcon } from "../../../components/ui/PixelIcon";
-import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
+import { PixelIcon } from "../ui/PixelIcon";
+import type { WasmPlayerStatus } from "../../lib/runtime/wasm/runtimeTypes";
 
 type WasmPlayerControlsProps = {
   gameTitle: string;

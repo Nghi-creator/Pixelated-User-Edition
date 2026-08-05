@@ -11,7 +11,7 @@ import {
   parseInputPreferences,
   rebindGamepad,
   rebindKeyboard,
-} from "../../../src/features/player/input/inputMappings.ts";
+} from "../../../src/lib/runtime/wasm/inputMappings.ts";
 
 test("default keyboard and standard-gamepad mappings are complete and conflict-free", () => {
   assert.equal(isValidKeyboardMapping(DEFAULT_KEYBOARD_MAPPING), true);

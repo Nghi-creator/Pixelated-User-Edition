@@ -1,4 +1,4 @@
-import { getLocalGameTitle, type LocalRomSystemId } from "./localVaultState.ts";
+import { getLocalGameTitle, type LocalRomSystemId } from "./localRom.ts";
 
 const DATABASE_NAME = "pixelated-user-edition";
 const DATABASE_VERSION = 1;

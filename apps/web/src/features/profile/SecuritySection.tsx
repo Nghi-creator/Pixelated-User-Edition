@@ -1,5 +1,5 @@
 import { AlertOctagon } from "lucide-react";
-import { AuthCaptcha } from "../auth/AuthCaptcha";
+import { AuthCaptcha } from "../../components/auth/AuthCaptcha";
 import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_HINT } from "../../lib/auth/passwordPolicy";
 import type { ProfileSettingsState } from "./ProfileSettingsState";
 

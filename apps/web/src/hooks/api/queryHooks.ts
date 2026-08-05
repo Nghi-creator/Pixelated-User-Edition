@@ -1,9 +1,13 @@
-import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getAuthSession, api } from "./apiClient";
-import { queryKeys } from "./queryClient";
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query";
+import { getAuthSession, api } from "../../lib/api/apiClient";
+import { queryKeys } from "../../lib/api/queryClient";
 import type {
   ApiGame,
-} from "./apiTypes";
+} from "../../lib/api/apiTypes";
 
 export function useAuthSessionQuery() {
   return useQuery({

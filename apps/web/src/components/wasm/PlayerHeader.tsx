@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { PixelIcon } from "../../../components/ui/PixelIcon";
-import type { ApiGame } from "../../../lib/api/apiClient";
+import { PixelIcon } from "../ui/PixelIcon";
+import type { ApiGame } from "../../lib/api/apiClient";
 
 export type PlayerHeaderStatus = "idle" | "connecting" | "playing" | "error";
 

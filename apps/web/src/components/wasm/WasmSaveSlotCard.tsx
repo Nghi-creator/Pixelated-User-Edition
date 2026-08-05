@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Download, Trash2, Upload } from "lucide-react";
-import type { WasmCoreId, WasmSystemId } from "../../../lib/runtime/wasm/coreRegistry";
-import type { WasmSaveRecord, WasmSaveSlot } from "../saves/wasmSaveStore";
+import type { WasmCoreId, WasmSystemId } from "../../lib/runtime/wasm/coreRegistry";
+import type { WasmSaveRecord, WasmSaveSlot } from "../../lib/runtime/wasm/wasmSaveStore";
 
 type Props = {
   busy: boolean; importInputId: string; isRunning: boolean; onDelete: () => void;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/NostalgistWasmRuntime";
+import type { WasmRuntimeProgress } from "../../lib/runtime/wasm/NostalgistWasmRuntime";
 import {
   captureWasmCapabilities,
   createWasmResearchBundle,
@@ -11,9 +11,9 @@ import {
   type WasmLaunchMetrics,
   type WasmLongTask,
   type WasmRuntimeError,
-} from "../research/wasmResearch";
-import type { WasmPlayerStatus } from "./useWasmPlayer";
-import type { WasmCoreId, WasmSystemId } from "../../../lib/runtime/wasm/coreRegistry";
+} from "../../lib/runtime/wasm/wasmResearch";
+import type { WasmPlayerStatus } from "../../lib/runtime/wasm/runtimeTypes";
+import type { WasmCoreId, WasmSystemId } from "../../lib/runtime/wasm/coreRegistry";
 
 const emptyLaunchMetrics = (): WasmLaunchMetrics => ({
   coreLoadMs: null,
@@ -224,3 +224,5 @@ export function useWasmResearch({
     setConsented,
   };
 }
+
+export type WasmResearch = ReturnType<typeof useWasmResearch>;

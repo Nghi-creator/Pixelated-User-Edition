@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
-import { AuthCaptcha } from "./AuthCaptcha";
+import { AuthCaptcha } from "../../components/auth/AuthCaptcha";
 
 type Props = { captchaResetKey: number; captchaToken: string; email: string; isAuthCaptchaEnabled: boolean; loading: boolean; onEmailChange: (value: string) => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onTokenChange: (value: string) => void; showSignIn: () => void };
 

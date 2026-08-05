@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFavorite } from "../../features/favorites/useFavorite";
+import { useFavorite } from "../../hooks/favorites/useFavorite";
 import {
   GameArtworkFallback,
 } from "./GameArtworkFallback";

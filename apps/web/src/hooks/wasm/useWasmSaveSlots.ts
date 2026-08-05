@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import type { WasmCoreId, WasmSystemId } from "../../../lib/runtime/wasm/coreRegistry";
+import type { WasmCoreId, WasmSystemId } from "../../lib/runtime/wasm/coreRegistry";
 import {
   createWasmSaveRecord, deleteWasmSaveRecord, getSaveStorageEstimate,
   listWasmSaveRecords, putWasmSaveRecord, validateImportedState,
   type WasmSaveRecord, type WasmSaveSlot,
-} from "./wasmSaveStore";
+} from "../../lib/runtime/wasm/wasmSaveStore";
 
 type Options = {
   captureState: () => Promise<{ state: Blob; thumbnail?: Blob }>;

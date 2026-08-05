@@ -3,22 +3,22 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   PlayerHeader,
   type PlayerHeaderStatus,
-} from "../../features/player/components/PlayerHeader";
-import { PlayerStreamGrid } from "../../features/player/components/PlayerStreamGrid";
-import { WasmPlayerControls } from "../../features/player/components/WasmPlayerControls";
-import { WasmPlayerToolDrawer } from "../../features/player/components/WasmPlayerToolDrawer";
-import { WasmResearchPanel } from "../../features/player/components/WasmResearchPanel";
-import { WasmSavePanel } from "../../features/player/components/WasmSavePanel";
-import { WasmStage } from "../../features/player/components/WasmStage";
-import { WasmTouchControls } from "../../features/player/components/WasmTouchControls";
-import { WasmInputSettings } from "../../features/player/components/WasmInputSettings";
+} from "../../components/wasm/PlayerHeader";
+import { PlayerStreamGrid } from "../../components/wasm/PlayerStreamGrid";
+import { WasmPlayerControls } from "../../components/wasm/WasmPlayerControls";
+import { WasmPlayerToolDrawer } from "../../components/wasm/WasmPlayerToolDrawer";
+import { WasmResearchPanel } from "../../components/wasm/WasmResearchPanel";
+import { WasmSavePanel } from "../../components/wasm/WasmSavePanel";
+import { WasmStage } from "../../components/wasm/WasmStage";
+import { WasmTouchControls } from "../../components/wasm/WasmTouchControls";
+import { WasmInputSettings } from "../../components/wasm/WasmInputSettings";
 import { useAuthUser } from "../../features/player/hooks/useAuthUser";
 import { useGameMetadata } from "../../features/player/hooks/useGameMetadata";
 import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNavigation";
 import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
-import { useWasmResearch } from "../../features/player/hooks/useWasmResearch";
-import { getBrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
+import { useWasmResearch } from "../../hooks/wasm/useWasmResearch";
+import { getBrowserGameCompatibility } from "../../lib/catalog/browserCompatibility";
 import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
 
 const PlayerCommunitySection = lazy(() =>

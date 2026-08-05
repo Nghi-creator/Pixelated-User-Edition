@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { api } from "../api/apiClient";
-import { useAuthSession } from "../auth/authSessionContext";
+import { api } from "../../lib/api/apiClient";
+import { useAuthSession } from "../auth/useAuthSession";
 
 const SESSION_ID_KEY = "pixelated_access_session_id";
 const LOGGED_STATE_PREFIX = "pixelated_logged_user_";

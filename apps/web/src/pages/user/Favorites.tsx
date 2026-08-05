@@ -6,8 +6,8 @@ import GameCard from "../../components/user/GameCard";
 import { FavoritesPageSkeleton } from "../../components/ui/Skeleton";
 import { PixelIcon } from "../../components/ui/PixelIcon";
 import { LibraryGamePicker, type SavedGame } from "../../features/favorites/LibraryGamePicker";
-import { replaceFavoriteIds } from "../../features/favorites/favoriteState";
-import { useFavoritesQuery } from "../../lib/api/apiQueries";
+import { replaceFavoriteIds } from "../../lib/favorites/favoriteState";
+import { useFavoritesQuery } from "../../hooks/api/queryHooks";
 import { queryKeys } from "../../lib/api/queryClient";
 
 export default function Favorites() {

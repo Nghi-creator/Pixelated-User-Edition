@@ -1,7 +1,7 @@
 import { AlertTriangle, LoaderCircle, Play } from "lucide-react";
 import type { RefObject } from "react";
-import type { WasmPlayerStatus } from "../hooks/useWasmPlayer";
-import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/NostalgistWasmRuntime";
+import type { WasmPlayerStatus } from "../../lib/runtime/wasm/runtimeTypes";
+import type { WasmRuntimeProgress } from "../../lib/runtime/wasm/NostalgistWasmRuntime";
 
 type WasmStageProps = {
   canStart?: boolean;

@@ -1,5 +1,17 @@
 import type { GameRuntime } from "../gameRuntime.ts";
 
+export type WasmPlayerStatus =
+  | "idle"
+  | "preparing"
+  | "downloading"
+  | "verifying"
+  | "loading-core"
+  | "starting"
+  | "playing"
+  | "paused"
+  | "stopped"
+  | "error";
+
 export type WasmRuntimePhase =
   | "downloading"
   | "verifying"

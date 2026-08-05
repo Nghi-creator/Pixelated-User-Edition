@@ -8,10 +8,10 @@ import {
   useAuthSessionQuery,
   useProfileQuery,
   useProfileActivityQuery,
-} from "../../lib/api/apiQueries";
+} from "../../hooks/api/queryHooks";
 import { invalidateProfileQueries } from "../../lib/api/queryClient";
 import { supabase } from "../../lib/auth/supabaseClient";
-import { isAuthCaptchaEnabled } from "../auth/captchaConfig";
+import { isAuthCaptchaEnabled } from "../../lib/auth/captchaConfig";
 import { saveProfile } from "./profileMutations";
 import type { ProfileMessage } from "./profileSettingsTypes";
 import { useDeleteAccount } from "./useDeleteAccount";

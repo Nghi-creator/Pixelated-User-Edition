@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createLocalRomRecent, listLocalRomRecents } from "../../../src/features/local-vault/localRomRecents.ts";
+import { createLocalRomRecent, listLocalRomRecents } from "../../../src/lib/local-rom/localRomRecents.ts";
 
 test("local ROM recents contain metadata but no ROM bytes", () => {
   const recent = createLocalRomRecent(
