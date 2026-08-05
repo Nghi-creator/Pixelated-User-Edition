@@ -1,4 +1,5 @@
 import type { ApiSessionResponse } from "./apiTypes";
+import { encodeApiPathSegment } from "./apiPath.ts";
 
 type SessionApiDependencies = {
   apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
@@ -18,7 +19,7 @@ export function createSessionApi({ apiRequest }: SessionApiDependencies) {
         method: "POST",
       }),
     stopSession: (sessionId: string, sessionToken: string) =>
-      apiRequest<void>(`/sessions/${sessionId}`, {
+      apiRequest<void>(`/sessions/${encodeApiPathSegment(sessionId)}`, {
         body: JSON.stringify({ sessionToken }),
         method: "DELETE",
       }),

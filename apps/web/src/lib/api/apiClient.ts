@@ -4,7 +4,10 @@ import {
   createRequestAbortController,
   withTimeout,
 } from "./requestLifecycle";
-import { clearAuthScopedCache } from "../auth/authCache";
+import {
+  clearAuthScopedCache,
+  setAuthScopedSession,
+} from "../auth/authCache";
 import type { ApiPermissionsResponse } from "./apiTypes";
 import { createCatalogApi } from "./catalogApi";
 import { createProfileApi } from "./profileApi";
@@ -72,6 +75,10 @@ const authScopedCache = {
 
 export function clearApiAuthScopedCache() {
   clearAuthScopedCache(authScopedCache);
+}
+
+export function setApiAuthSession(session: Session | null) {
+  setAuthScopedSession(authScopedCache, session);
 }
 
 export async function getAuthSession() {

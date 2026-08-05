@@ -6,7 +6,10 @@ import {
 } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { resetFavoriteState } from "../../features/favorites/favoriteState";
-import { clearApiAuthScopedCache } from "../api/apiClient";
+import {
+  clearApiAuthScopedCache,
+  setApiAuthSession,
+} from "../api/apiClient";
 import { queryClient } from "../api/queryClient";
 import { createAuthIdentityTracker } from "./authIdentityTracker";
 import { AuthSessionContext } from "./authSessionContext";
@@ -27,6 +30,9 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
     const updateSession = (nextSession: Session | null) => {
       if (!active) return;
       trackIdentity(nextSession?.user.id || null);
+      // TOKEN_REFRESHED keeps the same identity but replaces the access token.
+      // Keep API authentication current without discarding same-user query data.
+      setApiAuthSession(nextSession);
       setSession(nextSession);
       setLoading(false);
     };

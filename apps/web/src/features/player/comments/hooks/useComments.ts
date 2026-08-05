@@ -56,7 +56,7 @@ export function useComments(gameId: string | undefined, currentUser: User | null
     event.preventDefault();
     if (!currentUser || !newComment.trim() || !gameId) return;
 
-    await postCommentMutation.mutateAsync(newComment.trim());
+    await postCommentMutation.mutateAsync(newComment.trim()).catch(() => undefined);
   };
 
   const handleDeleteComment = async (commentId: string) => {
@@ -69,7 +69,7 @@ export function useComments(gameId: string | undefined, currentUser: User | null
     setPendingCommentIds(new Set(pendingCommentIdsRef.current));
     setCommentsError("");
     try {
-      await deleteCommentMutation.mutateAsync(commentId);
+      await deleteCommentMutation.mutateAsync(commentId).catch(() => undefined);
     } finally {
       pendingCommentIdsRef.current.delete(commentId);
       setPendingCommentIds(new Set(pendingCommentIdsRef.current));
@@ -95,10 +95,12 @@ export function useComments(gameId: string | undefined, currentUser: User | null
         (reaction) => reaction.user_id === currentUser.id,
       );
 
-      await commentReactionMutation.mutateAsync({
-        commentId,
-        isLike: existingReaction?.is_like === isLike ? null : isLike,
-      });
+      await commentReactionMutation
+        .mutateAsync({
+          commentId,
+          isLike: existingReaction?.is_like === isLike ? null : isLike,
+        })
+        .catch(() => undefined);
     } finally {
       pendingCommentIdsRef.current.delete(commentId);
       setPendingCommentIds(new Set(pendingCommentIdsRef.current));

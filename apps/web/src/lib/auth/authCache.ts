@@ -9,3 +9,10 @@ export const clearAuthScopedCache = (state: AuthScopedCacheState) => {
   state.permissions = null;
   state.session = null;
 };
+
+export const setAuthScopedSession = (
+  state: Pick<AuthScopedCacheState, "session">,
+  session: unknown,
+) => {
+  state.session = Promise.resolve(session);
+};

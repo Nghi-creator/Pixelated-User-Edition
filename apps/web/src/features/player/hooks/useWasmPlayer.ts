@@ -211,7 +211,6 @@ export function useWasmPlayer(gameId: string | undefined) {
     captureBatterySave,
     captureState,
     error,
-    gamepadName: inputBindings.gamepadName,
     inputBindings,
     isMuted,
     progress,

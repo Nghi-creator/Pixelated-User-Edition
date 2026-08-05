@@ -11,22 +11,6 @@ export function Skeleton({ className = "" }: SkeletonProps) {
   );
 }
 
-export function SkeletonText({
-  className = "",
-  lines = 1,
-}: SkeletonProps & { lines?: number }) {
-  return (
-    <div className={`space-y-2 ${className}`}>
-      {Array.from({ length: lines }, (_, index) => (
-        <Skeleton
-          key={index}
-          className={index === lines - 1 ? "h-3 w-2/3" : "h-3 w-full"}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function GameGridSkeleton({ count = 15 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5">

@@ -52,9 +52,9 @@ export function useGameReactions(gameId: string | undefined, currentUser: User |
     if (!gameId) return;
     setReactionError("");
 
-    await reactionMutation.mutateAsync(
-      reactionSummary.userReaction === isLike ? null : isLike,
-    );
+    await reactionMutation
+      .mutateAsync(reactionSummary.userReaction === isLike ? null : isLike)
+      .catch(() => undefined);
   };
 
   return {

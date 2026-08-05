@@ -139,7 +139,6 @@ export function useLocalWasmPlayer(file: File | null, systemId: string | null) {
     captureBatterySave,
     captureState,
     error,
-    gamepadName: inputBindings.gamepadName,
     inputBindings,
     isMuted,
     progress,

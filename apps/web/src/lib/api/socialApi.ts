@@ -1,3 +1,5 @@
+import { encodeApiPathSegment } from "./apiPath.ts";
+
 type SocialApiDependencies = {
   apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
 };
@@ -5,27 +7,27 @@ type SocialApiDependencies = {
 export function createSocialApi({ apiRequest }: SocialApiDependencies) {
   return {
     deleteComment: (commentId: string) =>
-      apiRequest<void>(`/comments/${commentId}`, {
+      apiRequest<void>(`/comments/${encodeApiPathSegment(commentId)}`, {
         method: "DELETE",
       }),
     gameComments: <TComment>(gameId: string, page: number) =>
       apiRequest<{ comments: TComment[]; hasMore: boolean }>(
-        `/games/${gameId}/comments?page=${page}`,
+        `/games/${encodeApiPathSegment(gameId)}/comments?page=${page}`,
         { authenticated: false },
       ),
     gameReactions: (gameId: string) =>
       apiRequest<{ reactions: { is_like: boolean; user_id: string }[] }>(
-        `/games/${gameId}/reactions`,
+        `/games/${encodeApiPathSegment(gameId)}/reactions`,
         { authenticated: false },
       ),
     postComment: (gameId: string, content: string) =>
-      apiRequest<{ success: true }>(`/games/${gameId}/comments`, {
+      apiRequest<{ success: true }>(`/games/${encodeApiPathSegment(gameId)}/comments`, {
         body: JSON.stringify({ content }),
         method: "POST",
       }),
     reportComment: (commentId: string, reason: string) =>
       apiRequest<{ success: true }>(
-        `/moderation/comments/${commentId}/report`,
+        `/moderation/comments/${encodeApiPathSegment(commentId)}/report`,
         {
           body: JSON.stringify({ reason }),
           method: "POST",
@@ -33,14 +35,14 @@ export function createSocialApi({ apiRequest }: SocialApiDependencies) {
       ),
     setCommentReaction: (commentId: string, isLike: boolean | null) =>
       apiRequest<{ reactions: { is_like: boolean; user_id: string }[] }>(
-        `/comments/${commentId}/reaction`,
+        `/comments/${encodeApiPathSegment(commentId)}/reaction`,
         {
           body: JSON.stringify({ isLike }),
           method: "PUT",
         },
       ),
     setGameReaction: (gameId: string, isLike: boolean | null) =>
-      apiRequest<{ success: true }>(`/games/${gameId}/reaction`, {
+      apiRequest<{ success: true }>(`/games/${encodeApiPathSegment(gameId)}/reaction`, {
         body: JSON.stringify({ isLike }),
         method: "PUT",
       }),

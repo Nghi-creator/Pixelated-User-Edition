@@ -4,6 +4,7 @@ import type {
   ApiGame,
   ApiPaginatedGamesResponse,
 } from "./apiTypes";
+import { encodeApiPathSegment } from "./apiPath.ts";
 
 type CatalogApiDependencies = {
   apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
@@ -18,7 +19,7 @@ export function createCatalogApi({
 }: CatalogApiDependencies) {
   return {
     countPlay: (gameId: string, playEventId: string) =>
-      apiRequest<{ success: true }>(`/games/${gameId}/play-count`, {
+      apiRequest<{ success: true }>(`/games/${encodeApiPathSegment(gameId)}/play-count`, {
         body: JSON.stringify({ clientEdition: "user", playEventId, runtimeKind: "wasm" }),
         method: "POST",
       }),
@@ -65,13 +66,13 @@ export function createCatalogApi({
         cache: "no-store",
       }),
     game: (gameId: string) =>
-      apiRequest<{ game: ApiGame }>(`/games/${gameId}`, {
+      apiRequest<{ game: ApiGame }>(`/games/${encodeApiPathSegment(gameId)}`, {
         authenticated: false,
       }),
     listFavorites: <TFavorite>() =>
       apiRequest<{ favorites: TFavorite[] }>("/favorites"),
     removeFavorite: async (gameId: string) => {
-      const result = await apiRequest<void>(`/favorites/${gameId}`, {
+      const result = await apiRequest<void>(`/favorites/${encodeApiPathSegment(gameId)}`, {
         method: "DELETE",
       });
       clearFavoritesCache();
@@ -79,7 +80,7 @@ export function createCatalogApi({
     },
     saveFavorite: async (gameId: string) => {
       const result = await apiRequest<{ favorited: true }>(
-        `/favorites/${gameId}`,
+        `/favorites/${encodeApiPathSegment(gameId)}`,
         {
           method: "PUT",
         },

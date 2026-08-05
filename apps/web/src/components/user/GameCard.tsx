@@ -7,6 +7,7 @@ import {
 } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
 import type { BrowserGameCompatibility } from "../../features/catalog/browserCompatibility";
+import { getGamePlayPath } from "../../lib/navigation/appUrl";
 
 interface GameCardProps {
   id: string;
@@ -49,7 +50,7 @@ export default function GameCard({
 
   return (
     <article className="group relative overflow-hidden rounded-lg border border-synth-border bg-synth-surface transition-colors hover:bg-synth-elevated">
-      <Link to={`/play/${id}`} className="block">
+      <Link to={getGamePlayPath(id)} className="block">
         <div className="overflow-hidden bg-synth-bg">
         {showCover ? (
           <img
