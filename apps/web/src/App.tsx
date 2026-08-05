@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
-import { useSessionTracker } from "./hooks/session/useSessionTracker";
+import { useSessionTracker } from "./hooks/useSessionTracker";
 import { SUPABASE_CONFIGURATION_ERROR } from "./lib/auth/supabaseClient";
 import { AuthSessionProvider } from "./components/auth/AuthSessionProvider";
 

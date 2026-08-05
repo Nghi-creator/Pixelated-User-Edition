@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ApiGame } from "../../lib/api/apiTypes";
-import { useCatalogFiltersQuery, useFeaturedGamesQuery, useGameCatalogQuery } from "../../hooks/api/queryHooks";
+import { useCatalogFiltersQuery, useFeaturedGamesQuery, useGameCatalogQuery } from "../../hooks/queryHooks";
 
 export const GAMES_PER_PAGE = 15;
 const ZERO_PLAY_FEATURED_REFRESH_MS = 30_000;

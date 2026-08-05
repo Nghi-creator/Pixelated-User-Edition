@@ -1,12 +1,12 @@
 import { Heart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useFavorite } from "../../hooks/favorites/useFavorite";
+import { useFavorite } from "../../hooks/useFavorite";
 import {
   GameArtworkFallback,
 } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
-import type { BrowserGameCompatibility } from "../../lib/catalog/browserCompatibility";
+import type { BrowserGameCompatibility } from "../../lib/browserCompatibility";
 import { getGamePlayPath } from "../../lib/navigation/appUrl";
 
 interface GameCardProps {

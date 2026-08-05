@@ -1,5 +1,5 @@
 import type { ApiGame } from "../../../lib/api/apiClient";
-import { useGameMetadataQuery } from "../../../hooks/api/queryHooks";
+import { useGameMetadataQuery } from "../../../hooks/queryHooks";
 
 type GameRights = NonNullable<ApiGame["game_rights"]>[number];
 

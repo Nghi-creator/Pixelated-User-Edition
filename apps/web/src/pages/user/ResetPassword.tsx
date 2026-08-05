@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "../../lib/auth/supabaseClient";
-import { useAuthSession } from "../../hooks/auth/useAuthSession";
+import { useAuthSession } from "../../hooks/useAuthSession";
 import {
   getPasswordPolicyError,
   PASSWORD_MIN_LENGTH,

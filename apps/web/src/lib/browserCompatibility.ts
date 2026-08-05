@@ -1,5 +1,5 @@
-import type { ApiGame } from "../api/apiTypes";
-import { findWasmCoreForArtifact } from "../runtime/wasm/coreRegistry.ts";
+import type { ApiGame } from "./api/apiTypes";
+import { findWasmCoreForArtifact } from "./runtime/wasm/coreRegistry.ts";
 
 export type BrowserCompatibilityKind = "browser" | "desktop" | "unavailable";
 

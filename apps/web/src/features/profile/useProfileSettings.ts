@@ -8,7 +8,7 @@ import {
   useAuthSessionQuery,
   useProfileQuery,
   useProfileActivityQuery,
-} from "../../hooks/api/queryHooks";
+} from "../../hooks/queryHooks";
 import { invalidateProfileQueries } from "../../lib/api/queryClient";
 import { supabase } from "../../lib/auth/supabaseClient";
 import { isAuthCaptchaEnabled } from "../../lib/auth/captchaConfig";

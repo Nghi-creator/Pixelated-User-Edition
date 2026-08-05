@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/auth/supabaseClient";
-import { usePermissionsQuery } from "../../hooks/api/queryHooks";
-import { useAuthSession } from "../../hooks/auth/useAuthSession";
+import { usePermissionsQuery } from "../../hooks/queryHooks";
+import { useAuthSession } from "../../hooks/useAuthSession";
 
 export function useNavbarAccount() {
   const { session } = useAuthSession();

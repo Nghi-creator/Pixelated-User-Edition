@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { ApiGame } from "../../../src/lib/api/apiTypes.ts";
-import { getBrowserGameCompatibility, getPlatformLabel } from "../../../src/lib/catalog/browserCompatibility.ts";
+import { getBrowserGameCompatibility, getPlatformLabel } from "../../../src/lib/browserCompatibility.ts";
 
 function game(overrides: Partial<NonNullable<ApiGame["game_builds"]>[number]> = {}): ApiGame {
   return {

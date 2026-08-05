@@ -5,14 +5,14 @@ import {
   type ReactNode,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { resetFavoriteState } from "../../lib/favorites/favoriteState";
+import { resetFavoriteState } from "../../lib/favoriteState";
 import {
   clearApiAuthScopedCache,
   setApiAuthSession,
 } from "../../lib/api/apiClient";
 import { queryClient } from "../../lib/api/queryClient";
 import { createAuthIdentityTracker } from "../../lib/auth/authIdentityTracker";
-import { AuthSessionContext } from "../../hooks/auth/useAuthSession";
+import { AuthSessionContext } from "../../hooks/useAuthSession";
 import { supabase } from "../../lib/auth/supabaseClient";
 
 export function AuthSessionProvider({ children }: { children: ReactNode }) {

@@ -18,7 +18,7 @@ import { usePlayerNavigation } from "../../features/player/hooks/usePlayerNaviga
 import { usePlayCount } from "../../features/player/hooks/usePlayCount";
 import { useWasmPlayer } from "../../features/player/hooks/useWasmPlayer";
 import { useWasmResearch } from "../../hooks/wasm/useWasmResearch";
-import { getBrowserGameCompatibility } from "../../lib/catalog/browserCompatibility";
+import { getBrowserGameCompatibility } from "../../lib/browserCompatibility";
 import { findWasmCoreForArtifact } from "../../lib/runtime/wasm/coreRegistry";
 
 const PlayerCommunitySection = lazy(() =>
