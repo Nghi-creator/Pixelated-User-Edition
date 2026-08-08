@@ -14,7 +14,7 @@ export default function Favorites() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const favoritesQuery = useFavoritesQuery<SavedGame>({
+  const favoritesQuery = useFavoritesQuery({
     onMissingSession: () => navigate("/login"),
   });
   const favorites = useMemo(

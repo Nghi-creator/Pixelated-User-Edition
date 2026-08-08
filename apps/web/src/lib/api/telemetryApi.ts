@@ -1,16 +1,17 @@
+import type { ApiRequest } from "./apiRequestTypes.ts";
+import { successSchema } from "./apiResponseSchemas.ts";
+
 type TelemetryApiDependencies = {
-  apiRequest: <T>(
-    path: string,
-    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
-  ) => Promise<T>;
+  apiRequest: ApiRequest;
 };
 
 export function createTelemetryApi({ apiRequest }: TelemetryApiDependencies) {
   return {
     logAccess: (path: string, sessionId: string) =>
-      apiRequest<{ success: true }>("/access-logs", {
-        body: JSON.stringify({ path, sessionId }),
-        method: "POST",
-      }),
+      apiRequest(
+        "/access-logs",
+        { body: JSON.stringify({ path, sessionId }), method: "POST" },
+        successSchema,
+      ),
   };
 }

@@ -1,30 +1,33 @@
-import type { ApiSessionResponse } from "./apiTypes";
+import type { ApiRequest } from "./apiRequestTypes.ts";
+import { apiSessionSchema, voidSchema } from "./apiResponseSchemas.ts";
 import { encodeApiPathSegment } from "./apiPath.ts";
 
 type SessionApiDependencies = {
-  apiRequest: <T>(
-    path: string,
-    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
-  ) => Promise<T>;
+  apiRequest: ApiRequest;
 };
 
 export function createSessionApi({ apiRequest }: SessionApiDependencies) {
   return {
     createSession: (gameId: string, clientSessionId: string) =>
-      apiRequest<ApiSessionResponse>("/sessions", {
-        body: JSON.stringify({
-          clientEdition: "user",
-          clientSessionId,
-          gameId,
-          mode: "cloud",
-          runtimeKind: "wasm",
-        }),
-        method: "POST",
-      }),
+      apiRequest(
+        "/sessions",
+        {
+          body: JSON.stringify({
+            clientEdition: "user",
+            clientSessionId,
+            gameId,
+            mode: "cloud",
+            runtimeKind: "wasm",
+          }),
+          method: "POST",
+        },
+        apiSessionSchema,
+      ),
     stopSession: (sessionId: string, sessionToken: string) =>
-      apiRequest<void>(`/sessions/${encodeApiPathSegment(sessionId)}`, {
-        body: JSON.stringify({ sessionToken }),
-        method: "DELETE",
-      }),
+      apiRequest(
+        `/sessions/${encodeApiPathSegment(sessionId)}`,
+        { body: JSON.stringify({ sessionToken }), method: "DELETE" },
+        voidSchema,
+      ),
   };
 }

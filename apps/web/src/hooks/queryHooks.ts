@@ -35,7 +35,7 @@ export function useFavoriteIdsQuery() {
   });
 }
 
-export function useFavoritesQuery<TFavorite>({
+export function useFavoritesQuery({
   onMissingSession,
 }: {
   onMissingSession?: () => void;
@@ -46,10 +46,10 @@ export function useFavoritesQuery<TFavorite>({
       const session = await getAuthSession();
       if (!session) {
         onMissingSession?.();
-        return { favorites: [] as TFavorite[] };
+        return { favorites: [] };
       }
 
-      return api.listFavorites<TFavorite>();
+      return api.listFavorites();
     },
   });
 }
@@ -96,12 +96,12 @@ export function useGameCatalogQuery({
   });
 }
 
-export function useGameCommentsQuery<TComment>(gameId: string | undefined) {
+export function useGameCommentsQuery(gameId: string | undefined) {
   return useInfiniteQuery({
     enabled: Boolean(gameId),
     initialPageParam: 1,
     queryKey: queryKeys.gameComments(gameId),
-    queryFn: ({ pageParam }) => api.gameComments<TComment>(gameId!, pageParam),
+    queryFn: ({ pageParam }) => api.gameComments(gameId!, pageParam),
     getNextPageParam: (lastPage, allPages) => (lastPage.hasMore ? allPages.length + 1 : undefined),
   });
 }

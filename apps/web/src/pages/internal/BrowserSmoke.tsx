@@ -22,19 +22,17 @@ export default function BrowserSmoke() {
   const [ticket] = useState(consumeTicketFragment);
   const [session, setSession] = useState<BrowserSmokeSession | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "running" | "passed" | "failed">(
-    "loading",
+    ticket ? "loading" : "failed",
   );
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    ticket ? "" : "This smoke-test link is missing its short-lived ticket.",
+  );
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const runtimeRef = useRef<GameRuntime | null>(null);
 
   useEffect(() => {
     let active = true;
-    if (!ticket) {
-      setError("This smoke-test link is missing its short-lived ticket.");
-      setState("failed");
-      return;
-    }
+    if (!ticket) return;
     void getBrowserSmokeSession(ticket)
       .then((value) => {
         if (!active) return;

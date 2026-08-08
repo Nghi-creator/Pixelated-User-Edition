@@ -1,16 +1,18 @@
-import type {
-  ApiFeaturedGamesResponse,
-  ApiCatalogFiltersResponse,
-  ApiGame,
-  ApiPaginatedGamesResponse,
-} from "./apiTypes";
+import type { ApiRequest } from "./apiRequestTypes.ts";
+import {
+  apiCatalogFiltersSchema,
+  apiFeaturedGamesSchema,
+  apiGameResponseSchema,
+  apiPaginatedGamesSchema,
+  favoritedSchema,
+  favoriteListSchema,
+  successSchema,
+  voidSchema,
+} from "./apiResponseSchemas.ts";
 import { encodeApiPathSegment } from "./apiPath.ts";
 
 type CatalogApiDependencies = {
-  apiRequest: <T>(
-    path: string,
-    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
-  ) => Promise<T>;
+  apiRequest: ApiRequest;
   clearFavoritesCache: () => void;
   getFavoriteIds: () => Promise<Set<string>>;
 };
@@ -22,15 +24,17 @@ export function createCatalogApi({
 }: CatalogApiDependencies) {
   return {
     countPlay: (gameId: string, playEventId: string) =>
-      apiRequest<{ success: true }>(`/games/${encodeApiPathSegment(gameId)}/play-count`, {
-        body: JSON.stringify({ clientEdition: "user", playEventId, runtimeKind: "wasm" }),
-        method: "POST",
-      }),
+      apiRequest(
+        `/games/${encodeApiPathSegment(gameId)}/play-count`,
+        {
+          body: JSON.stringify({ clientEdition: "user", playEventId, runtimeKind: "wasm" }),
+          method: "POST",
+        },
+        successSchema,
+      ),
     favoriteIds: () => getFavoriteIds(),
     catalogFilters: () =>
-      apiRequest<ApiCatalogFiltersResponse>("/games/filters", {
-        authenticated: false,
-      }),
+      apiRequest("/games/filters", { authenticated: false }, apiCatalogFiltersSchema),
     games: (
       {
         genre = "",
@@ -61,34 +65,41 @@ export function createCatalogApi({
       if (genre) params.set("genre", genre);
       if (license) params.set("license", license);
 
-      return apiRequest<ApiPaginatedGamesResponse>(`/games?${params}`, {
-        authenticated: false,
-        signal,
-      });
+      return apiRequest(
+        `/games?${params}`,
+        { authenticated: false, signal },
+        apiPaginatedGamesSchema,
+      );
     },
     featuredGames: () =>
-      apiRequest<ApiFeaturedGamesResponse>("/games/featured", {
-        authenticated: false,
-        cache: "no-store",
-      }),
+      apiRequest(
+        "/games/featured",
+        { authenticated: false, cache: "no-store" },
+        apiFeaturedGamesSchema,
+      ),
     game: (gameId: string) =>
-      apiRequest<{ game: ApiGame }>(`/games/${encodeApiPathSegment(gameId)}`, {
-        authenticated: false,
-      }),
-    listFavorites: <TFavorite>() => apiRequest<{ favorites: TFavorite[] }>("/favorites"),
+      apiRequest(
+        `/games/${encodeApiPathSegment(gameId)}`,
+        { authenticated: false },
+        apiGameResponseSchema,
+      ),
+    listFavorites: () => apiRequest("/favorites", undefined, favoriteListSchema),
     removeFavorite: async (gameId: string) => {
-      const result = await apiRequest<void>(`/favorites/${encodeApiPathSegment(gameId)}`, {
-        method: "DELETE",
-      });
+      const result = await apiRequest(
+        `/favorites/${encodeApiPathSegment(gameId)}`,
+        { method: "DELETE" },
+        voidSchema,
+      );
       clearFavoritesCache();
       return result;
     },
     saveFavorite: async (gameId: string) => {
-      const result = await apiRequest<{ favorited: true }>(
+      const result = await apiRequest(
         `/favorites/${encodeApiPathSegment(gameId)}`,
         {
           method: "PUT",
         },
+        favoritedSchema,
       );
       clearFavoritesCache();
       return result;

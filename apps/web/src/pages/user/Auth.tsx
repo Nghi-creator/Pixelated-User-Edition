@@ -21,12 +21,6 @@ export default function Auth() {
     onCaptchaChallengeReset: resetCaptchaChallenge,
     oauthRedirectTo: getPublicAppUrl(),
     resetPasswordRedirectTo: `${getPublicAppUrl()}/reset-password`,
-    resetPasswordRequest: {
-      redirectTo: `${getPublicAppUrl()}/reset-password`,
-    },
-    signUp: {
-      emailRedirectTo: getPublicAppUrl(),
-    },
     signUpEmailRedirectTo: getPublicAppUrl(),
     signupPendingMessage,
   };

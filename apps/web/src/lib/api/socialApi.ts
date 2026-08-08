@@ -1,53 +1,61 @@
 import { encodeApiPathSegment } from "./apiPath.ts";
+import type { ApiRequest } from "./apiRequestTypes.ts";
+import {
+  commentsPageSchema,
+  reactionsSchema,
+  successSchema,
+  voidSchema,
+} from "./apiResponseSchemas.ts";
 
 type SocialApiDependencies = {
-  apiRequest: <T>(
-    path: string,
-    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
-  ) => Promise<T>;
+  apiRequest: ApiRequest;
 };
 
 export function createSocialApi({ apiRequest }: SocialApiDependencies) {
   return {
     deleteComment: (commentId: string) =>
-      apiRequest<void>(`/comments/${encodeApiPathSegment(commentId)}`, {
-        method: "DELETE",
-      }),
-    gameComments: <TComment>(gameId: string, page: number) =>
-      apiRequest<{ comments: TComment[]; hasMore: boolean }>(
+      apiRequest(`/comments/${encodeApiPathSegment(commentId)}`, { method: "DELETE" }, voidSchema),
+    gameComments: (gameId: string, page: number) =>
+      apiRequest(
         `/games/${encodeApiPathSegment(gameId)}/comments?page=${page}`,
         { authenticated: false },
+        commentsPageSchema,
       ),
     gameReactions: (gameId: string) =>
-      apiRequest<{ reactions: { is_like: boolean; user_id: string }[] }>(
+      apiRequest(
         `/games/${encodeApiPathSegment(gameId)}/reactions`,
         { authenticated: false },
+        reactionsSchema,
       ),
     postComment: (gameId: string, content: string) =>
-      apiRequest<{ success: true }>(`/games/${encodeApiPathSegment(gameId)}/comments`, {
-        body: JSON.stringify({ content }),
-        method: "POST",
-      }),
+      apiRequest(
+        `/games/${encodeApiPathSegment(gameId)}/comments`,
+        { body: JSON.stringify({ content }), method: "POST" },
+        successSchema,
+      ),
     reportComment: (commentId: string, reason: string) =>
-      apiRequest<{ success: true }>(
+      apiRequest(
         `/moderation/comments/${encodeApiPathSegment(commentId)}/report`,
         {
           body: JSON.stringify({ reason }),
           method: "POST",
         },
+        successSchema,
       ),
     setCommentReaction: (commentId: string, isLike: boolean | null) =>
-      apiRequest<{ reactions: { is_like: boolean; user_id: string }[] }>(
+      apiRequest(
         `/comments/${encodeApiPathSegment(commentId)}/reaction`,
         {
           body: JSON.stringify({ isLike }),
           method: "PUT",
         },
+        reactionsSchema,
       ),
     setGameReaction: (gameId: string, isLike: boolean | null) =>
-      apiRequest<{ success: true }>(`/games/${encodeApiPathSegment(gameId)}/reaction`, {
-        body: JSON.stringify({ isLike }),
-        method: "PUT",
-      }),
+      apiRequest(
+        `/games/${encodeApiPathSegment(gameId)}/reaction`,
+        { body: JSON.stringify({ isLike }), method: "PUT" },
+        successSchema,
+      ),
   };
 }

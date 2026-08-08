@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { FormEvent } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -21,15 +21,17 @@ export function usePublicProfileSettings({
   const profileMutationRef = useRef(false);
   const [profileMessage, setProfileMessage] = useState<ProfileMessage | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [username, setUsername] = useState("");
-  const avatar = useProfileAvatar({ setProfileMessage });
-  const { setAvatarUrl } = avatar;
-
-  useEffect(() => {
-    if (!profile) return;
-    setUsername(profile.username || "");
-    setAvatarUrl(profile.avatar_url || "");
-  }, [profile, setAvatarUrl]);
+  const profileUsername = profile?.username || "";
+  const [usernameDraft, setUsernameDraft] = useState<{ baseValue: string; value: string } | null>(
+    null,
+  );
+  const username =
+    usernameDraft?.baseValue === profileUsername ? usernameDraft.value : profileUsername;
+  const setUsername = (value: string) => setUsernameDraft({ baseValue: profileUsername, value });
+  const avatar = useProfileAvatar({
+    profileAvatarUrl: profile?.avatar_url || "",
+    setProfileMessage,
+  });
 
   const updateProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
