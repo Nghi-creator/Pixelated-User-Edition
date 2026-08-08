@@ -6,6 +6,11 @@ test("pagination shows all small page sets and condenses larger sets", () => {
   assert.deepEqual(getVisiblePageNumbers(2, 4), [1, 2, 3, 4]);
   assert.deepEqual(getVisiblePageNumbers(5, 10), [1, 4, 5, 6, 10]);
   assert.deepEqual(getVisiblePageNumbers(10, 10), [1, 9, 10]);
+  assert.deepEqual(
+    getVisiblePageNumbers(500_000_000, 1_000_000_000),
+    [1, 499_999_999, 500_000_000, 500_000_001, 1_000_000_000],
+  );
+  assert.deepEqual(getVisiblePageNumbers(Number.NaN, Number.POSITIVE_INFINITY), [1]);
 });
 
 test("page slices clamp invalid pages and preserve paging metadata", () => {

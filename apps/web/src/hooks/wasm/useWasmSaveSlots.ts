@@ -28,8 +28,21 @@ export function useWasmSaveSlots({ captureState, gameKey, restoreState, runtime 
     setStorage(await getSaveStorageEstimate());
   }, [gameKey]);
   useEffect(() => {
-    void refresh().catch(() => setMessage("Browser save storage is unavailable."));
-  }, [refresh]);
+    let active = true;
+    void Promise.all([listWasmSaveRecords(gameKey), getSaveStorageEstimate()]).then(
+      ([nextRecords, nextStorage]) => {
+        if (!active) return;
+        setRecords(nextRecords);
+        setStorage(nextStorage);
+      },
+      () => {
+        if (active) setMessage("Browser save storage is unavailable.");
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [gameKey]);
   const run = useCallback(
     async (slot: WasmSaveSlot, action: () => Promise<string>) => {
       setBusySlot(slot);

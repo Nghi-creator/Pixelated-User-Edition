@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useSetGameReactionMutation } from "./playerMutations";
 import { useGameReactionsQuery } from "../../../hooks/queryHooks";
@@ -32,12 +32,9 @@ export function useGameReactions(gameId: string | undefined, currentUser: User |
     },
   });
 
-  useEffect(() => {
-    if (!reactionsQuery.isError) return;
-    setReactionError(
-      getSocialErrorMessage(reactionsQuery.error, "Could not load reactions. Try again."),
-    );
-  }, [reactionsQuery.error, reactionsQuery.isError]);
+  const queryReactionError = reactionsQuery.isError
+    ? getSocialErrorMessage(reactionsQuery.error, "Could not load reactions. Try again.")
+    : "";
 
   const handleReaction = async (isLike: boolean) => {
     if (!currentUser) {
@@ -57,7 +54,7 @@ export function useGameReactions(gameId: string | undefined, currentUser: User |
     handleReaction,
     isReactionLoading: reactionsQuery.isLoading || reactionMutation.isPending,
     likes: gameId ? reactionSummary.likeCount : 0,
-    reactionError,
+    reactionError: reactionError || queryReactionError,
     retryReactions: () => void reactionsQuery.refetch(),
     userReaction: gameId ? reactionSummary.userReaction : null,
   };

@@ -5,13 +5,18 @@ import type { ProfileMessage } from "./profileSettingsTypes";
 import { validateAvatarFile } from "./profileMutations";
 
 export function useProfileAvatar({
+  profileAvatarUrl,
   setProfileMessage,
 }: {
+  profileAvatarUrl: string;
   setProfileMessage: (message: ProfileMessage | null) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [committedAvatar, setCommittedAvatar] = useState<{
+    baseUrl: string;
+    value: string;
+  } | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -19,6 +24,8 @@ export function useProfileAvatar({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(null);
   const [isCropping, setIsCropping] = useState(false);
+  const avatarUrl =
+    committedAvatar?.baseUrl === profileAvatarUrl ? committedAvatar.value : profileAvatarUrl;
 
   useEffect(
     () => () => {
@@ -86,7 +93,7 @@ export function useProfileAvatar({
   };
 
   const commitSavedAvatar = (nextAvatarUrl: string) => {
-    setAvatarUrl(nextAvatarUrl);
+    setCommittedAvatar({ baseUrl: profileAvatarUrl, value: nextAvatarUrl });
     setAvatarFile(null);
     setPreviewUrl(null);
   };
@@ -103,7 +110,6 @@ export function useProfileAvatar({
     imageSrc,
     isCropping,
     onCropComplete,
-    setAvatarUrl,
     setCrop,
     setShowCropper,
     setZoom,

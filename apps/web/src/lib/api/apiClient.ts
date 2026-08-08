@@ -12,6 +12,8 @@ import { createProfileApi } from "./profileApi";
 import { createSessionApi } from "./sessionApi";
 import { createSocialApi } from "./socialApi";
 import { createTelemetryApi } from "./telemetryApi";
+import type { ApiRequest, ApiRequestOptions, ApiResponseParser } from "./apiRequestTypes.ts";
+import { apiPermissionsSchema, favoriteIdsSchema } from "./apiResponseSchemas.ts";
 
 export type * from "./apiTypes";
 
@@ -34,11 +36,6 @@ const getDefaultApiUrl = () => {
 };
 
 export const API_URL = getDefaultApiUrl().replace(/\/$/, "");
-
-type ApiRequestOptions = RequestInit & {
-  authenticated?: boolean;
-  timeoutMs?: number;
-};
 
 export class ApiError extends Error {
   status: number;
@@ -100,7 +97,7 @@ export function clearPermissionsCache() {
   authScopedCache.permissions = null;
 }
 
-export async function apiRequest<T>(
+export const apiRequest: ApiRequest = async <T>(
   path: string,
   {
     authenticated = true,
@@ -108,7 +105,8 @@ export async function apiRequest<T>(
     timeoutMs = DEFAULT_API_TIMEOUT_MS,
     ...options
   }: ApiRequestOptions = {},
-) {
+  parser: ApiResponseParser<T>,
+) => {
   const requestHeaders = new Headers(headers);
   requestHeaders.set("Accept", "application/json");
 
@@ -180,8 +178,14 @@ export async function apiRequest<T>(
     throw new ApiError(response.status, payload);
   }
 
-  return payload as T;
-}
+  try {
+    return parser.parse(payload);
+  } catch {
+    throw new ApiError(response.status, {
+      error: "The API returned data that did not match the expected response shape.",
+    });
+  }
+};
 
 export async function getCachedPermissions(): Promise<ApiPermissionsResponse> {
   if (isCacheFresh(authScopedCache.permissions) && authScopedCache.permissions) {
@@ -189,7 +193,7 @@ export async function getCachedPermissions(): Promise<ApiPermissionsResponse> {
     return authScopedCache.permissions.promise;
   }
 
-  const request = apiRequest<ApiPermissionsResponse>("/me/permissions").then((value) => {
+  const request = apiRequest("/me/permissions", undefined, apiPermissionsSchema).then((value) => {
     if (authScopedCache.permissions) authScopedCache.permissions.value = value;
     return value;
   });
@@ -205,18 +209,13 @@ export async function getCachedPermissions(): Promise<ApiPermissionsResponse> {
   return promise;
 }
 
-type FavoriteLike = {
-  id?: string;
-  game_id?: string;
-};
-
 async function getFavoriteIds(): Promise<Set<string>> {
   if (isCacheFresh(authScopedCache.favorites) && authScopedCache.favorites) {
     if (authScopedCache.favorites.value) return authScopedCache.favorites.value;
     return authScopedCache.favorites.promise;
   }
 
-  const request = apiRequest<{ favorites: FavoriteLike[] }>("/favorites").then(({ favorites }) => {
+  const request = apiRequest("/favorites", undefined, favoriteIdsSchema).then(({ favorites }) => {
     const favoriteIds = new Set(
       favorites
         .map((favorite) => favorite.id || favorite.game_id)

@@ -1,19 +1,21 @@
 import { useEffect } from "react";
 import { api } from "../lib/api/apiClient";
+import { createSessionTrackerStorage } from "../lib/sessionTrackerStorage";
 import { useAuthSession } from "./useAuthSession";
 
 const SESSION_ID_KEY = "pixelated_access_session_id";
 const LOGGED_STATE_PREFIX = "pixelated_logged_user_";
+const trackerStorage = createSessionTrackerStorage();
 
 function getAccessSessionId() {
-  const existingSessionId = sessionStorage.getItem(SESSION_ID_KEY);
+  const existingSessionId = trackerStorage.getItem(SESSION_ID_KEY);
   if (existingSessionId) return existingSessionId;
 
   const nextSessionId =
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  sessionStorage.setItem(SESSION_ID_KEY, nextSessionId);
+  trackerStorage.setItem(SESSION_ID_KEY, nextSessionId);
   return nextSessionId;
 }
 
@@ -28,17 +30,17 @@ export function useSessionTracker() {
     const logSession = async (user_id: string | null = null) => {
       const sessionKey = LOGGED_STATE_PREFIX + (user_id || "guest");
 
-      if (sessionStorage.getItem(sessionKey) === "true") {
+      if (trackerStorage.getItem(sessionKey) === "true") {
         return;
       }
 
-      sessionStorage.setItem(sessionKey, "true");
+      trackerStorage.setItem(sessionKey, "true");
 
       try {
         await api.logAccess(window.location.pathname, accessSessionId);
       } catch (err) {
         console.error("Exception in logSession", err);
-        sessionStorage.removeItem(sessionKey);
+        trackerStorage.removeItem(sessionKey);
       }
     };
 

@@ -1,16 +1,7 @@
 import { API_URL } from "./apiClient";
 import { readBoundedResponseBlob } from "./boundedResponse";
-
-export type BrowserSmokeSession = {
-  artifactFilename: string;
-  artifactSha256: string;
-  artifactSize: number;
-  candidateId: string;
-  coreId: "fceumm" | "gambatte";
-  expiresAt: string;
-  systemId: "nes" | "gb" | "gbc";
-  title: string;
-};
+import { browserSmokeSessionSchema } from "./apiResponseSchemas.ts";
+export type { BrowserSmokeSession } from "./apiResponseSchemas.ts";
 
 function ticketHeaders(ticket: string, json = false) {
   const headers = new Headers({ Authorization: `Smoke ${ticket}` });
@@ -29,7 +20,7 @@ export async function getBrowserSmokeSession(ticket: string) {
     headers: ticketHeaders(ticket),
   });
   if (!response.ok) throw new Error(await errorMessage(response));
-  return response.json() as Promise<BrowserSmokeSession>;
+  return browserSmokeSessionSchema.parse(await response.json());
 }
 
 export async function getBrowserSmokeArtifact(ticket: string, expectedSize: number) {

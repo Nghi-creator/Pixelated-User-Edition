@@ -6,7 +6,6 @@ import {
   useSetCommentReactionMutation,
 } from "./commentMutations";
 import { useGameCommentsQuery } from "../../../../hooks/queryHooks";
-import type { GameComment } from "../../types";
 import { getSocialErrorMessage } from "../../socialFeedback";
 
 export function useComments(gameId: string | undefined, currentUser: User | null) {
@@ -15,7 +14,7 @@ export function useComments(gameId: string | undefined, currentUser: User | null
   const [pendingCommentIds, setPendingCommentIds] = useState<Set<string>>(() => new Set());
   const pendingCommentIdsRef = useRef(new Set<string>());
 
-  const commentsQuery = useGameCommentsQuery<GameComment>(gameId);
+  const commentsQuery = useGameCommentsQuery(gameId);
   const comments = commentsQuery.data?.pages.flatMap((page) => page.comments) || [];
   const hasMoreComments = Boolean(commentsQuery.hasNextPage);
 

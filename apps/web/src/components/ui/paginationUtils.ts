@@ -1,20 +1,24 @@
 export function getVisiblePageNumbers(currentPage: number, totalPages: number) {
-  const safeTotalPages = Math.max(1, totalPages);
-  const safeCurrentPage = Math.min(Math.max(1, currentPage), safeTotalPages);
+  const safeTotalPages = Number.isSafeInteger(totalPages) && totalPages > 0 ? totalPages : 1;
+  const normalizedCurrentPage = Number.isSafeInteger(currentPage) ? currentPage : 1;
+  const safeCurrentPage = Math.min(Math.max(1, normalizedCurrentPage), safeTotalPages);
 
-  return Array.from({ length: safeTotalPages }, (_, index) => index + 1).filter(
-    (page) =>
-      safeTotalPages <= 5 ||
-      page === 1 ||
-      page === safeTotalPages ||
-      Math.abs(page - safeCurrentPage) <= 1,
-  );
+  if (safeTotalPages <= 5) {
+    return Array.from({ length: safeTotalPages }, (_, index) => index + 1);
+  }
+
+  return [
+    ...new Set([1, safeCurrentPage - 1, safeCurrentPage, safeCurrentPage + 1, safeTotalPages]),
+  ]
+    .filter((page) => page >= 1 && page <= safeTotalPages)
+    .sort((left, right) => left - right);
 }
 
 export function getPageSlice<T>(items: T[], currentPage: number, pageSize: number) {
-  const safePageSize = Math.max(1, pageSize);
+  const safePageSize = Number.isSafeInteger(pageSize) && pageSize > 0 ? pageSize : 1;
   const totalPages = Math.max(1, Math.ceil(items.length / safePageSize));
-  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const normalizedCurrentPage = Number.isSafeInteger(currentPage) ? currentPage : 1;
+  const safeCurrentPage = Math.min(Math.max(1, normalizedCurrentPage), totalPages);
   const pageStart = (safeCurrentPage - 1) * safePageSize;
 
   return {

@@ -27,8 +27,19 @@ export function useLocalRomSelection() {
   }, []);
 
   useEffect(() => {
-    void refreshRecents();
-  }, [refreshRecents]);
+    let active = true;
+    void listLocalRomRecents().then(
+      (rows) => {
+        if (active) setRecents(rows);
+      },
+      () => {
+        if (active) setRecents([]);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const clearSelection = useCallback(() => {
     setSelectedFile(null);

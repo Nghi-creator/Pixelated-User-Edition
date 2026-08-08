@@ -58,6 +58,7 @@ export function EmailAuthForm(props: Props) {
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/70" />
           <input
+            aria-label="Email address"
             className="w-full rounded-lg border border-synth-border bg-synth-bg py-3 pl-10 pr-4 text-white placeholder:text-white/70 focus:border-synth-secondary focus:outline-none"
             onChange={(event) => props.onEmailChange(event.target.value)}
             placeholder="Email address"
@@ -69,6 +70,7 @@ export function EmailAuthForm(props: Props) {
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/70" />
           <input
+            aria-label="Password"
             className="w-full rounded-lg border border-synth-border bg-synth-bg py-3 pl-10 pr-11 text-white placeholder:text-white/70 focus:border-synth-secondary focus:outline-none"
             minLength={props.isLogin ? undefined : PASSWORD_MIN_LENGTH}
             onChange={(event) => props.onPasswordChange(event.target.value)}
@@ -98,6 +100,7 @@ export function EmailAuthForm(props: Props) {
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/70" />
             <input
+              aria-label="Confirm password"
               className="w-full rounded-lg border border-synth-border bg-synth-bg py-3 pl-10 pr-11 text-white placeholder:text-white/70 focus:border-synth-secondary focus:outline-none"
               minLength={PASSWORD_MIN_LENGTH}
               onChange={(event) => props.onConfirmPasswordChange(event.target.value)}
