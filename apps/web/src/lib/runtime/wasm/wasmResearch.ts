@@ -28,7 +28,10 @@ type PerformanceWithMemory = Performance & {
   memory?: { jsHeapSizeLimit: number; totalJSHeapSize: number; usedJSHeapSize: number };
 };
 
-type NavigatorWithMemory = Navigator & { deviceMemory?: number; userAgentData?: { platform?: string } };
+type NavigatorWithMemory = Navigator & {
+  deviceMemory?: number;
+  userAgentData?: { platform?: string };
+};
 
 export function captureWasmCapabilities(): WasmCapabilitySnapshot {
   const extendedNavigator = navigator as NavigatorWithMemory;
@@ -66,8 +69,12 @@ function percentile(values: number[], ratio: number) {
 }
 
 export function summarizeWasmFrames(samples: WasmFrameSample[]) {
-  const values = samples.map((sample) => sample.deltaMs).filter((value) => Number.isFinite(value) && value > 0);
-  const meanDeltaMs = values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
+  const values = samples
+    .map((sample) => sample.deltaMs)
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const meanDeltaMs = values.length
+    ? values.reduce((total, value) => total + value, 0) / values.length
+    : null;
   return {
     approximateFps: meanDeltaMs ? 1000 / meanDeltaMs : null,
     droppedFrameCount: values.filter((value) => value > 1000 / 30).length,
@@ -135,15 +142,25 @@ export function createWasmResearchBundle({
     runtime: { ...runtime, kind: "libretro-wasm", library: "nostalgist" },
     schemaVersion: 1,
   };
-  return createResearchRunBundleTar([
-    { data: `${JSON.stringify(summary, null, 2)}\n`, name: "summary.json" },
-    { data: wasmFrameSamplesToCsv(frameSamples), name: "frame-timing.csv" },
-    { data: wasmLongTasksToCsv(longTasks), name: "long-tasks.csv" },
-    { data: `${JSON.stringify(errors, null, 2)}\n`, name: "runtime-errors.json" },
-  ], recordedAt);
+  return createResearchRunBundleTar(
+    [
+      { data: `${JSON.stringify(summary, null, 2)}\n`, name: "summary.json" },
+      { data: wasmFrameSamplesToCsv(frameSamples), name: "frame-timing.csv" },
+      { data: wasmLongTasksToCsv(longTasks), name: "long-tasks.csv" },
+      { data: `${JSON.stringify(errors, null, 2)}\n`, name: "runtime-errors.json" },
+    ],
+    recordedAt,
+  );
 }
 
-export function createWasmResearchBundleFilename(gameKey: string, runId: string, recordedAt = new Date()) {
-  const safeName = `${gameKey}-${runId}`.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+export function createWasmResearchBundleFilename(
+  gameKey: string,
+  runId: string,
+  recordedAt = new Date(),
+) {
+  const safeName = `${gameKey}-${runId}`
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
   return `pixelated-wasm-research-${safeName}-${recordedAt.toISOString().replace(/[:.]/g, "-")}.tar`;
 }

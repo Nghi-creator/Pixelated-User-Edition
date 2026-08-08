@@ -1,13 +1,7 @@
-import {
-  keepPreviousData,
-  useInfiniteQuery,
-  useQuery,
-} from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getAuthSession, api } from "../lib/api/apiClient";
 import { queryKeys } from "../lib/api/queryClient";
-import type {
-  ApiGame,
-} from "../lib/api/apiTypes";
+import type { ApiGame } from "../lib/api/apiTypes";
 
 export function useAuthSessionQuery() {
   return useQuery({
@@ -95,32 +89,20 @@ export function useGameCatalogQuery({
 }) {
   return useQuery({
     enabled,
-    queryKey: queryKeys.gameCatalog(
-      page,
-      pageSize,
-      search,
-      platform,
-      runtime,
-      genre,
-      license,
-    ),
+    queryKey: queryKeys.gameCatalog(page, pageSize, search, platform, runtime, genre, license),
     placeholderData: keepPreviousData,
     queryFn: ({ signal }) =>
       api.games({ genre, license, page, pageSize, platform, runtime, search }, signal),
   });
 }
 
-export function useGameCommentsQuery<TComment>(
-  gameId: string | undefined,
-) {
+export function useGameCommentsQuery<TComment>(gameId: string | undefined) {
   return useInfiniteQuery({
     enabled: Boolean(gameId),
     initialPageParam: 1,
     queryKey: queryKeys.gameComments(gameId),
-    queryFn: ({ pageParam }) =>
-      api.gameComments<TComment>(gameId!, pageParam),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.hasMore ? allPages.length + 1 : undefined,
+    queryFn: ({ pageParam }) => api.gameComments<TComment>(gameId!, pageParam),
+    getNextPageParam: (lastPage, allPages) => (lastPage.hasMore ? allPages.length + 1 : undefined),
   });
 }
 

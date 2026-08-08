@@ -21,7 +21,9 @@ function consumeTicketFragment() {
 export default function BrowserSmoke() {
   const [ticket] = useState(consumeTicketFragment);
   const [session, setSession] = useState<BrowserSmokeSession | null>(null);
-  const [state, setState] = useState<"loading" | "ready" | "running" | "passed" | "failed">("loading");
+  const [state, setState] = useState<"loading" | "ready" | "running" | "passed" | "failed">(
+    "loading",
+  );
   const [error, setError] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const runtimeRef = useRef<GameRuntime | null>(null);
@@ -58,7 +60,7 @@ export default function BrowserSmoke() {
     try {
       const core = resolveWasmCore(session.coreId, session.systemId, session.artifactFilename);
       if (!core) throw new Error("This candidate does not match an installed User Edition core.");
-      const artifact = await getBrowserSmokeArtifact(ticket);
+      const artifact = await getBrowserSmokeArtifact(ticket, session.artifactSize);
       const runtime = await core.loadRuntime({ canvas: canvasRef.current });
       runtimeRef.current = runtime;
       await runtime.prepare({
@@ -96,37 +98,64 @@ export default function BrowserSmoke() {
         <div className="flex items-start gap-3">
           <FlaskConical className="mt-1 h-6 w-6 text-synth-secondary" />
           <div>
-            <h1 className="text-xl font-black uppercase tracking-wide">Candidate browser smoke test</h1>
+            <h1 className="text-xl font-black uppercase tracking-wide">
+              Candidate browser smoke test
+            </h1>
             <p className="mt-1 text-sm text-slate-300">
-              Isolated User Edition runner. The ticket expires automatically and cannot publish or administer catalog data.
+              Isolated User Edition runner. The ticket expires automatically and cannot publish or
+              administer catalog data.
             </p>
           </div>
         </div>
 
         {state === "loading" && (
-          <p className="mt-8 flex items-center gap-2 text-slate-200"><LoaderCircle className="h-5 w-5 animate-spin" /> Validating test session…</p>
+          <p className="mt-8 flex items-center gap-2 text-slate-200">
+            <LoaderCircle className="h-5 w-5 animate-spin" /> Validating test session…
+          </p>
         )}
 
         {session && (
           <>
             <div className="mt-6 rounded-lg border border-synth-border bg-black/30 p-4">
               <p className="font-bold">{session.title}</p>
-              <p className="mt-1 text-xs text-slate-400">{session.artifactFilename} · {session.coreId}</p>
+              <p className="mt-1 text-xs text-slate-400">
+                {session.artifactFilename} · {session.coreId}
+              </p>
             </div>
-            <canvas ref={canvasRef} aria-label="Candidate smoke-test emulator output" className="mt-4 aspect-video w-full rounded-lg border border-synth-border bg-black" />
+            <canvas
+              ref={canvasRef}
+              aria-label="Candidate smoke-test emulator output"
+              className="mt-4 aspect-video w-full rounded-lg border border-synth-border bg-black"
+            />
           </>
         )}
 
         {state === "ready" && (
-          <button type="button" onClick={() => void run()} className="mt-5 inline-flex h-11 items-center gap-2 rounded-lg bg-synth-secondary px-5 font-extrabold text-white hover:brightness-110">
+          <button
+            type="button"
+            onClick={() => void run()}
+            className="mt-5 inline-flex h-11 items-center gap-2 rounded-lg bg-synth-secondary px-5 font-extrabold text-white hover:brightness-110"
+          >
             <FlaskConical className="h-4 w-4" /> Run verified test
           </button>
         )}
-        {state === "running" && <p className="mt-5 flex items-center gap-2 font-bold"><LoaderCircle className="h-5 w-5 animate-spin" /> Launching and observing…</p>}
-        {state === "passed" && <p className="mt-5 flex items-center gap-2 font-bold text-emerald-300"><CheckCircle2 className="h-5 w-5" /> Passed. You can close this tab.</p>}
+        {state === "running" && (
+          <p className="mt-5 flex items-center gap-2 font-bold">
+            <LoaderCircle className="h-5 w-5 animate-spin" /> Launching and observing…
+          </p>
+        )}
+        {state === "passed" && (
+          <p className="mt-5 flex items-center gap-2 font-bold text-emerald-300">
+            <CheckCircle2 className="h-5 w-5" /> Passed. You can close this tab.
+          </p>
+        )}
         {state === "failed" && (
           <p className="mt-5 flex items-start gap-2 font-bold text-red-300">
-            {ticket ? <XCircle className="mt-0.5 h-5 w-5 shrink-0" /> : <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />}
+            {ticket ? (
+              <XCircle className="mt-0.5 h-5 w-5 shrink-0" />
+            ) : (
+              <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />
+            )}
             <span>{error}</span>
           </p>
         )}

@@ -3,12 +3,7 @@ type SkeletonProps = {
 };
 
 export function Skeleton({ className = "" }: SkeletonProps) {
-  return (
-    <div
-      aria-hidden
-      className={`animate-pulse rounded-md bg-synth-border/45 ${className}`}
-    />
-  );
+  return <div aria-hidden className={`animate-pulse rounded-md bg-synth-border/45 ${className}`} />;
 }
 
 export function GameGridSkeleton({ count = 15 }: { count?: number }) {

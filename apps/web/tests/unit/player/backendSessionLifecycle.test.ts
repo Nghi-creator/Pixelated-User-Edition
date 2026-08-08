@@ -12,10 +12,8 @@ const createdSession = {
 
 test("a session created for a cancelled launch is released instead of retained", () => {
   const released: BackendSession[] = [];
-  const claimed = claimCreatedBackendSession(
-    createdSession,
-    false,
-    (session) => released.push(session),
+  const claimed = claimCreatedBackendSession(createdSession, false, (session) =>
+    released.push(session),
   );
 
   assert.equal(claimed, null);
@@ -24,10 +22,8 @@ test("a session created for a cancelled launch is released instead of retained",
 
 test("a session created for the current launch is retained", () => {
   const released: BackendSession[] = [];
-  const claimed = claimCreatedBackendSession(
-    createdSession,
-    true,
-    (session) => released.push(session),
+  const claimed = claimCreatedBackendSession(createdSession, true, (session) =>
+    released.push(session),
   );
 
   assert.deepEqual(claimed, { id: "backend-session", token: "opaque-token" });

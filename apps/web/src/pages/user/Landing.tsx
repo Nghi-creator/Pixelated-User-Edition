@@ -1,10 +1,4 @@
-import {
-  Cloud,
-  FlaskConical,
-  HardDrive,
-  MessageCircle,
-  ShieldCheck,
-} from "lucide-react";
+import { Cloud, FlaskConical, HardDrive, MessageCircle, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const featureCards = [
@@ -60,10 +54,10 @@ export default function Landing() {
               Fast, verified retro games running directly in your browser.
             </p>
             <p className="mt-3 max-w-4xl text-base leading-7 text-gray-200 sm:text-lg">
-              User Edition replaces the desktop streaming path with an on-demand
-              WebAssembly emulator. Browse the shared catalog, play eligible NES
-              games, open personal ROMs locally, and export browser-focused
-              research measurements without pairing a native engine.
+              User Edition replaces the desktop streaming path with an on-demand WebAssembly
+              emulator. Browse the shared catalog, play eligible NES games, open personal ROMs
+              locally, and export browser-focused research measurements without pairing a native
+              engine.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -91,9 +85,7 @@ export default function Landing() {
               className="feature-pop-card rounded-lg border border-synth-border bg-synth-surface/70 p-5 shadow-card"
               key={feature.title}
             >
-              <div className={`mb-4 inline-flex ${feature.accent}`}>
-                {feature.icon}
-              </div>
+              <div className={`mb-4 inline-flex ${feature.accent}`}>{feature.icon}</div>
               <h2 className="text-lg font-extrabold text-white">{feature.title}</h2>
               <p className="mt-3 text-sm leading-6 text-gray-300">{feature.body}</p>
             </article>
@@ -108,9 +100,9 @@ export default function Landing() {
               One browser, one verified launch path
             </h2>
             <p className="mt-5 text-base leading-7 text-gray-300">
-              Catalog pages stay lightweight. Emulator code is downloaded only
-              after you start a compatible game, while saves and personal-file
-              metadata stay under your control in the browser.
+              Catalog pages stay lightweight. Emulator code is downloaded only after you start a
+              compatible game, while saves and personal-file metadata stay under your control in the
+              browser.
             </p>
           </div>
 

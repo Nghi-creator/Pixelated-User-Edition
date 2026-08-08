@@ -5,9 +5,7 @@ import { useReportCommentMutation } from "./commentMutations";
 import { getSocialErrorMessage } from "../../socialFeedback";
 
 export function useCommentReporting(currentUser: User | null) {
-  const [reportingCommentId, setReportingCommentId] = useState<string | null>(
-    null,
-  );
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState("");
   const [reportError, setReportError] = useState("");
   const [reportMessage, setReportMessage] = useState("");
@@ -15,21 +13,15 @@ export function useCommentReporting(currentUser: User | null) {
   const reportMutation = useReportCommentMutation({
     onError: (err) => {
       if (err instanceof ApiError && err.status === 409) {
-        setReportError(
-          "You have already reported this comment. Our moderators are reviewing it.",
-        );
+        setReportError("You have already reported this comment. Our moderators are reviewing it.");
         return;
       }
 
       console.error("Failed to submit report:", err);
-      setReportError(
-        getSocialErrorMessage(err, "Failed to submit report. Please try again."),
-      );
+      setReportError(getSocialErrorMessage(err, "Failed to submit report. Please try again."));
     },
     onSuccess: () => {
-      setReportMessage(
-        "Report submitted successfully. Thank you for keeping the community safe!",
-      );
+      setReportMessage("Report submitted successfully. Thank you for keeping the community safe!");
       closeReportModal();
     },
   });

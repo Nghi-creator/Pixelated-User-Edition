@@ -35,8 +35,14 @@ test("summarizes WASM frame pacing and dropped frames", () => {
 });
 
 test("exports stable frame and long-task CSV columns", () => {
-  assert.equal(wasmFrameSamplesToCsv([{ capturedAtMs: 16.1234, deltaMs: 15.9876 }]), "captured_at_ms,frame_delta_ms\n16.123,15.988");
-  assert.equal(wasmLongTasksToCsv([{ startedAtMs: 10.125, durationMs: 75.5 }]), "started_at_ms,duration_ms\n10.125,75.5");
+  assert.equal(
+    wasmFrameSamplesToCsv([{ capturedAtMs: 16.1234, deltaMs: 15.9876 }]),
+    "captured_at_ms,frame_delta_ms\n16.123,15.988",
+  );
+  assert.equal(
+    wasmLongTasksToCsv([{ startedAtMs: 10.125, durationMs: 75.5 }]),
+    "started_at_ms,duration_ms\n10.125,75.5",
+  );
 });
 
 test("creates an edition-tagged research tar and safe filename", () => {

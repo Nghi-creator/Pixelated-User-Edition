@@ -18,10 +18,7 @@ export function Pagination({
 }: PaginationProps) {
   const safeTotalPages = Math.max(1, totalPages);
   const safeCurrentPage = Math.min(Math.max(1, currentPage), safeTotalPages);
-  const visiblePageNumbers = getVisiblePageNumbers(
-    safeCurrentPage,
-    safeTotalPages,
-  );
+  const visiblePageNumbers = getVisiblePageNumbers(safeCurrentPage, safeTotalPages);
 
   return (
     <nav aria-label="Pagination" className="flex flex-wrap items-center gap-1.5">

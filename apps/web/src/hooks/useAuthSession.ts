@@ -6,9 +6,7 @@ export type AuthSessionContextValue = {
   session: Session | null;
 };
 
-export const AuthSessionContext = createContext<AuthSessionContextValue | null>(
-  null,
-);
+export const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
 
 export function useAuthSession() {
   const value = useContext(AuthSessionContext);

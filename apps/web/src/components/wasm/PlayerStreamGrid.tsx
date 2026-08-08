@@ -14,9 +14,7 @@ export function PlayerStreamGrid({
   return (
     <div
       className={`grid w-full items-start gap-4 transition-[max-width,grid-template-columns] duration-300 ${
-        showTelemetry
-          ? `${layoutClassName} xl:grid-cols-[minmax(0,1fr)_18rem]`
-          : layoutClassName
+        showTelemetry ? `${layoutClassName} xl:grid-cols-[minmax(0,1fr)_18rem]` : layoutClassName
       }`}
     >
       {children}

@@ -1,4 +1,5 @@
 import { API_URL } from "./apiClient";
+import { readBoundedResponseBlob } from "./boundedResponse";
 
 export type BrowserSmokeSession = {
   artifactFilename: string;
@@ -18,7 +19,7 @@ function ticketHeaders(ticket: string, json = false) {
 }
 
 async function errorMessage(response: Response) {
-  const payload = await response.json().catch(() => null) as { error?: string } | null;
+  const payload = (await response.json().catch(() => null)) as { error?: string } | null;
   return payload?.error || `Smoke API request failed with HTTP ${response.status}.`;
 }
 
@@ -31,13 +32,13 @@ export async function getBrowserSmokeSession(ticket: string) {
   return response.json() as Promise<BrowserSmokeSession>;
 }
 
-export async function getBrowserSmokeArtifact(ticket: string) {
+export async function getBrowserSmokeArtifact(ticket: string, expectedSize: number) {
   const response = await fetch(`${API_URL}/browser-smoke/artifact`, {
     cache: "no-store",
     headers: ticketHeaders(ticket),
   });
   if (!response.ok) throw new Error(await errorMessage(response));
-  return response.blob();
+  return readBoundedResponseBlob(response, expectedSize);
 }
 
 export async function recordBrowserSmokeResult(

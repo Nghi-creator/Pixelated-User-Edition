@@ -43,13 +43,8 @@ export function useSetCommentReactionMutation(
 ) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      commentId,
-      isLike,
-    }: {
-      commentId: string;
-      isLike: boolean | null;
-    }) => api.setCommentReaction(commentId, isLike),
+    mutationFn: ({ commentId, isLike }: { commentId: string; isLike: boolean | null }) =>
+      api.setCommentReaction(commentId, isLike),
     onError,
     onSuccess: async () => {
       await invalidateGameCommentsQuery(queryClient, gameId);
@@ -65,13 +60,8 @@ export function useReportCommentMutation({
   onSuccess?: () => void;
 } = {}) {
   return useMutation({
-    mutationFn: ({
-      commentId,
-      reason,
-    }: {
-      commentId: string;
-      reason: string;
-    }) => api.reportComment(commentId, reason),
+    mutationFn: ({ commentId, reason }: { commentId: string; reason: string }) =>
+      api.reportComment(commentId, reason),
     onError,
     onSuccess,
   });

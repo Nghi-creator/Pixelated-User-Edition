@@ -14,25 +14,18 @@ function toBytes(data: string | Uint8Array) {
   return typeof data === "string" ? new TextEncoder().encode(data) : data;
 }
 
-function writeAscii(
-  target: Uint8Array,
-  offset: number,
-  length: number,
-  value: string,
-) {
+function writeAscii(target: Uint8Array, offset: number, length: number, value: string) {
   const text = value.slice(0, length);
   for (let index = 0; index < text.length; index += 1) {
     target[offset + index] = text.charCodeAt(index);
   }
 }
 
-function writeOctal(
-  target: Uint8Array,
-  offset: number,
-  length: number,
-  value: number,
-) {
-  const octal = value.toString(8).padStart(length - 1, "0").slice(0, length - 1);
+function writeOctal(target: Uint8Array, offset: number, length: number, value: number) {
+  const octal = value
+    .toString(8)
+    .padStart(length - 1, "0")
+    .slice(0, length - 1);
   writeAscii(target, offset, length, `${octal}\0`);
 }
 
@@ -63,20 +56,14 @@ function paddedLength(length: number) {
   return Math.ceil(length / 512) * 512;
 }
 
-export function createResearchRunBundleTar(
-  files: ResearchRunBundleFile[],
-  mtime = new Date(),
-) {
+export function createResearchRunBundleTar(files: ResearchRunBundleFile[], mtime = new Date()) {
   const mtimeSeconds = Math.floor(mtime.getTime() / 1000);
   const encodedFiles = files.map((file) => ({
     bytes: toBytes(file.data),
     name: file.name.replace(/^\/+/, "").slice(0, 100),
   }));
   const totalLength =
-    encodedFiles.reduce(
-      (total, file) => total + 512 + paddedLength(file.bytes.length),
-      0,
-    ) + 1024;
+    encodedFiles.reduce((total, file) => total + 512 + paddedLength(file.bytes.length), 0) + 1024;
   const archive = new Uint8Array(totalLength);
   let offset = 0;
 

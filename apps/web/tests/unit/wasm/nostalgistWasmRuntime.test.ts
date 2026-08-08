@@ -14,14 +14,15 @@ function validNesRom() {
 
 function validGameBoyRom() {
   const bytes = new Uint8Array(0x150);
-  bytes.set([
-    0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b,
-    0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00, 0x0d,
-    0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e,
-    0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99,
-    0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc,
-    0xdd, 0xdc, 0x99, 0x9f, 0xbb, 0xb9, 0x33, 0x3e,
-  ], 0x104);
+  bytes.set(
+    [
+      0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b, 0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00,
+      0x0d, 0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e, 0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd,
+      0xd9, 0x99, 0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc, 0xdd, 0xdc, 0x99, 0x9f, 0xbb,
+      0xb9, 0x33, 0x3e,
+    ],
+    0x104,
+  );
   return bytes;
 }
 
@@ -60,18 +61,40 @@ test("prepares the fceumm core and exposes runtime controls", async (context) =>
           assert.equal(typeof options.resolveCoreJs, "function");
           assert.equal(typeof options.resolveCoreWasm, "function");
           return {
-            exit: () => { status = "terminated"; actions.push("exit"); },
+            exit: () => {
+              status = "terminated";
+              actions.push("exit");
+            },
             getStatus: () => status,
-            loadState: async () => { actions.push("load-state"); },
-            pause: () => { status = "paused"; actions.push("pause"); },
-            pressDown: (button: string) => { actions.push(`down:${button}`); },
-            pressUp: (button: string) => { actions.push(`up:${button}`); },
-            restart: () => { actions.push("restart"); },
-            resume: () => { status = "running"; actions.push("resume"); },
+            loadState: async () => {
+              actions.push("load-state");
+            },
+            pause: () => {
+              status = "paused";
+              actions.push("pause");
+            },
+            pressDown: (button: string) => {
+              actions.push(`down:${button}`);
+            },
+            pressUp: (button: string) => {
+              actions.push(`up:${button}`);
+            },
+            restart: () => {
+              actions.push("restart");
+            },
+            resume: () => {
+              status = "running";
+              actions.push("resume");
+            },
             saveSRAM: async () => new Blob(["sram"]),
             saveState: async () => ({ state: new Blob(["state"]), thumbnail: undefined }),
-            sendCommand: (command: string) => { actions.push(command); },
-            start: async () => { status = "running"; actions.push("start"); },
+            sendCommand: (command: string) => {
+              actions.push(command);
+            },
+            start: async () => {
+              status = "running";
+              actions.push("start");
+            },
           };
         },
       },
@@ -212,12 +235,13 @@ test("aborts a stalled hosted launch at its configured deadline", async (context
   });
   const expectedSha256 = await sha256Hex(bytes);
   await assert.rejects(
-    () => runtime.prepare({
-      expectedSha256,
-      expectedSize: bytes.byteLength,
-      fileName: "game.nes",
-      url: "https://example.test/game.nes",
-    }),
+    () =>
+      runtime.prepare({
+        expectedSha256,
+        expectedSize: bytes.byteLength,
+        fileName: "game.nes",
+        url: "https://example.test/game.nes",
+      }),
     /safety deadline/,
   );
   runtime.stop();
@@ -246,7 +270,9 @@ test("exits an emulator instance that resolves after the launch deadline", async
   const bytes = validNesRom();
   let exited = false;
   const lateInstance = {
-    exit: () => { exited = true; },
+    exit: () => {
+      exited = true;
+    },
     getStatus: () => "initial" as const,
     loadState: async () => undefined,
     pause: () => undefined,

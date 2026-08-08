@@ -23,11 +23,7 @@ test("default keyboard and standard-gamepad mappings are complete and conflict-f
 
 test("input preferences preserve valid per-controller mappings", () => {
   const preferences = createDefaultInputPreferences();
-  preferences.gamepads["Example Controller"] = rebindGamepad(
-    DEFAULT_GAMEPAD_MAPPING,
-    "a",
-    7,
-  );
+  preferences.gamepads["Example Controller"] = rebindGamepad(DEFAULT_GAMEPAD_MAPPING, "a", 7);
   const parsed = parseInputPreferences(JSON.stringify(preferences));
   assert.equal(parsed.gamepads["Example Controller"]?.a, 7);
   assert.equal(parsed.keyboard.start, "Enter");

@@ -1,7 +1,4 @@
-import type {
-  WasmRuntimeFactory,
-  WasmRuntimeFactoryOptions,
-} from "./runtimeTypes.ts";
+import type { WasmRuntimeFactory, WasmRuntimeFactoryOptions } from "./runtimeTypes.ts";
 
 export type WasmCoreId = "fceumm" | "gambatte";
 export type WasmSystemId = "nes" | "gb" | "gbc";
@@ -55,14 +52,9 @@ export const WASM_CORE_REGISTRY: readonly WasmCoreDefinition[] = [
   },
 ];
 
-function hasSupportedExtension(
-  definition: WasmCoreDefinition,
-  fileName: string,
-) {
+function hasSupportedExtension(definition: WasmCoreDefinition, fileName: string) {
   const normalizedFileName = fileName.toLowerCase();
-  return definition.artifactExtensions.some((extension) =>
-    normalizedFileName.endsWith(extension),
-  );
+  return definition.artifactExtensions.some((extension) => normalizedFileName.endsWith(extension));
 }
 
 export function findWasmCoreForArtifact(
@@ -70,11 +62,12 @@ export function findWasmCoreForArtifact(
   fileName: string | null | undefined,
 ) {
   if (!systemId || !fileName) return null;
-  return WASM_CORE_REGISTRY.find(
-    (definition) =>
-      definition.systemId === systemId &&
-      hasSupportedExtension(definition, fileName),
-  ) || null;
+  return (
+    WASM_CORE_REGISTRY.find(
+      (definition) =>
+        definition.systemId === systemId && hasSupportedExtension(definition, fileName),
+    ) || null
+  );
 }
 
 export function resolveWasmCore(
@@ -83,10 +76,12 @@ export function resolveWasmCore(
   fileName: string | null | undefined,
 ) {
   if (!coreId || !systemId || !fileName) return null;
-  return WASM_CORE_REGISTRY.find(
-    (definition) =>
-      definition.coreId === coreId &&
-      definition.systemId === systemId &&
-      hasSupportedExtension(definition, fileName),
-  ) || null;
+  return (
+    WASM_CORE_REGISTRY.find(
+      (definition) =>
+        definition.coreId === coreId &&
+        definition.systemId === systemId &&
+        hasSupportedExtension(definition, fileName),
+    ) || null
+  );
 }

@@ -32,30 +32,81 @@ test("local vault ROM validation rejects missing, unsupported, and oversized fil
 });
 
 test("local ROM inspection detects systems and validates NES headers", async () => {
-  const file = (name: string, bytes: number[]) => ({
-    ...new Blob([Uint8Array.from(bytes)]),
-    name,
-    size: bytes.length,
-    slice: (start?: number, end?: number) => new Blob([Uint8Array.from(bytes).slice(start, end)]),
-  }) as File;
+  const file = (name: string, bytes: number[]) =>
+    ({
+      ...new Blob([Uint8Array.from(bytes)]),
+      name,
+      size: bytes.length,
+      slice: (start?: number, end?: number) => new Blob([Uint8Array.from(bytes).slice(start, end)]),
+    }) as File;
 
   assert.equal(detectLocalRomSystem("demo.SMC")?.id, "snes");
   assert.equal(detectLocalRomSystem("demo.zip"), null);
   assert.equal(
-    (await inspectLocalRomFile(file("demo.nes", [0x4e, 0x45, 0x53, 0x1a, ...new Array(12).fill(0)]))).browserPlayable,
+    (
+      await inspectLocalRomFile(
+        file("demo.nes", [0x4e, 0x45, 0x53, 0x1a, ...new Array(12).fill(0)]),
+      )
+    ).browserPlayable,
     true,
   );
   assert.equal(
-    (await inspectLocalRomFile(file("demo.gb", [
-      ...new Array(0x104).fill(0),
-      0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b,
-      0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00, 0x0d,
-      0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e,
-      0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99,
-      0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc,
-      0xdd, 0xdc, 0x99, 0x9f, 0xbb, 0xb9, 0x33, 0x3e,
-      ...new Array(64).fill(0),
-    ]))).browserPlayable,
+    (
+      await inspectLocalRomFile(
+        file("demo.gb", [
+          ...new Array(0x104).fill(0),
+          0xce,
+          0xed,
+          0x66,
+          0x66,
+          0xcc,
+          0x0d,
+          0x00,
+          0x0b,
+          0x03,
+          0x73,
+          0x00,
+          0x83,
+          0x00,
+          0x0c,
+          0x00,
+          0x0d,
+          0x00,
+          0x08,
+          0x11,
+          0x1f,
+          0x88,
+          0x89,
+          0x00,
+          0x0e,
+          0xdc,
+          0xcc,
+          0x6e,
+          0xe6,
+          0xdd,
+          0xdd,
+          0xd9,
+          0x99,
+          0xbb,
+          0xbb,
+          0x67,
+          0x63,
+          0x6e,
+          0x0e,
+          0xec,
+          0xcc,
+          0xdd,
+          0xdc,
+          0x99,
+          0x9f,
+          0xbb,
+          0xb9,
+          0x33,
+          0x3e,
+          ...new Array(64).fill(0),
+        ]),
+      )
+    ).browserPlayable,
     true,
   );
   assert.equal(
@@ -77,8 +128,5 @@ test("local vault derives display titles without retaining ROM bytes", () => {
 });
 
 test("local vault play paths encode route-sensitive filenames", () => {
-  assert.equal(
-    getLocalGamePlayPath("demo #1?rev=2%.gba"),
-    "/play/demo%20%231%3Frev%3D2%25.gba",
-  );
+  assert.equal(getLocalGamePlayPath("demo #1?rev=2%.gba"), "/play/demo%20%231%3Frev%3D2%25.gba");
 });

@@ -7,7 +7,10 @@ import type {
 import { encodeApiPathSegment } from "./apiPath.ts";
 
 type CatalogApiDependencies = {
-  apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
+  apiRequest: <T>(
+    path: string,
+    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
+  ) => Promise<T>;
   clearFavoritesCache: () => void;
   getFavoriteIds: () => Promise<Set<string>>;
 };
@@ -28,23 +31,26 @@ export function createCatalogApi({
       apiRequest<ApiCatalogFiltersResponse>("/games/filters", {
         authenticated: false,
       }),
-    games: ({
-      genre = "",
-      license = "",
-      page = 1,
-      pageSize = 15,
-      platform = "",
-      runtime = "all",
-      search = "",
-    }: {
-      page?: number;
-      pageSize?: number;
-      genre?: string;
-      license?: string;
-      platform?: string;
-      runtime?: "all" | "browser" | "desktop" | "unavailable";
-      search?: string;
-    } = {}, signal?: AbortSignal) => {
+    games: (
+      {
+        genre = "",
+        license = "",
+        page = 1,
+        pageSize = 15,
+        platform = "",
+        runtime = "all",
+        search = "",
+      }: {
+        page?: number;
+        pageSize?: number;
+        genre?: string;
+        license?: string;
+        platform?: string;
+        runtime?: "all" | "browser" | "desktop" | "unavailable";
+        search?: string;
+      } = {},
+      signal?: AbortSignal,
+    ) => {
       const params = new URLSearchParams({
         page: String(page),
         pageSize: String(pageSize),
@@ -69,8 +75,7 @@ export function createCatalogApi({
       apiRequest<{ game: ApiGame }>(`/games/${encodeApiPathSegment(gameId)}`, {
         authenticated: false,
       }),
-    listFavorites: <TFavorite>() =>
-      apiRequest<{ favorites: TFavorite[] }>("/favorites"),
+    listFavorites: <TFavorite>() => apiRequest<{ favorites: TFavorite[] }>("/favorites"),
     removeFavorite: async (gameId: string) => {
       const result = await apiRequest<void>(`/favorites/${encodeApiPathSegment(gameId)}`, {
         method: "DELETE",

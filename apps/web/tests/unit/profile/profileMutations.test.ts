@@ -7,14 +7,8 @@ import {
 } from "../../../src/features/profile/profileMutations.ts";
 
 test("avatar validation rejects non-images and oversized files", () => {
-  assert.match(
-    validateAvatarFile({ size: 10, type: "text/plain" }) || "",
-    /image file/,
-  );
-  assert.match(
-    validateAvatarFile({ size: 6 * 1024 * 1024, type: "image/png" }) || "",
-    /5 MB/,
-  );
+  assert.match(validateAvatarFile({ size: 10, type: "text/plain" }) || "", /image file/);
+  assert.match(validateAvatarFile({ size: 6 * 1024 * 1024, type: "image/png" }) || "", /5 MB/);
   assert.equal(validateAvatarFile({ size: 100, type: "image/png" }), null);
 });
 

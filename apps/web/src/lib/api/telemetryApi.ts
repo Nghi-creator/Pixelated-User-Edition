@@ -1,5 +1,8 @@
 type TelemetryApiDependencies = {
-  apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
+  apiRequest: <T>(
+    path: string,
+    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
+  ) => Promise<T>;
 };
 
 export function createTelemetryApi({ apiRequest }: TelemetryApiDependencies) {

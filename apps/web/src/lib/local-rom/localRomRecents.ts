@@ -56,9 +56,9 @@ export async function listLocalRomRecents() {
   const database = await openRecentsDatabase();
   if (!database) return [];
   try {
-    const rows = await requestResult(
+    const rows = (await requestResult(
       database.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).getAll(),
-    ) as LocalRomRecent[];
+    )) as LocalRomRecent[];
     return rows
       .sort((left, right) => right.lastOpenedAt.localeCompare(left.lastOpenedAt))
       .slice(0, 12);

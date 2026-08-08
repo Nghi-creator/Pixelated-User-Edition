@@ -49,9 +49,7 @@ export function CommentsPanel({
   setNewComment,
 }: CommentsPanelProps) {
   return (
-    <div
-      className={`mt-12 w-full border-t border-synth-border pt-8 ${layoutClassName}`}
-    >
+    <div className={`mt-12 w-full border-t border-synth-border pt-8 ${layoutClassName}`}>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-xl font-bold text-white">
           Comments ({comments.length}

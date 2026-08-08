@@ -28,19 +28,14 @@ export function useGameReactions(gameId: string | undefined, currentUser: User |
   const reactionMutation = useSetGameReactionMutation(gameId, {
     onError: (err) => {
       console.error(err);
-      setReactionError(
-        getSocialErrorMessage(err, "Failed to update reaction. Try again."),
-      );
+      setReactionError(getSocialErrorMessage(err, "Failed to update reaction. Try again."));
     },
   });
 
   useEffect(() => {
     if (!reactionsQuery.isError) return;
     setReactionError(
-      getSocialErrorMessage(
-        reactionsQuery.error,
-        "Could not load reactions. Try again.",
-      ),
+      getSocialErrorMessage(reactionsQuery.error, "Could not load reactions. Try again."),
     );
   }, [reactionsQuery.error, reactionsQuery.isError]);
 

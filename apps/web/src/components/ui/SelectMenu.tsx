@@ -61,9 +61,7 @@ export function SelectMenu<TValue extends string>({
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
-        <span className="min-w-0 truncate">
-          {selectedOption?.label || "Select"}
-        </span>
+        <span className="min-w-0 truncate">{selectedOption?.label || "Select"}</span>
         <ChevronDown
           className={`${iconClassName} flex-shrink-0 transition-transform ${
             isOpen ? "rotate-180" : ""
@@ -90,9 +88,7 @@ export function SelectMenu<TValue extends string>({
                 type="button"
               >
                 <Check
-                  className={`h-4 w-4 flex-shrink-0 ${
-                    isSelected ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`h-4 w-4 flex-shrink-0 ${isSelected ? "opacity-100" : "opacity-0"}`}
                 />
                 <span className="whitespace-nowrap">{option.label}</span>
               </button>

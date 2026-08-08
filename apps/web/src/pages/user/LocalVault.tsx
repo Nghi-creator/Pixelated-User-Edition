@@ -23,19 +23,33 @@ export default function LocalVault() {
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <Link className="group mb-6 inline-flex items-center gap-2 font-medium text-gray-400 hover:text-white" to="/home">
-        <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" /> Back to Library
+      <Link
+        className="group mb-6 inline-flex items-center gap-2 font-medium text-gray-400 hover:text-white"
+        to="/home"
+      >
+        <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" /> Back to
+        Library
       </Link>
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-white">Personal ROMs</h1>
-        <p className="mt-2 max-w-3xl text-gray-400">Choose a ROM you are legally allowed to use. Supported NES, Game Boy, and Game Boy Color files run directly in this tab with WebAssembly.</p>
+        <p className="mt-2 max-w-3xl text-gray-400">
+          Choose a ROM you are legally allowed to use. Supported NES, Game Boy, and Game Boy Color
+          files run directly in this tab with WebAssembly.
+        </p>
       </div>
       {selection.message && (
-        <div className={`mb-6 rounded-lg border p-4 text-sm font-semibold ${selection.message.tone === "error" ? "border-red-500/40 bg-red-950/30 text-red-200" : "border-synth-border bg-synth-surface text-gray-200"}`} role={selection.message.tone === "error" ? "alert" : "status"}>
+        <div
+          className={`mb-6 rounded-lg border p-4 text-sm font-semibold ${selection.message.tone === "error" ? "border-red-500/40 bg-red-950/30 text-red-200" : "border-synth-border bg-synth-surface text-gray-200"}`}
+          role={selection.message.tone === "error" ? "alert" : "status"}
+        >
           {selection.message.text}
         </div>
       )}
-      <LocalRomPicker fileInputVersion={selection.fileInputVersion} isInspecting={selection.isInspecting} onSelectFile={(file) => void selection.selectFile(file)} />
+      <LocalRomPicker
+        fileInputVersion={selection.fileInputVersion}
+        isInspecting={selection.isInspecting}
+        onSelectFile={(file) => void selection.selectFile(file)}
+      />
       <LocalRomRecentsSection onChanged={selection.refreshRecents} recents={selection.recents} />
     </div>
   );

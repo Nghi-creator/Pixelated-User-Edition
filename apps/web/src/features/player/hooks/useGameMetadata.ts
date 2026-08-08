@@ -10,8 +10,7 @@ export function useGameMetadata(gameId: string | undefined) {
   const { data, isError, isLoading } = useGameMetadataQuery(gameId);
 
   const game = data?.game;
-  const gameTitle =
-    game?.title || (isError && gameId ? formatFallbackTitle(gameId) : "");
+  const gameTitle = game?.title || (isError && gameId ? formatFallbackTitle(gameId) : "");
   const authorName = game?.author_name || null;
   const gameRights = (game?.game_rights || []) as GameRights[];
 

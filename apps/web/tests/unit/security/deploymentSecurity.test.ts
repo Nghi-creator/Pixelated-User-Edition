@@ -22,10 +22,7 @@ test("deployment CSP permits required WASM resources without broad network acces
   assert.match(csp, /script-src[^;]*'wasm-unsafe-eval'/);
   assert.match(csp, /worker-src 'self' blob:/);
   assert.doesNotMatch(csp, /cdn\.jsdelivr\.net/);
-  assert.match(
-    csp,
-    /connect-src[^;]*pixelated-api-services-6ovi\.onrender\.com/,
-  );
+  assert.match(csp, /connect-src[^;]*pixelated-api-services-6ovi\.onrender\.com/);
   assert.match(csp, /connect-src[^;]*https:\/\/\*\.supabase\.co/);
   assert.doesNotMatch(csp, /connect-src[^;]*http:/);
   assert.doesNotMatch(csp, /connect-src[^;]*\shttps:\s/);

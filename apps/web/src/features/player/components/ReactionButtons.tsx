@@ -28,9 +28,7 @@ export function ReactionButtons({
           onClick={() => onReaction(true)}
           className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all disabled:cursor-wait disabled:opacity-50 ${userReaction === true ? "bg-synth-primary/20 text-synth-primary shadow-card" : "text-gray-400 hover:bg-synth-elevated hover:text-white"}`}
         >
-          <ThumbsUp
-            className={`w-4 h-4 ${userReaction === true ? "fill-current" : ""}`}
-          />
+          <ThumbsUp className={`w-4 h-4 ${userReaction === true ? "fill-current" : ""}`} />
           <span className="font-bold text-sm">{likes}</span>
         </button>
         <div className="w-px h-6 bg-synth-border" />
@@ -44,9 +42,7 @@ export function ReactionButtons({
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <ThumbsDown
-              className={`w-4 h-4 ${userReaction === false ? "fill-current" : ""}`}
-            />
+            <ThumbsDown className={`w-4 h-4 ${userReaction === false ? "fill-current" : ""}`} />
           )}
         </button>
       </div>

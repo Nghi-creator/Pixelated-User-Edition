@@ -1,9 +1,6 @@
 import { lazy, Suspense, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {
-  PlayerHeader,
-  type PlayerHeaderStatus,
-} from "../../components/wasm/PlayerHeader";
+import { PlayerHeader, type PlayerHeaderStatus } from "../../components/wasm/PlayerHeader";
 import { PlayerStreamGrid } from "../../components/wasm/PlayerStreamGrid";
 import { WasmPlayerControls } from "../../components/wasm/WasmPlayerControls";
 import { WasmPlayerToolDrawer } from "../../components/wasm/WasmPlayerToolDrawer";
@@ -53,7 +50,14 @@ export default function Player() {
   const [activePlayerTool, setActivePlayerTool] = useState<PlayerTool | null>(null);
   const currentUser = useAuthUser();
   const { backRoute, backText } = usePlayerNavigation(location, id);
-  const { authorName, game, gameRights, gameTitle, isError: metadataError, isLoading: metadataLoading } = useGameMetadata(id);
+  const {
+    authorName,
+    game,
+    gameRights,
+    gameTitle,
+    isError: metadataError,
+    isLoading: metadataLoading,
+  } = useGameMetadata(id);
   const player = useWasmPlayer(id);
   const gameKey = `catalog:${id || "unknown"}`;
   const compatibility = useMemo(() => getBrowserGameCompatibility(game), [game]);
@@ -64,7 +68,13 @@ export default function Player() {
       ? { core: core.coreId, system: core.systemId }
       : { core: "fceumm" as const, system: "nes" as const };
   }, [game]);
-  const research = useWasmResearch({ error: player.error, gameKey, progress: player.progress, runtime: runtimeMetadata, status: player.status });
+  const research = useWasmResearch({
+    error: player.error,
+    gameKey,
+    progress: player.progress,
+    runtime: runtimeMetadata,
+    status: player.status,
+  });
   const canStart = !metadataLoading && !metadataError && compatibility.kind === "browser";
 
   usePlayCount(id, Boolean(currentUser) && player.status === "playing");
@@ -72,7 +82,9 @@ export default function Player() {
   const headerStatus = useMemo<PlayerHeaderStatus>(() => {
     if (player.status === "playing" || player.status === "paused") return "playing";
     if (player.status === "error") return "error";
-    if (["preparing", "downloading", "verifying", "loading-core", "starting"].includes(player.status)) {
+    if (
+      ["preparing", "downloading", "verifying", "loading-core", "starting"].includes(player.status)
+    ) {
       return "connecting";
     }
     return "idle";
@@ -81,9 +93,7 @@ export default function Player() {
   const enterFullscreen = () => {
     void stageRef.current?.requestFullscreen?.();
   };
-  const playerLayoutClassName = showBrowserTelemetry
-    ? "max-w-7xl"
-    : PLAYER_LAYOUT_CLASS_NAME;
+  const playerLayoutClassName = showBrowserTelemetry ? "max-w-7xl" : PLAYER_LAYOUT_CLASS_NAME;
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 pb-24 pt-24">
@@ -94,9 +104,7 @@ export default function Player() {
         gameTitle={gameTitle}
         hideGameChrome
         layoutClassName={playerLayoutClassName}
-        onToggleTelemetry={() =>
-          setShowBrowserTelemetry((isVisible) => !isVisible)
-        }
+        onToggleTelemetry={() => setShowBrowserTelemetry((isVisible) => !isVisible)}
         showTelemetry={showBrowserTelemetry}
         status={headerStatus}
         statusLabelOverride={
@@ -118,49 +126,47 @@ export default function Player() {
         }
       >
         <div className="w-full overflow-visible rounded-lg border border-synth-border bg-synth-surface shadow-panel">
-        <WasmPlayerControls
-          gameTitle={gameTitle}
-          isMuted={player.isMuted}
-          onFullscreen={enterFullscreen}
-          onMuteChange={player.setMuted}
-          onOpenInputSettings={() => setActivePlayerTool("input")}
-          onOpenSaveStates={() => setActivePlayerTool("saves")}
-          onPauseToggle={player.togglePause}
-          onPixelPerfectChange={setPixelPerfect}
-          onReset={player.reset}
-          onStop={player.stop}
-          onToggleTelemetry={() =>
-            setShowBrowserTelemetry((isVisible) => !isVisible)
-          }
-          onVolumeChange={player.setVolume}
-          pixelPerfect={pixelPerfect}
-          showTelemetry={showBrowserTelemetry}
-          status={player.status}
-          volume={player.volume}
-        />
-        <WasmStage
-          canStart={canStart}
-          canvasRef={player.canvasRef}
-          error={player.error}
-          idleMessage={
-            metadataLoading
-              ? "Checking browser compatibility…"
-              : metadataError
-                ? "Could not verify this game's browser build. Return to the catalog and try again."
-                : compatibility.reason
-          }
-          onStart={player.start}
-          pixelPerfect={pixelPerfect}
-          progress={player.progress}
-          stageRef={stageRef}
-          status={player.status}
-        />
-        <WasmTouchControls
-          gameKey={gameKey}
-          onPress={player.pressInput}
-          onRelease={player.releaseInput}
-          status={player.status}
-        />
+          <WasmPlayerControls
+            gameTitle={gameTitle}
+            isMuted={player.isMuted}
+            onFullscreen={enterFullscreen}
+            onMuteChange={player.setMuted}
+            onOpenInputSettings={() => setActivePlayerTool("input")}
+            onOpenSaveStates={() => setActivePlayerTool("saves")}
+            onPauseToggle={player.togglePause}
+            onPixelPerfectChange={setPixelPerfect}
+            onReset={player.reset}
+            onStop={player.stop}
+            onToggleTelemetry={() => setShowBrowserTelemetry((isVisible) => !isVisible)}
+            onVolumeChange={player.setVolume}
+            pixelPerfect={pixelPerfect}
+            showTelemetry={showBrowserTelemetry}
+            status={player.status}
+            volume={player.volume}
+          />
+          <WasmStage
+            canStart={canStart}
+            canvasRef={player.canvasRef}
+            error={player.error}
+            idleMessage={
+              metadataLoading
+                ? "Checking browser compatibility…"
+                : metadataError
+                  ? "Could not verify this game's browser build. Return to the catalog and try again."
+                  : compatibility.reason
+            }
+            onStart={player.start}
+            pixelPerfect={pixelPerfect}
+            progress={player.progress}
+            stageRef={stageRef}
+            status={player.status}
+          />
+          <WasmTouchControls
+            gameKey={gameKey}
+            onPress={player.pressInput}
+            onRelease={player.releaseInput}
+            status={player.status}
+          />
         </div>
       </PlayerStreamGrid>
 
@@ -203,15 +209,19 @@ export default function Player() {
         </WasmPlayerToolDrawer>
       )}
 
-      <div
-        className={`mt-3 flex w-full ${playerLayoutClassName} justify-start`}
-      >
-        {authorName && <p className="text-left text-sm font-medium text-synth-primary">Developed by: {authorName}</p>}
+      <div className={`mt-3 flex w-full ${playerLayoutClassName} justify-start`}>
+        {authorName && (
+          <p className="text-left text-sm font-medium text-synth-primary">
+            Developed by: {authorName}
+          </p>
+        )}
       </div>
 
       <Suspense
         fallback={
-          <div className={`mt-6 flex min-h-32 w-full ${playerLayoutClassName} items-center justify-center rounded-lg border border-synth-border bg-synth-surface text-sm text-gray-300`}>
+          <div
+            className={`mt-6 flex min-h-32 w-full ${playerLayoutClassName} items-center justify-center rounded-lg border border-synth-border bg-synth-surface text-sm text-gray-300`}
+          >
             Loading community…
           </div>
         }

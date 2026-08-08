@@ -40,23 +40,28 @@ repository rather than this repository.
 
 ```bash
 npm run dev
+npm run format
 npm run lint
 npm test
+npm run test:e2e
 npm run build
 npm run preview
 ```
 
+Run `npx playwright install chromium` once before the browser smoke suite on a
+new development or CI machine.
+
 ## Main routes
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Landing page |
-| `/home` | Catalog |
-| `/play/:id` | WebAssembly catalog gameplay |
-| `/local` | Personal ROMs and local gameplay |
-| `/storage` | Browser storage management |
-| `/favorites` | Favorites |
-| `/profile` | Account settings |
+| Route                     | Purpose                             |
+| ------------------------- | ----------------------------------- |
+| `/`                       | Landing page                        |
+| `/home`                   | Catalog                             |
+| `/play/:id`               | WebAssembly catalog gameplay        |
+| `/local`                  | Personal ROMs and local gameplay    |
+| `/storage`                | Browser storage management          |
+| `/favorites`              | Favorites                           |
+| `/profile`                | Account settings                    |
 | `/internal/browser-smoke` | Internal browser-runtime smoke test |
 
 ## Runtime assets

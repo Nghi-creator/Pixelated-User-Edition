@@ -2,9 +2,7 @@ import { Heart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useFavorite } from "../../hooks/useFavorite";
-import {
-  GameArtworkFallback,
-} from "./GameArtworkFallback";
+import { GameArtworkFallback } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
 import type { BrowserGameCompatibility } from "../../lib/browserCompatibility";
 import { getGamePlayPath } from "../../lib/appUrl";
@@ -26,15 +24,8 @@ export default function GameCard({
 }: GameCardProps) {
   const [coverFailed, setCoverFailed] = useState(false);
   const [favoriteError, setFavoriteError] = useState("");
-  const {
-    isFavorited,
-    isPending,
-    toggleFavorite: toggleFavoriteState,
-  } = useFavorite(id);
-  const showCover =
-    Boolean(coverUrl) &&
-    !coverFailed &&
-    !isGeneratedCatalogArtworkUrl(coverUrl);
+  const { isFavorited, isPending, toggleFavorite: toggleFavoriteState } = useFavorite(id);
+  const showCover = Boolean(coverUrl) && !coverFailed && !isGeneratedCatalogArtworkUrl(coverUrl);
 
   const toggleFavorite = async () => {
     if (isPending) return;
@@ -52,37 +43,37 @@ export default function GameCard({
     <article className="group relative overflow-hidden rounded-lg border border-synth-border bg-synth-surface transition-colors hover:bg-synth-elevated">
       <Link to={getGamePlayPath(id)} className="block">
         <div className="overflow-hidden bg-synth-bg">
-        {showCover ? (
-          <img
-            src={coverUrl}
-            alt={title}
-            decoding="async"
-            loading="lazy"
-            onError={() => setCoverFailed(true)}
-            className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-72"
-          />
-        ) : (
-          <GameArtworkFallback
-            className="h-64 transition-transform duration-300 group-hover:scale-[1.03] md:h-72"
-            title={title}
-          />
-        )}
+          {showCover ? (
+            <img
+              src={coverUrl}
+              alt={title}
+              decoding="async"
+              loading="lazy"
+              onError={() => setCoverFailed(true)}
+              className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-72"
+            />
+          ) : (
+            <GameArtworkFallback
+              className="h-64 transition-transform duration-300 group-hover:scale-[1.03] md:h-72"
+              title={title}
+            />
+          )}
         </div>
 
-      {compatibility && (
-        <div
-          className={`absolute left-2 top-2 rounded-md border px-2 py-1 text-[11px] font-black uppercase tracking-wide backdrop-blur-sm ${
-            compatibility.kind === "browser"
-              ? "border-emerald-400/50 bg-emerald-950/90 text-emerald-200"
-              : compatibility.kind === "desktop"
-                ? "border-amber-400/50 bg-amber-950/90 text-amber-100"
-                : "border-red-400/50 bg-red-950/90 text-red-200"
-          }`}
-          title={compatibility.reason}
-        >
-          {compatibility.label}
-        </div>
-      )}
+        {compatibility && (
+          <div
+            className={`absolute left-2 top-2 rounded-md border px-2 py-1 text-[11px] font-black uppercase tracking-wide backdrop-blur-sm ${
+              compatibility.kind === "browser"
+                ? "border-emerald-400/50 bg-emerald-950/90 text-emerald-200"
+                : compatibility.kind === "desktop"
+                  ? "border-amber-400/50 bg-amber-950/90 text-amber-100"
+                  : "border-red-400/50 bg-red-950/90 text-red-200"
+            }`}
+            title={compatibility.reason}
+          >
+            {compatibility.label}
+          </div>
+        )}
 
         <div className="border-t border-synth-border p-3">
           <h3 className="truncate text-lg font-bold text-white">{title}</h3>
@@ -109,7 +100,6 @@ export default function GameCard({
           />
         )}
       </button>
-
     </article>
   );
 }

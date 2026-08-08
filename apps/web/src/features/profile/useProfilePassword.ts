@@ -18,8 +18,7 @@ export function useProfilePassword({
 }) {
   const passwordMutationRef = useRef(false);
   const [savingPassword, setSavingPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] =
-    useState<PasswordMessage | null>(null);
+  const [passwordMessage, setPasswordMessage] = useState<PasswordMessage | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 

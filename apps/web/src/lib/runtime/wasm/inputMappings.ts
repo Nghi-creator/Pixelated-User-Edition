@@ -67,15 +67,23 @@ function hasEveryAction(mapping: Record<string, unknown>) {
 }
 
 export function isValidKeyboardMapping(value: unknown): value is KeyboardInputMapping {
-  if (!value || typeof value !== "object" || !hasEveryAction(value as Record<string, unknown>)) return false;
+  if (!value || typeof value !== "object" || !hasEveryAction(value as Record<string, unknown>))
+    return false;
   const bindings = WASM_INPUT_ACTIONS.map((action) => (value as Record<string, unknown>)[action]);
-  return bindings.every((binding) => typeof binding === "string" && binding.length > 0) && new Set(bindings).size === bindings.length;
+  return (
+    bindings.every((binding) => typeof binding === "string" && binding.length > 0) &&
+    new Set(bindings).size === bindings.length
+  );
 }
 
 export function isValidGamepadMapping(value: unknown): value is GamepadInputMapping {
-  if (!value || typeof value !== "object" || !hasEveryAction(value as Record<string, unknown>)) return false;
+  if (!value || typeof value !== "object" || !hasEveryAction(value as Record<string, unknown>))
+    return false;
   const bindings = WASM_INPUT_ACTIONS.map((action) => (value as Record<string, unknown>)[action]);
-  return bindings.every((binding) => Number.isInteger(binding) && Number(binding) >= 0) && new Set(bindings).size === bindings.length;
+  return (
+    bindings.every((binding) => Number.isInteger(binding) && Number(binding) >= 0) &&
+    new Set(bindings).size === bindings.length
+  );
 }
 
 export function parseInputPreferences(value: string | null): WasmInputPreferences {

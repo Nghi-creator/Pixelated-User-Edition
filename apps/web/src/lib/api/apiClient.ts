@@ -1,9 +1,6 @@
 import { supabase } from "../auth/supabaseClient";
 import type { Session } from "@supabase/supabase-js";
-import {
-  createRequestAbortController,
-  withTimeout,
-} from "./requestLifecycle";
+import { createRequestAbortController, withTimeout } from "./requestLifecycle";
 import {
   clearCacheEntryOnRejection,
   clearAuthScopedCache,
@@ -36,8 +33,7 @@ const getDefaultApiUrl = () => {
   return isLocalBrowserHost() ? LOCAL_API_URL : PRODUCTION_API_URL;
 };
 
-export const API_URL =
-  getDefaultApiUrl().replace(/\/$/, "");
+export const API_URL = getDefaultApiUrl().replace(/\/$/, "");
 
 type ApiRequestOptions = RequestInit & {
   authenticated?: boolean;
@@ -58,20 +54,16 @@ export class ApiError extends Error {
 
 const authScopedCache = {
   session: null as Promise<Session | null> | null,
-  permissions: null as
-    | {
-      expiresAt: number;
-      promise: Promise<ApiPermissionsResponse>;
-      value?: ApiPermissionsResponse;
-    }
-    | null,
-  favorites: null as
-    | {
-      expiresAt: number;
-      promise: Promise<Set<string>>;
-      value?: Set<string>;
-    }
-    | null,
+  permissions: null as {
+    expiresAt: number;
+    promise: Promise<ApiPermissionsResponse>;
+    value?: ApiPermissionsResponse;
+  } | null,
+  favorites: null as {
+    expiresAt: number;
+    promise: Promise<Set<string>>;
+    value?: Set<string>;
+  } | null,
 };
 
 export function clearApiAuthScopedCache() {
@@ -130,8 +122,7 @@ export async function apiRequest<T>(
       timeoutMs,
       () =>
         new ApiError(0, {
-          error:
-            "Authentication did not respond in time. Refresh the page and try again.",
+          error: "Authentication did not respond in time. Refresh the page and try again.",
         }),
     );
 
@@ -140,10 +131,7 @@ export async function apiRequest<T>(
     }
   }
 
-  const { controller, cleanup } = createRequestAbortController(
-    timeoutMs,
-    options.signal,
-  );
+  const { controller, cleanup } = createRequestAbortController(timeoutMs, options.signal);
 
   let response: Response;
   try {
@@ -155,8 +143,7 @@ export async function apiRequest<T>(
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       throw new ApiError(0, {
-        error:
-          "The API did not respond in time. The backend may be waking up; try again shortly.",
+        error: "The API did not respond in time. The backend may be waking up; try again shortly.",
       });
     }
 
@@ -202,12 +189,10 @@ export async function getCachedPermissions(): Promise<ApiPermissionsResponse> {
     return authScopedCache.permissions.promise;
   }
 
-  const request = apiRequest<ApiPermissionsResponse>("/me/permissions").then(
-    (value) => {
-      if (authScopedCache.permissions) authScopedCache.permissions.value = value;
-      return value;
-    },
-  );
+  const request = apiRequest<ApiPermissionsResponse>("/me/permissions").then((value) => {
+    if (authScopedCache.permissions) authScopedCache.permissions.value = value;
+    return value;
+  });
   const promise = clearCacheEntryOnRejection(request, (rejectedPromise) => {
     if (authScopedCache.permissions?.promise === rejectedPromise) {
       authScopedCache.permissions = null;
@@ -231,17 +216,15 @@ async function getFavoriteIds(): Promise<Set<string>> {
     return authScopedCache.favorites.promise;
   }
 
-  const request = apiRequest<{ favorites: FavoriteLike[] }>("/favorites").then(
-    ({ favorites }) => {
-      const favoriteIds = new Set(
-        favorites
-          .map((favorite) => favorite.id || favorite.game_id)
-          .filter((id): id is string => Boolean(id)),
-      );
-      if (authScopedCache.favorites) authScopedCache.favorites.value = favoriteIds;
-      return favoriteIds;
-    },
-  );
+  const request = apiRequest<{ favorites: FavoriteLike[] }>("/favorites").then(({ favorites }) => {
+    const favoriteIds = new Set(
+      favorites
+        .map((favorite) => favorite.id || favorite.game_id)
+        .filter((id): id is string => Boolean(id)),
+    );
+    if (authScopedCache.favorites) authScopedCache.favorites.value = favoriteIds;
+    return favoriteIds;
+  });
   const promise = clearCacheEntryOnRejection(request, (rejectedPromise) => {
     if (authScopedCache.favorites?.promise === rejectedPromise) {
       authScopedCache.favorites = null;
