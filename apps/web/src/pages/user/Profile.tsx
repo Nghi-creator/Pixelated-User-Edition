@@ -1,7 +1,4 @@
-import {
-  AvatarCropModal,
-  DeleteAccountModal,
-} from "../../features/profile/ProfileModals";
+import { AvatarCropModal, DeleteAccountModal } from "../../features/profile/ProfileModals";
 import {
   ProfileLoadingState,
   ProfileLoadError,
@@ -19,43 +16,38 @@ export default function Profile() {
   }
 
   if (profile.loadError) {
-    return (
-      <ProfileLoadError
-        loadError={profile.loadError}
-        onRetry={() => profile.setLoadAttempt()}
-      />
-    );
+    return <ProfileLoadError loadError={profile.loadError} onRetry={profile.retryLoad} />;
   }
 
   return (
     <div className="flex flex-col min-h-screen">
-      {profile.showCropper && profile.imageSrc && (
+      {profile.avatarModal.showCropper && profile.avatarModal.imageSrc && (
         <AvatarCropModal
-          crop={profile.crop}
-          imageSrc={profile.imageSrc}
-          isCropping={profile.isCropping}
-          onCancel={() => profile.setShowCropper(false)}
-          onConfirm={() => void profile.handleCropConfirm()}
-          onCropChange={profile.setCrop}
-          onCropComplete={profile.onCropComplete}
-          onZoomChange={profile.setZoom}
-          zoom={profile.zoom}
+          crop={profile.avatarModal.crop}
+          imageSrc={profile.avatarModal.imageSrc}
+          isCropping={profile.avatarModal.isCropping}
+          onCancel={() => profile.avatarModal.setShowCropper(false)}
+          onConfirm={() => void profile.avatarModal.handleCropConfirm()}
+          onCropChange={profile.avatarModal.setCrop}
+          onCropComplete={profile.avatarModal.onCropComplete}
+          onZoomChange={profile.avatarModal.setZoom}
+          zoom={profile.avatarModal.zoom}
         />
       )}
 
-      {profile.showDeleteModal && (
+      {profile.deleteModal.show && (
         <DeleteAccountModal
-          deleteError={profile.deleteError}
-          deleteInput={profile.deleteInput}
-          hasPassword={Boolean(profile.hasPassword)}
-          isDeleting={profile.isDeleting}
-          isAuthCaptchaEnabled={profile.isAuthCaptchaEnabled}
-          onCancel={profile.closeDeleteModal}
-          onCaptchaTokenChange={profile.setDeleteCaptchaToken}
-          onDeleteInputChange={profile.setDeleteInput}
-          onSubmit={profile.handleDeleteAccount}
-          captchaResetKey={profile.deleteCaptchaResetKey}
-          captchaToken={profile.deleteCaptchaToken}
+          deleteError={profile.deleteModal.deleteError}
+          deleteInput={profile.deleteModal.deleteInput}
+          hasPassword={profile.deleteModal.hasPassword}
+          isDeleting={profile.deleteModal.isDeleting}
+          isAuthCaptchaEnabled={profile.deleteModal.isAuthCaptchaEnabled}
+          onCancel={profile.deleteModal.close}
+          onCaptchaTokenChange={profile.deleteModal.setCaptchaToken}
+          onDeleteInputChange={profile.deleteModal.setDeleteInput}
+          onSubmit={profile.deleteModal.handleDeleteAccount}
+          captchaResetKey={profile.deleteModal.captchaResetKey}
+          captchaToken={profile.deleteModal.captchaToken}
         />
       )}
 
@@ -67,14 +59,12 @@ export default function Profile() {
           Back to Home
         </button>
 
-        <h1 className="text-4xl font-extrabold tracking-tight mb-2 text-white">
-          Account Settings
-        </h1>
+        <h1 className="text-4xl font-extrabold tracking-tight mb-2 text-white">Account Settings</h1>
 
         <div className="space-y-8">
-          <PublicProfileSection profile={profile} />
-          <RecentActivitySection profile={profile} />
-          <SecuritySection profile={profile} />
+          <PublicProfileSection profile={profile.publicProfile} />
+          <RecentActivitySection profile={profile.activity} />
+          <SecuritySection profile={profile.security} />
         </div>
       </div>
     </div>

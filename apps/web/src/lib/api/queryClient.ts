@@ -26,11 +26,9 @@ export const queryKeys = {
     genre = "",
     license = "",
   ) => ["gameCatalog", page, pageSize, search, platform, runtime, genre, license] as const,
-  libraryGamePicker: (pageSize: number) =>
-    ["libraryGamePicker", pageSize] as const,
+  libraryGamePicker: (pageSize: number) => ["libraryGamePicker", pageSize] as const,
   gameComments: (gameId: string | undefined) => ["gameComments", gameId] as const,
-  gameReactions: (gameId: string | undefined) =>
-    ["gameReactions", gameId] as const,
+  gameReactions: (gameId: string | undefined) => ["gameReactions", gameId] as const,
   permissions: () => ["permissions"] as const,
   profile: () => ["profile"] as const,
   profileActivity: (userId: string | undefined) => ["profileActivity", userId] as const,

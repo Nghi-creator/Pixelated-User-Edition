@@ -6,17 +6,49 @@
     <meta name="theme-color" content="#080b14" />
     <title>Pixelated is offline</title>
     <style>
-      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #080b14; color: #f8fafc; font: 16px system-ui, sans-serif; }
-      main { width: min(34rem, calc(100% - 3rem)); padding: 2rem; border: 1px solid #394056; border-radius: 1rem; background: #111827; }
-      h1 { margin-top: 0; }
-      p { color: #cbd5e1; line-height: 1.6; }
-      button { border: 0; border-radius: .6rem; padding: .75rem 1rem; background: #8b5cf6; color: white; font-weight: 800; cursor: pointer; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #080b14;
+        color: #f8fafc;
+        font:
+          16px system-ui,
+          sans-serif;
+      }
+      main {
+        width: min(34rem, calc(100% - 3rem));
+        padding: 2rem;
+        border: 1px solid #394056;
+        border-radius: 1rem;
+        background: #111827;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      p {
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+      button {
+        border: 0;
+        border-radius: 0.6rem;
+        padding: 0.75rem 1rem;
+        background: #8b5cf6;
+        color: white;
+        font-weight: 800;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <main>
       <h1>You’re offline</h1>
-      <p>Pixelated could not reach the network. Previously cached application files and emulator cores remain on this device, but cloud library data and ROM downloads require a connection.</p>
+      <p>
+        Pixelated could not reach the network. Previously cached application files and emulator
+        cores remain on this device, but cloud library data and ROM downloads require a connection.
+      </p>
       <button id="retry" type="button">Try again</button>
     </main>
     <script src="/offline.js"></script>

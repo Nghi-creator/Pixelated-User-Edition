@@ -1,18 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../../lib/api/apiClient";
-import type {
-  GameRuntime,
-  GameRuntimeSource,
-} from "../../../lib/runtime/gameRuntime";
+import type { GameRuntime, GameRuntimeSource } from "../../../lib/runtime/gameRuntime";
 import { getWasmBrowserSupport } from "../../../lib/runtime/wasm/browserSupport";
 import { resolveWasmCore } from "../../../lib/runtime/wasm/coreRegistry";
 import type { WasmRuntimeProgress } from "../../../lib/runtime/wasm/runtimeTypes";
 import type { WasmPlayerStatus } from "../../../lib/runtime/wasm/runtimeTypes";
 import { useWasmInputBindings } from "../../../hooks/wasm/useWasmInputBindings";
-import {
-  claimCreatedBackendSession,
-  type BackendSession,
-} from "./backendSessionLifecycle";
+import { claimCreatedBackendSession, type BackendSession } from "./backendSessionLifecycle";
 
 function stopBackendSession(session: BackendSession) {
   return api.stopSession(session.id, session.token).catch((sessionError) => {
@@ -101,7 +95,9 @@ export function useWasmPlayer(gameId: string | undefined) {
         throw new Error("This game does not have a browser ROM filename.");
       }
       if (!backendSession.boot.browser.eligible) {
-        throw new Error(backendSession.boot.browser.reason || "This game is not eligible for browser play.");
+        throw new Error(
+          backendSession.boot.browser.reason || "This game is not eligible for browser play.",
+        );
       }
       const core = resolveWasmCore(
         backendSession.boot.browser.coreId,
@@ -161,19 +157,25 @@ export function useWasmPlayer(gameId: string | undefined) {
 
   const reset = useCallback(() => runtimeRef.current?.reset(), []);
   const captureState = useCallback(() => {
-    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before saving a state."));
+    if (!runtimeRef.current)
+      return Promise.reject(new Error("Start the game before saving a state."));
     return runtimeRef.current.captureState();
   }, []);
   const restoreState = useCallback((state: Blob) => {
-    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before loading a state."));
+    if (!runtimeRef.current)
+      return Promise.reject(new Error("Start the game before loading a state."));
     return runtimeRef.current.restoreState(state);
   }, []);
   const captureBatterySave = useCallback(() => {
-    if (!runtimeRef.current) return Promise.reject(new Error("Start the game before backing up battery RAM."));
+    if (!runtimeRef.current)
+      return Promise.reject(new Error("Start the game before backing up battery RAM."));
     return runtimeRef.current.captureBatterySave();
   }, []);
   const pressInput = useCallback((button: string) => runtimeRef.current?.pressInput(button), []);
-  const releaseInput = useCallback((button: string) => runtimeRef.current?.releaseInput(button), []);
+  const releaseInput = useCallback(
+    (button: string) => runtimeRef.current?.releaseInput(button),
+    [],
+  );
   const setMuted = useCallback((muted: boolean) => {
     runtimeRef.current?.setMuted(muted);
     setIsMutedState(muted);
@@ -188,12 +190,15 @@ export function useWasmPlayer(gameId: string | undefined) {
     onRelease: releaseInput,
   });
 
-  useEffect(() => () => {
-    generationRef.current += 1;
-    runtimeRef.current?.stop();
-    runtimeRef.current = null;
-    releaseSession();
-  }, [gameId, releaseSession]);
+  useEffect(
+    () => () => {
+      generationRef.current += 1;
+      runtimeRef.current?.stop();
+      runtimeRef.current = null;
+      releaseSession();
+    },
+    [gameId, releaseSession],
+  );
 
   return {
     canvasRef,

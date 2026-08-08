@@ -63,10 +63,7 @@ export async function mutateFavorite(
   } catch (error) {
     emit({
       ...snapshot,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Could not update favorite. Try again.",
+      error: error instanceof Error ? error.message : "Could not update favorite. Try again.",
     });
     throw error;
   } finally {

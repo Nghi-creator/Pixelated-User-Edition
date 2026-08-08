@@ -93,9 +93,7 @@ export async function saveProfile({
     try {
       await removeAvatar(previousAvatarPath);
     } catch {
-      warnings.push(
-        "Profile saved, but the previous avatar could not be cleaned up.",
-      );
+      warnings.push("Profile saved, but the previous avatar could not be cleaned up.");
     }
   }
 

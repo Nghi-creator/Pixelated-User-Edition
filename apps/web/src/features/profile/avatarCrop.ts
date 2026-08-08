@@ -5,15 +5,11 @@ export type CropArea = {
   height: number;
 };
 
-export async function createCroppedAvatar(
-  imageSrc: string,
-  pixelCrop: CropArea,
-): Promise<File> {
+export async function createCroppedAvatar(imageSrc: string, pixelCrop: CropArea): Promise<File> {
   const image = new Image();
   await new Promise<void>((resolve, reject) => {
     image.onload = () => resolve();
-    image.onerror = () =>
-      reject(new Error("The selected image could not be loaded."));
+    image.onerror = () => reject(new Error("The selected image could not be loaded."));
     image.src = imageSrc;
   });
 

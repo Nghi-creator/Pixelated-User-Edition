@@ -74,9 +74,7 @@ export function useDeleteAccount({
       } else if (error instanceof Error) {
         setDeleteError(error.message);
       } else {
-        setDeleteError(
-          "An unexpected error occurred while deleting your account.",
-        );
+        setDeleteError("An unexpected error occurred while deleting your account.");
       }
       deleteMutationRef.current = false;
       setIsDeleting(false);

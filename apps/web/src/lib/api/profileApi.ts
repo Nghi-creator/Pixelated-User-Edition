@@ -6,7 +6,10 @@ import type {
 } from "./apiTypes";
 
 type ProfileApiDependencies = {
-  apiRequest: <T>(path: string, options?: RequestInit & { authenticated?: boolean; timeoutMs?: number }) => Promise<T>;
+  apiRequest: <T>(
+    path: string,
+    options?: RequestInit & { authenticated?: boolean; timeoutMs?: number },
+  ) => Promise<T>;
   clearPermissionsCache: () => void;
   getCachedPermissions: () => Promise<ApiPermissionsResponse>;
 };
@@ -26,13 +29,8 @@ export function createProfileApi({
     permissions: () => getCachedPermissions(),
     profile: () => apiRequest<{ profile: ApiProfile | null }>("/profile"),
     profileActivity: (limit = 8) =>
-      apiRequest<{ activity: ApiProfileActivityEntry[] }>(
-        `/profile/activity?limit=${limit}`,
-      ),
-    updateProfile: async (payload: {
-      avatarUrl: string | null;
-      username: string;
-    }) => {
+      apiRequest<{ activity: ApiProfileActivityEntry[] }>(`/profile/activity?limit=${limit}`),
+    updateProfile: async (payload: { avatarUrl: string | null; username: string }) => {
       const result = await apiRequest<{ success: true }>("/profile", {
         body: JSON.stringify(payload),
         method: "PATCH",

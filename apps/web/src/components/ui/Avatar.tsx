@@ -22,9 +22,7 @@ function getInitials(name: string | null | undefined) {
   if (!normalizedName) return "?";
 
   const parts = normalizedName.split(/\s+/).filter(Boolean);
-  const initials = parts.length > 1
-    ? `${parts[0][0]}${parts[1][0]}`
-    : normalizedName.slice(0, 2);
+  const initials = parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : normalizedName.slice(0, 2);
 
   return initials.toUpperCase();
 }

@@ -17,8 +17,7 @@ export function useProfileAvatar({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] =
-    useState<CropArea | null>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(null);
   const [isCropping, setIsCropping] = useState(false);
 
   useEffect(
@@ -58,12 +57,9 @@ export function useProfileAvatar({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const onCropComplete = useCallback(
-    (_croppedArea: CropArea, nextCroppedAreaPixels: CropArea) => {
-      setCroppedAreaPixels(nextCroppedAreaPixels);
-    },
-    [],
-  );
+  const onCropComplete = useCallback((_croppedArea: CropArea, nextCroppedAreaPixels: CropArea) => {
+    setCroppedAreaPixels(nextCroppedAreaPixels);
+  }, []);
 
   const handleCropConfirm = async () => {
     if (isCropping) return;

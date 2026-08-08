@@ -1,15 +1,7 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { resetFavoriteState } from "../../lib/favoriteState";
-import {
-  clearApiAuthScopedCache,
-  setApiAuthSession,
-} from "../../lib/api/apiClient";
+import { clearApiAuthScopedCache, setApiAuthSession } from "../../lib/api/apiClient";
 import { queryClient } from "../../lib/api/queryClient";
 import { createAuthIdentityTracker } from "../../lib/auth/authIdentityTracker";
 import { AuthSessionContext } from "../../hooks/useAuthSession";
@@ -54,9 +46,5 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(() => ({ loading, session }), [loading, session]);
-  return (
-    <AuthSessionContext.Provider value={value}>
-      {children}
-    </AuthSessionContext.Provider>
-  );
+  return <AuthSessionContext.Provider value={value}>{children}</AuthSessionContext.Provider>;
 }

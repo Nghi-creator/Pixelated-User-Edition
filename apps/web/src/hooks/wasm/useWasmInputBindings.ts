@@ -20,7 +20,10 @@ type Options = {
 };
 
 function connectedGamepad() {
-  return navigator.getGamepads?.().find((gamepad): gamepad is Gamepad => Boolean(gamepad?.connected)) || null;
+  return (
+    navigator.getGamepads?.().find((gamepad): gamepad is Gamepad => Boolean(gamepad?.connected)) ||
+    null
+  );
 }
 
 function shouldIgnoreKeyboardEvent(event: KeyboardEvent) {
@@ -64,29 +67,35 @@ export function useWasmInputBindings({ active, onPress, onRelease }: Options) {
     setPreferences(next);
   }, []);
 
-  const setKeyboardBinding = useCallback((action: WasmInputAction, code: string) => {
-    try {
-      const keyboard = rebindKeyboard(preferences.keyboard, action, code);
-      commit({ ...preferences, keyboard });
-      return null;
-    } catch (error) {
-      return error instanceof Error ? error.message : "Could not assign that key.";
-    }
-  }, [commit, preferences]);
+  const setKeyboardBinding = useCallback(
+    (action: WasmInputAction, code: string) => {
+      try {
+        const keyboard = rebindKeyboard(preferences.keyboard, action, code);
+        commit({ ...preferences, keyboard });
+        return null;
+      } catch (error) {
+        return error instanceof Error ? error.message : "Could not assign that key.";
+      }
+    },
+    [commit, preferences],
+  );
 
-  const setGamepadBinding = useCallback((action: WasmInputAction, button: number) => {
-    if (!gamepadName) return "Connect a gamepad before assigning buttons.";
-    try {
-      const mapping = rebindGamepad(gamepadMapping, action, button);
-      commit({
-        ...preferences,
-        gamepads: { ...preferences.gamepads, [gamepadName]: mapping },
-      });
-      return null;
-    } catch (error) {
-      return error instanceof Error ? error.message : "Could not assign that button.";
-    }
-  }, [commit, gamepadMapping, gamepadName, preferences]);
+  const setGamepadBinding = useCallback(
+    (action: WasmInputAction, button: number) => {
+      if (!gamepadName) return "Connect a gamepad before assigning buttons.";
+      try {
+        const mapping = rebindGamepad(gamepadMapping, action, button);
+        commit({
+          ...preferences,
+          gamepads: { ...preferences.gamepads, [gamepadName]: mapping },
+        });
+        return null;
+      } catch (error) {
+        return error instanceof Error ? error.message : "Could not assign that button.";
+      }
+    },
+    [commit, gamepadMapping, gamepadName, preferences],
+  );
 
   const resetKeyboardMapping = useCallback(() => {
     commit({ ...preferences, keyboard: { ...DEFAULT_KEYBOARD_MAPPING } });

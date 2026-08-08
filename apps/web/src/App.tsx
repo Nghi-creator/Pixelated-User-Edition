@@ -1,11 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from "react";
 import { LoaderCircle } from "lucide-react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Outlet,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import { useSessionTracker } from "./hooks/useSessionTracker";
@@ -54,8 +49,12 @@ const StandardLayout = () => {
       <Navbar />
       <main className="flex-grow pt-16">
         {SUPABASE_CONFIGURATION_ERROR && (
-          <div className="border-b border-amber-500/40 bg-amber-950/60 px-4 py-2 text-center text-sm text-amber-100" role="alert">
-            Authentication is unavailable because this deployment is missing its Supabase configuration.
+          <div
+            className="border-b border-amber-500/40 bg-amber-950/60 px-4 py-2 text-center text-sm text-amber-100"
+            role="alert"
+          >
+            Authentication is unavailable because this deployment is missing its Supabase
+            configuration.
           </div>
         )}
         <Outlet />

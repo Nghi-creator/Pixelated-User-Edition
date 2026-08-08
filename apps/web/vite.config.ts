@@ -3,6 +3,9 @@ import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __APP_BUILD_ID__: JSON.stringify(Date.now().toString(36)),
+  },
   plugins: [react()],
   build: {
     rollupOptions: {
@@ -11,13 +14,6 @@ export default defineConfig({
           if (!id.includes("node_modules")) return;
           if (id.includes("node_modules/nostalgist/")) return "wasm-runtime";
           if (id.includes("@supabase")) return "supabase";
-          if (id.includes("socket.io-client") || id.includes("engine.io-client")) {
-            return "realtime";
-          }
-          if (id.includes("lucide-react") || id.includes("react-icons")) {
-            return "icons";
-          }
-          return "vendor";
         },
       },
     },

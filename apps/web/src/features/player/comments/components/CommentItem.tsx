@@ -36,11 +36,7 @@ export function CommentItem({
 
   return (
     <div className="flex gap-4 group">
-      <Avatar
-        alt="Avatar"
-        name={displayName}
-        src={comment.profiles?.avatar_url}
-      />
+      <Avatar alt="Avatar" name={displayName} src={comment.profiles?.avatar_url} />
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-1">
           <div className="flex items-center gap-2">
@@ -81,9 +77,7 @@ export function CommentItem({
           </div>
         </div>
 
-        <p className="text-gray-300 text-sm leading-relaxed mb-3">
-          {comment.content}
-        </p>
+        <p className="text-gray-300 text-sm leading-relaxed mb-3">{comment.content}</p>
 
         <div className="flex items-center gap-3">
           <button

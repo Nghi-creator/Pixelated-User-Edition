@@ -88,11 +88,7 @@ export function AvatarCropModal({
               type="button"
               className="px-5 py-2.5 bg-synth-primary hover:bg-synth-primary-hover text-white rounded-lg transition-colors font-bold "
             >
-              {isCropping ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                "Confirm Crop"
-              )}
+              {isCropping ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm Crop"}
             </button>
           </div>
         </div>
@@ -135,10 +131,7 @@ export function DeleteAccountModal({
     >
       <div className="bg-synth-surface border border-red-500/30 rounded-lg w-full max-w-md overflow-hidden shadow-card flex flex-col">
         <div className="p-6 border-b border-synth-border flex justify-between items-center bg-red-500/10">
-          <h3
-            id="delete-account-title"
-            className="text-red-400 font-bold flex items-center gap-2"
-          >
+          <h3 id="delete-account-title" className="text-red-400 font-bold flex items-center gap-2">
             <AlertOctagon className="w-5 h-5" /> Delete Account
           </h3>
           <button
@@ -155,12 +148,9 @@ export function DeleteAccountModal({
         <div className="p-6">
           <p className="text-gray-300 text-sm mb-6 leading-relaxed">
             This action is{" "}
-            <span className="text-red-400 font-bold">
-              permanent and irreversible
-            </span>
-            . Your profile, social activity, active sessions, and uploaded
-            account files will be removed. Sign in again first if your session
-            is older than 10 minutes.
+            <span className="text-red-400 font-bold">permanent and irreversible</span>. Your
+            profile, social activity, active sessions, and uploaded account files will be removed.
+            Sign in again first if your session is older than 10 minutes.
           </p>
 
           {deleteError && (
@@ -172,9 +162,7 @@ export function DeleteAccountModal({
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">
-                {hasPassword
-                  ? "Enter Password to confirm"
-                  : "Type 'DELETE' to confirm"}
+                {hasPassword ? "Enter Password to confirm" : "Type 'DELETE' to confirm"}
               </label>
               <input
                 type={hasPassword ? "password" : "text"}
@@ -188,10 +176,7 @@ export function DeleteAccountModal({
             </div>
 
             {hasPassword && (
-              <AuthCaptcha
-                onTokenChange={onCaptchaTokenChange}
-                resetKey={captchaResetKey}
-              />
+              <AuthCaptcha onTokenChange={onCaptchaTokenChange} resetKey={captchaResetKey} />
             )}
 
             <div className="flex justify-end gap-3 mt-6">

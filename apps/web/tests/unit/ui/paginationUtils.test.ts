@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  getPageSlice,
-  getVisiblePageNumbers,
-} from "../../../src/components/ui/paginationUtils.ts";
+import { getPageSlice, getVisiblePageNumbers } from "../../../src/components/ui/paginationUtils.ts";
 
 test("pagination shows all small page sets and condenses larger sets", () => {
   assert.deepEqual(getVisiblePageNumbers(2, 4), [1, 2, 3, 4]);

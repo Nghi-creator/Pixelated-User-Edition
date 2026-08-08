@@ -133,7 +133,12 @@ export function useWasmResearch({
   }, [progress]);
 
   useEffect(() => {
-    if (!consentedRef.current || status !== "playing" || launchRef.current.launchToFirstFrameMs !== null) return;
+    if (
+      !consentedRef.current ||
+      status !== "playing" ||
+      launchRef.current.launchToFirstFrameMs !== null
+    )
+      return;
     const frameId = requestAnimationFrame((now) => {
       if (launchStartedAtRef.current !== null) {
         launchRef.current.launchToFirstFrameMs = Math.max(0, now - launchStartedAtRef.current);
@@ -177,13 +182,27 @@ export function useWasmResearch({
 
   useEffect(() => {
     if (!consented || !error) return;
-    errorsRef.current.push({ capturedAt: new Date().toISOString(), message: error, source: "player" });
+    errorsRef.current.push({
+      capturedAt: new Date().toISOString(),
+      message: error,
+      source: "player",
+    });
   }, [consented, error]);
 
   useEffect(() => {
     if (!consented) return;
-    const onError = (event: ErrorEvent) => errorsRef.current.push({ capturedAt: new Date().toISOString(), message: event.message, source: "window.error" });
-    const onRejection = (event: PromiseRejectionEvent) => errorsRef.current.push({ capturedAt: new Date().toISOString(), message: errorMessage(event.reason), source: "unhandledrejection" });
+    const onError = (event: ErrorEvent) =>
+      errorsRef.current.push({
+        capturedAt: new Date().toISOString(),
+        message: event.message,
+        source: "window.error",
+      });
+    const onRejection = (event: PromiseRejectionEvent) =>
+      errorsRef.current.push({
+        capturedAt: new Date().toISOString(),
+        message: errorMessage(event.reason),
+        source: "unhandledrejection",
+      });
     window.addEventListener("error", onError);
     window.addEventListener("unhandledrejection", onRejection);
     return () => {
@@ -207,7 +226,10 @@ export function useWasmResearch({
       runId: runIdRef.current,
       runtime,
     });
-    downloadBlob(new Blob([bytes], { type: "application/x-tar" }), createWasmResearchBundleFilename(gameKey, runIdRef.current, recordedAt));
+    downloadBlob(
+      new Blob([bytes], { type: "application/x-tar" }),
+      createWasmResearchBundleFilename(gameKey, runIdRef.current, recordedAt),
+    );
   }, [capabilities, gameKey, runtime]);
 
   return {
@@ -215,9 +237,7 @@ export function useWasmResearch({
     exportBundle,
     getMetrics: () => ({
       errors: errorsRef.current.length,
-      frames: summarizeWasmFrames(
-        recentFrameSamples(framesRef.current, frameCursorRef.current),
-      ),
+      frames: summarizeWasmFrames(recentFrameSamples(framesRef.current, frameCursorRef.current)),
       launch: launchRef.current,
       longTasks: longTasksRef.current.length,
     }),

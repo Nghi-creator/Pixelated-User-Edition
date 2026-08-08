@@ -66,7 +66,8 @@ function openSaveDatabase() {
       }
     };
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error || new Error("Could not open browser save storage."));
+    request.onerror = () =>
+      reject(request.error || new Error("Could not open browser save storage."));
   });
 }
 
@@ -74,9 +75,13 @@ export async function listWasmSaveRecords(gameKey: string) {
   const database = await openSaveDatabase();
   if (!database) return [];
   try {
-    const records = await requestResult(
-      database.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).index("gameKey").getAll(gameKey),
-    ) as WasmSaveRecord[];
+    const records = (await requestResult(
+      database
+        .transaction(STORE_NAME, "readonly")
+        .objectStore(STORE_NAME)
+        .index("gameKey")
+        .getAll(gameKey),
+    )) as WasmSaveRecord[];
     return records.sort((left, right) => left.slot - right.slot);
   } finally {
     database.close();
@@ -87,7 +92,9 @@ export async function putWasmSaveRecord(record: WasmSaveRecord) {
   const database = await openSaveDatabase();
   if (!database) throw new Error("This browser does not provide IndexedDB save storage.");
   try {
-    await requestResult(database.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).put(record));
+    await requestResult(
+      database.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).put(record),
+    );
   } finally {
     database.close();
   }
@@ -97,7 +104,12 @@ export async function deleteWasmSaveRecord(gameKey: string, slot: WasmSaveSlot) 
   const database = await openSaveDatabase();
   if (!database) return;
   try {
-    await requestResult(database.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).delete(`${gameKey}:${slot}`));
+    await requestResult(
+      database
+        .transaction(STORE_NAME, "readwrite")
+        .objectStore(STORE_NAME)
+        .delete(`${gameKey}:${slot}`),
+    );
   } finally {
     database.close();
   }

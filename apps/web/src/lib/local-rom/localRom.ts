@@ -15,14 +15,7 @@ export const LOCAL_VAULT_EXTENSIONS = [
 ];
 export const MAX_LOCAL_ROM_BYTES = 64 * 1024 * 1024;
 export type LocalRomSystemId =
-  | "nes"
-  | "gb"
-  | "gbc"
-  | "gba"
-  | "snes"
-  | "genesis"
-  | "sms"
-  | "game_gear";
+  "nes" | "gb" | "gbc" | "gba" | "snes" | "genesis" | "sms" | "game_gear";
 
 export const LOCAL_ROM_SYSTEMS: readonly {
   extensions: readonly string[];
@@ -53,14 +46,14 @@ export function validateLocalRomFile(file: Pick<File, "name" | "size"> | null) {
 
 export function detectLocalRomSystem(filename: string) {
   const lowerFilename = filename.toLowerCase();
-  return LOCAL_ROM_SYSTEMS.find((system) =>
-    system.extensions.some((extension) => lowerFilename.endsWith(extension)),
-  ) || null;
+  return (
+    LOCAL_ROM_SYSTEMS.find((system) =>
+      system.extensions.some((extension) => lowerFilename.endsWith(extension)),
+    ) || null
+  );
 }
 
-export async function inspectLocalRomFile(
-  file: Pick<File, "name" | "size" | "slice">,
-) {
+export async function inspectLocalRomFile(file: Pick<File, "name" | "size" | "slice">) {
   const validationError = validateLocalRomFile(file as File);
   if (validationError) throw new Error(validationError);
   const system = detectLocalRomSystem(file.name);

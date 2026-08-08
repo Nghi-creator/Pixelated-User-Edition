@@ -8,6 +8,7 @@ const manifest = JSON.parse(readFileSync("public/manifest.webmanifest", "utf8"))
   start_url: string;
 };
 const worker = readFileSync("public/sw.js", "utf8");
+const workerRegistration = readFileSync("src/lib/registerServiceWorker.ts", "utf8");
 const offlinePage = readFileSync("public/offline.html", "utf8");
 const offlineScript = readFileSync("public/offline.js", "utf8");
 
@@ -35,6 +36,14 @@ test("pinned cores revalidate automatically and retain an offline fallback", () 
   assert.match(worker, /return cached \|\| response/);
   assert.match(worker, /if \(cached\) return cached/);
   assert.doesNotMatch(worker, /core changes/);
+});
+
+test("app caches are release-scoped and old releases are removed", () => {
+  assert.match(workerRegistration, /searchParams\.set\("v", __APP_BUILD_ID__\)/);
+  assert.match(worker, /searchParams\.get\("v"\)/);
+  assert.match(worker, /key\.startsWith\(CACHE_PREFIX\)/);
+  assert.match(worker, /caches\.delete\(key\)/);
+  assert.match(worker, /\[SHELL_CACHE, ASSET_CACHE, CORE_CACHE\]\.includes\(key\)/);
 });
 
 test("service worker refreshes the app shell only from extensionless HTML routes", () => {

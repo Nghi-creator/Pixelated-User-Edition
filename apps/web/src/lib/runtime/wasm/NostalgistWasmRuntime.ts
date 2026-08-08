@@ -101,9 +101,8 @@ async function downloadRom(
   }
 
   const headerSize = Number(response.headers.get("content-length"));
-  const totalBytes = Number.isFinite(headerSize) && headerSize > 0
-    ? headerSize
-    : evidence.expectedSize;
+  const totalBytes =
+    Number.isFinite(headerSize) && headerSize > 0 ? headerSize : evidence.expectedSize;
   if (totalBytes !== evidence.expectedSize) {
     throw new Error(
       `ROM size mismatch: expected ${evidence.expectedSize} bytes, received ${totalBytes}.`,
@@ -130,10 +129,7 @@ async function downloadRom(
     const { done, value } = await reader.read();
     if (done) break;
     const nextLoadedBytes = loadedBytes + value.byteLength;
-    if (
-      nextLoadedBytes > MAX_NES_ROM_BYTES ||
-      nextLoadedBytes > evidence.expectedSize
-    ) {
+    if (nextLoadedBytes > MAX_NES_ROM_BYTES || nextLoadedBytes > evidence.expectedSize) {
       await reader.cancel();
       throw new Error(
         `ROM size mismatch: expected ${evidence.expectedSize} bytes, received more data.`,
@@ -176,22 +172,34 @@ export class NostalgistWasmRuntime implements GameRuntime {
     const timeoutId = globalThis.setTimeout(() => {
       launchTimedOut = true;
       abortController.abort();
-      rejectDeadline?.(new Error(`The browser emulator exceeded its safety deadline while ${deadlinePhase}.`));
+      rejectDeadline?.(
+        new Error(`The browser emulator exceeded its safety deadline while ${deadlinePhase}.`),
+      );
     }, this.options.launchTimeoutMs || WASM_LAUNCH_TIMEOUT_MS);
     const beforeDeadline = <T>(operation: Promise<T>) => Promise.race([operation, deadline]);
 
     try {
-      this.options.onProgress?.({ loadedBytes: 0, phase: "downloading", totalBytes: source.expectedSize || source.file?.size || null });
+      this.options.onProgress?.({
+        loadedBytes: 0,
+        phase: "downloading",
+        totalBytes: source.expectedSize || source.file?.size || null,
+      });
       deadlinePhase = "downloading the ROM";
       const bytes = await beforeDeadline(downloadRom(source, signal, this.options.onProgress));
-      this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "verifying", totalBytes: bytes.byteLength });
+      this.options.onProgress?.({
+        loadedBytes: bytes.byteLength,
+        phase: "verifying",
+        totalBytes: bytes.byteLength,
+      });
       deadlinePhase = "verifying the ROM";
       await beforeDeadline(validateBrowserRom(this.options.systemId || "nes", bytes, source));
       if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
 
       this.options.onProgress?.({ loadedBytes: 0, phase: "loading-core", totalBytes: null });
       deadlinePhase = "loading the emulator core";
-      const { Nostalgist: NostalgistApi } = await beforeDeadline((this.options.loadNostalgist || defaultLoader)());
+      const { Nostalgist: NostalgistApi } = await beforeDeadline(
+        (this.options.loadNostalgist || defaultLoader)(),
+      );
       if (signal.aborted) throw new DOMException("Launch cancelled", "AbortError");
       deadlinePhase = "preparing the emulator";
       const prepareOperation = NostalgistApi.prepare({
@@ -215,21 +223,29 @@ export class NostalgistWasmRuntime implements GameRuntime {
         signal,
         size: "auto",
       });
-      void prepareOperation.then((lateInstance) => {
-        if (signal.aborted && lateInstance !== this.instance) {
-          lateInstance.exit({ removeCanvas: false });
-        }
-      }).catch(() => undefined);
+      void prepareOperation
+        .then((lateInstance) => {
+          if (signal.aborted && lateInstance !== this.instance) {
+            lateInstance.exit({ removeCanvas: false });
+          }
+        })
+        .catch(() => undefined);
       const instance = await beforeDeadline(prepareOperation);
       if (signal.aborted) {
         instance.exit({ removeCanvas: false });
         throw new DOMException("Launch cancelled", "AbortError");
       }
       this.instance = instance;
-      this.options.onProgress?.({ loadedBytes: bytes.byteLength, phase: "ready", totalBytes: bytes.byteLength });
+      this.options.onProgress?.({
+        loadedBytes: bytes.byteLength,
+        phase: "ready",
+        totalBytes: bytes.byteLength,
+      });
     } catch (error) {
       if (launchTimedOut) {
-        throw new Error(`The browser emulator exceeded its safety deadline while ${deadlinePhase}.`);
+        throw new Error(
+          `The browser emulator exceeded its safety deadline while ${deadlinePhase}.`,
+        );
       }
       throw error;
     } finally {

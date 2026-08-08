@@ -12,11 +12,7 @@ export type WasmPlayerStatus =
   | "stopped"
   | "error";
 
-export type WasmRuntimePhase =
-  | "downloading"
-  | "verifying"
-  | "loading-core"
-  | "ready";
+export type WasmRuntimePhase = "downloading" | "verifying" | "loading-core" | "ready";
 
 export type WasmRuntimeProgress = {
   loadedBytes: number;
@@ -29,6 +25,4 @@ export type WasmRuntimeFactoryOptions = {
   onProgress?: (progress: WasmRuntimeProgress) => void;
 };
 
-export type WasmRuntimeFactory = (
-  options: WasmRuntimeFactoryOptions,
-) => Promise<GameRuntime>;
+export type WasmRuntimeFactory = (options: WasmRuntimeFactoryOptions) => Promise<GameRuntime>;

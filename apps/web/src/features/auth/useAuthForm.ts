@@ -187,9 +187,7 @@ export function useAuthForm({
         redirectTo: resetPasswordRedirectTo,
       });
       if (error) throw error;
-      setMessage(
-        "If this account supports password reset, a link will arrive shortly.",
-      );
+      setMessage("If this account supports password reset, a link will arrive shortly.");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(getAuthErrorMessage(err));

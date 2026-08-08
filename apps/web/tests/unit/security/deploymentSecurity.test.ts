@@ -10,6 +10,7 @@ type VercelConfig = {
 };
 
 const config = JSON.parse(readFileSync("vercel.json", "utf8")) as VercelConfig;
+const viteConfig = readFileSync("vite.config.ts", "utf8");
 const headers = new Map(
   config.headers.flatMap((entry) =>
     entry.headers.map((header) => [header.key, header.value] as const),
@@ -21,10 +22,7 @@ test("deployment CSP permits required WASM resources without broad network acces
   assert.match(csp, /script-src[^;]*'wasm-unsafe-eval'/);
   assert.match(csp, /worker-src 'self' blob:/);
   assert.doesNotMatch(csp, /cdn\.jsdelivr\.net/);
-  assert.match(
-    csp,
-    /connect-src[^;]*pixelated-api-services-6ovi\.onrender\.com/,
-  );
+  assert.match(csp, /connect-src[^;]*pixelated-api-services-6ovi\.onrender\.com/);
   assert.match(csp, /connect-src[^;]*https:\/\/\*\.supabase\.co/);
   assert.doesNotMatch(csp, /connect-src[^;]*http:/);
   assert.doesNotMatch(csp, /connect-src[^;]*\shttps:\s/);
@@ -44,4 +42,12 @@ test("emulator dependency is pinned exactly", () => {
     dependencies: Record<string, string>;
   };
   assert.equal(packageJson.dependencies.nostalgist, "0.21.0");
+});
+
+test("route-only dependencies are not forced into eager shared chunks", () => {
+  assert.match(viteConfig, /return "wasm-runtime"/);
+  assert.match(viteConfig, /return "supabase"/);
+  assert.doesNotMatch(viteConfig, /return "vendor"/);
+  assert.doesNotMatch(viteConfig, /react-icons/);
+  assert.doesNotMatch(viteConfig, /react-easy-crop/);
 });

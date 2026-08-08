@@ -19,7 +19,8 @@ export function useNavbarAccount() {
     });
   }, [permissions.data, user]);
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut(); navigate("/");
+    await supabase.auth.signOut();
+    navigate("/");
   }, [navigate]);
   return { profile: permissions.data?.profile, signOut, user };
 }

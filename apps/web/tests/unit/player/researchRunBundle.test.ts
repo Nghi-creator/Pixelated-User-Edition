@@ -6,10 +6,7 @@ import {
 } from "../../../src/lib/runtime/wasm/researchRunBundle.ts";
 
 function readAscii(bytes: Uint8Array, start: number, length: number) {
-  return String.fromCharCode(...bytes.slice(start, start + length)).replace(
-    /\0+$/g,
-    "",
-  );
+  return String.fromCharCode(...bytes.slice(start, start + length)).replace(/\0+$/g, "");
 }
 
 function readOctal(bytes: Uint8Array, start: number, length: number) {
@@ -37,10 +34,7 @@ test("research run bundle tar stores text and binary files", () => {
   assert.equal(readAscii(archive, 512, 6), "hello\n");
 
   const secondHeaderOffset = 1024;
-  assert.equal(
-    readAscii(archive, secondHeaderOffset, 100),
-    "performance-network.png",
-  );
+  assert.equal(readAscii(archive, secondHeaderOffset, 100), "performance-network.png");
   assert.equal(readOctal(archive, secondHeaderOffset + 124, 12), 3);
   assert.deepEqual(
     Array.from(archive.slice(secondHeaderOffset + 512, secondHeaderOffset + 515)),
@@ -57,7 +51,10 @@ test("research run bundle tar ends with two empty blocks", () => {
   ]);
   const ending = archive.slice(archive.length - 1024);
 
-  assert.equal(ending.every((value) => value === 0), true);
+  assert.equal(
+    ending.every((value) => value === 0),
+    true,
+  );
 });
 
 test("research run bundle filenames are filesystem-safe tar names", () => {

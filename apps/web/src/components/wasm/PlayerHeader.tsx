@@ -42,7 +42,8 @@ export function PlayerHeader({
   status,
   statusLabelOverride,
 }: PlayerHeaderProps) {
-  const statusLabel = statusLabelOverride ||
+  const statusLabel =
+    statusLabelOverride ||
     (status === "connecting"
       ? "Preparing Browser Runtime..."
       : status === "playing"
@@ -70,10 +71,7 @@ export function PlayerHeader({
   const rightsLinks = primaryRights ? (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
       {(primaryRights.code_license_spdx || primaryRights.asset_license_spdx) && (
-        <span>
-          License:{" "}
-          {primaryRights.code_license_spdx || primaryRights.asset_license_spdx}
-        </span>
+        <span>License: {primaryRights.code_license_spdx || primaryRights.asset_license_spdx}</span>
       )}
       {licenseUrl && (
         <a

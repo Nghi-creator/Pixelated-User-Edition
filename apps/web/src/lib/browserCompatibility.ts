@@ -25,11 +25,15 @@ export const PLATFORM_OPTIONS = [
 
 export function getPlatformLabel(platformId: string | null | undefined) {
   if (!platformId) return "Unknown system";
-  return PLATFORM_OPTIONS.find((platform) => platform.id === platformId)?.label ||
-    platformId.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return (
+    PLATFORM_OPTIONS.find((platform) => platform.id === platformId)?.label ||
+    platformId.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+  );
 }
 
-export function getBrowserGameCompatibility(game: ApiGame | null | undefined): BrowserGameCompatibility {
+export function getBrowserGameCompatibility(
+  game: ApiGame | null | undefined,
+): BrowserGameCompatibility {
   const build = game?.game_builds?.find((candidate) => candidate.enabled);
   const platformId = build?.platform_id || null;
   const platformLabel = getPlatformLabel(platformId);
@@ -49,7 +53,8 @@ export function getBrowserGameCompatibility(game: ApiGame | null | undefined): B
       label: "Desktop required",
       platformId,
       platformLabel,
-      reason: "This native Linux game requires Pixelated Studio Edition and cannot run in a hosted browser.",
+      reason:
+        "This native Linux game requires Pixelated Studio Edition and cannot run in a hosted browser.",
     };
   }
 
@@ -65,7 +70,8 @@ export function getBrowserGameCompatibility(game: ApiGame | null | undefined): B
       label: "Currently unavailable",
       platformId,
       platformLabel,
-      reason: "This build is missing the verified browser artifact metadata required for a safe launch.",
+      reason:
+        "This build is missing the verified browser artifact metadata required for a safe launch.",
     };
   }
 

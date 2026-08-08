@@ -16,3 +16,14 @@ export const setAuthScopedSession = (
 ) => {
   state.session = Promise.resolve(session);
 };
+
+export function clearCacheEntryOnRejection<T>(
+  promise: Promise<T>,
+  clearIfCurrent: (rejectedPromise: Promise<T>) => void,
+) {
+  const guardedPromise: Promise<T> = promise.catch((error) => {
+    clearIfCurrent(guardedPromise);
+    throw error;
+  });
+  return guardedPromise;
+}

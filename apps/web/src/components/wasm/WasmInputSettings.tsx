@@ -45,14 +45,18 @@ export function WasmInputSettings({
     let ready = false;
     const poll = () => {
       const gamepad = navigator.getGamepads?.().find((candidate) => candidate?.id === gamepadName);
-      const pressed = gamepad?.buttons
-        .map((button, index) => ({ index, pressed: button.pressed || button.value > 0.5 }))
-        .filter((button) => button.pressed) || [];
+      const pressed =
+        gamepad?.buttons
+          .map((button, index) => ({ index, pressed: button.pressed || button.value > 0.5 }))
+          .filter((button) => button.pressed) || [];
       if (!ready) {
         ready = pressed.length === 0;
       } else if (pressed[0]) {
         const error = onGamepadBindingChange(capturingGamepad, pressed[0].index);
-        setMessage(error || `${INPUT_ACTION_LABELS[capturingGamepad]} assigned to gamepad button ${pressed[0].index}.`);
+        setMessage(
+          error ||
+            `${INPUT_ACTION_LABELS[capturingGamepad]} assigned to gamepad button ${pressed[0].index}.`,
+        );
         setCapturingGamepad(null);
         return;
       }
@@ -79,17 +83,29 @@ export function WasmInputSettings({
       return;
     }
     const error = onKeyboardBindingChange(capturingKeyboard, event.code);
-    setMessage(error || `${INPUT_ACTION_LABELS[capturingKeyboard]} assigned to ${formatKeyboardCode(event.code)}.`);
+    setMessage(
+      error ||
+        `${INPUT_ACTION_LABELS[capturingKeyboard]} assigned to ${formatKeyboardCode(event.code)}.`,
+    );
     setCapturingKeyboard(null);
   };
 
   const content = (
     <div data-ignore-game-input>
-      <div className={`grid gap-6 ${variant === "inline" ? "border-t border-synth-border p-4" : ""}`}>
+      <div
+        className={`grid gap-6 ${variant === "inline" ? "border-t border-synth-border p-4" : ""}`}
+      >
         <section>
           <div className="flex items-center justify-between gap-3">
             <h3 className="font-bold text-white">Keyboard</h3>
-            <button className="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white disabled:opacity-50" disabled={disabled} onClick={onResetKeyboard} type="button"><RotateCcw className="h-3.5 w-3.5" /> Defaults</button>
+            <button
+              className="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white disabled:opacity-50"
+              disabled={disabled}
+              onClick={onResetKeyboard}
+              type="button"
+            >
+              <RotateCcw className="h-3.5 w-3.5" /> Defaults
+            </button>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {WASM_INPUT_ACTIONS.map((action) => (
@@ -102,7 +118,9 @@ export function WasmInputSettings({
                   onKeyDown={captureKeyboard}
                   type="button"
                 >
-                  {capturingKeyboard === action ? "Press key…" : formatKeyboardCode(keyboardMapping[action])}
+                  {capturingKeyboard === action
+                    ? "Press key…"
+                    : formatKeyboardCode(keyboardMapping[action])}
                 </button>
               </label>
             ))}
@@ -112,7 +130,14 @@ export function WasmInputSettings({
         <section>
           <div className="flex items-center justify-between gap-3">
             <h3 className="min-w-0 truncate font-bold text-white">{gamepadName || "Gamepad"}</h3>
-            <button className="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white disabled:opacity-50" disabled={disabled || !gamepadName} onClick={onResetGamepad} type="button"><RotateCcw className="h-3.5 w-3.5" /> Defaults</button>
+            <button
+              className="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white disabled:opacity-50"
+              disabled={disabled || !gamepadName}
+              onClick={onResetGamepad}
+              type="button"
+            >
+              <RotateCcw className="h-3.5 w-3.5" /> Defaults
+            </button>
           </div>
           {gamepadName ? (
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -129,18 +154,25 @@ export function WasmInputSettings({
                     }}
                     type="button"
                   >
-                    {capturingGamepad === action ? "Press button…" : `Button ${gamepadMapping[action]}`}
+                    {capturingGamepad === action
+                      ? "Press button…"
+                      : `Button ${gamepadMapping[action]}`}
                   </button>
                 </label>
               ))}
             </div>
           ) : (
-            <p className="mt-3 rounded-md border border-synth-border bg-synth-bg/60 p-3 text-sm text-gray-400">Connect a gamepad to create a mapping for that controller.</p>
+            <p className="mt-3 rounded-md border border-synth-border bg-synth-bg/60 p-3 text-sm text-gray-400">
+              Connect a gamepad to create a mapping for that controller.
+            </p>
           )}
         </section>
       </div>
       <div className="border-t border-synth-border px-4 py-3 text-xs text-gray-400">
-        {disabled ? "Stop the game before changing input mappings." : message || "Mappings are stored only in this browser. Duplicate keys or buttons are rejected."}
+        {disabled
+          ? "Stop the game before changing input mappings."
+          : message ||
+            "Mappings are stored only in this browser. Duplicate keys or buttons are rejected."}
       </div>
     </div>
   );

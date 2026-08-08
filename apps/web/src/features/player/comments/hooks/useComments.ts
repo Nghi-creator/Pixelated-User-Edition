@@ -12,22 +12,17 @@ import { getSocialErrorMessage } from "../../socialFeedback";
 export function useComments(gameId: string | undefined, currentUser: User | null) {
   const [newComment, setNewComment] = useState("");
   const [commentsError, setCommentsError] = useState("");
-  const [pendingCommentIds, setPendingCommentIds] = useState<Set<string>>(
-    () => new Set(),
-  );
+  const [pendingCommentIds, setPendingCommentIds] = useState<Set<string>>(() => new Set());
   const pendingCommentIdsRef = useRef(new Set<string>());
 
   const commentsQuery = useGameCommentsQuery<GameComment>(gameId);
-  const comments =
-    commentsQuery.data?.pages.flatMap((page) => page.comments) || [];
+  const comments = commentsQuery.data?.pages.flatMap((page) => page.comments) || [];
   const hasMoreComments = Boolean(commentsQuery.hasNextPage);
 
   const postCommentMutation = usePostCommentMutation(gameId, {
     onError: (err) => {
       console.error(err);
-      setCommentsError(
-        getSocialErrorMessage(err, "Failed to post comment. Try again."),
-      );
+      setCommentsError(getSocialErrorMessage(err, "Failed to post comment. Try again."));
     },
     onSuccess: () => {
       setNewComment("");
@@ -37,18 +32,14 @@ export function useComments(gameId: string | undefined, currentUser: User | null
   const deleteCommentMutation = useDeleteCommentMutation(gameId, {
     onError: (err) => {
       console.error(err);
-      setCommentsError(
-        getSocialErrorMessage(err, "Failed to delete comment. Try again."),
-      );
+      setCommentsError(getSocialErrorMessage(err, "Failed to delete comment. Try again."));
     },
   });
 
   const commentReactionMutation = useSetCommentReactionMutation(gameId, {
     onError: (err) => {
       console.error(err);
-      setCommentsError(
-        getSocialErrorMessage(err, "Failed to update reaction. Try again."),
-      );
+      setCommentsError(getSocialErrorMessage(err, "Failed to update reaction. Try again."));
     },
   });
 
@@ -121,10 +112,7 @@ export function useComments(gameId: string | undefined, currentUser: User | null
     commentsError:
       commentsError ||
       (commentsQuery.isError
-        ? getSocialErrorMessage(
-            commentsQuery.error,
-            "Could not load comments. Try again.",
-          )
+        ? getSocialErrorMessage(commentsQuery.error, "Could not load comments. Try again.")
         : ""),
     isLoadingComments: commentsQuery.isLoading,
     isLoadingMoreComments: commentsQuery.isFetchingNextPage,

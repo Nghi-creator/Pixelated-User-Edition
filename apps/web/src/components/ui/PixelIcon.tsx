@@ -1,10 +1,4 @@
-type PixelIconName =
-  | "brand"
-  | "favorites"
-  | "gamepad"
-  | "logs"
-  | "profile"
-  | "vault";
+type PixelIconName = "brand" | "favorites" | "gamepad" | "logs" | "profile" | "vault";
 
 type PixelIconProps = React.SVGProps<SVGSVGElement> & {
   name: PixelIconName;
@@ -21,12 +15,7 @@ const sharedProps = {
 
 export function PixelIcon({ name, ...props }: PixelIconProps) {
   return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      viewBox="0 0 24 24"
-      {...props}
-    >
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" {...props}>
       {name === "brand" && (
         <>
           <path
@@ -39,10 +28,7 @@ export function PixelIcon({ name, ...props }: PixelIconProps) {
 
       {name === "gamepad" && (
         <>
-          <path
-            {...sharedProps}
-            d="M7 9h10l3 2.5v5L18 19h-3l-2-2h-2l-2 2H6l-2-2.5v-5z"
-          />
+          <path {...sharedProps} d="M7 9h10l3 2.5v5L18 19h-3l-2-2h-2l-2 2H6l-2-2.5v-5z" />
           <path {...sharedProps} d="M7.5 13h4M9.5 11v4" />
           <path fill="currentColor" d="M15 12h2v2h-2zM17 14h2v2h-2z" />
           <path fill="currentColor" d="M7 9h2v2H7zM15 17h3v2h-3z" opacity="0.28" />

@@ -16,17 +16,8 @@ export function usePlayerNavigation(location: Location, gameId?: string) {
   const backState = isPlayerBackState(location.state) ? location.state : null;
 
   return {
-    backRoute:
-      typeof backState?.backRoute === "string"
-        ? backState.backRoute
-        : fallbackBackRoute,
-    backText:
-      typeof backState?.backText === "string"
-        ? backState.backText
-        : fallbackBackText,
-    lobbySearch: useMemo(
-      () => new URLSearchParams(location.search),
-      [location.search],
-    ),
+    backRoute: typeof backState?.backRoute === "string" ? backState.backRoute : fallbackBackRoute,
+    backText: typeof backState?.backText === "string" ? backState.backText : fallbackBackText,
+    lobbySearch: useMemo(() => new URLSearchParams(location.search), [location.search]),
   };
 }

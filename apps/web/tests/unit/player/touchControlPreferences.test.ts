@@ -40,17 +40,11 @@ test("touch controls fall back when browser storage is blocked", () => {
     preset: "large",
     swapButtons: false,
   });
-  assert.equal(
-    writeTouchControlPreference("game", "preset", "compact", blockedStorage),
-    false,
-  );
+  assert.equal(writeTouchControlPreference("game", "preset", "compact", blockedStorage), false);
 });
 
 test("touch controls persist preferences when storage is available", () => {
   const storage = memoryStorage();
-  assert.equal(
-    writeTouchControlPreference("game", "preset", "contrast", storage),
-    true,
-  );
+  assert.equal(writeTouchControlPreference("game", "preset", "contrast", storage), true);
   assert.equal(storage.values.get("game:preset"), "contrast");
 });

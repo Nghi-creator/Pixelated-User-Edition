@@ -9,13 +9,7 @@ type WasmResearchPanelProps = {
   variant?: "inline" | "sidebar";
 };
 
-function ResearchPanelContent({
-  research,
-  sidebar,
-}: {
-  research: WasmResearch;
-  sidebar: boolean;
-}) {
+function ResearchPanelContent({ research, sidebar }: { research: WasmResearch; sidebar: boolean }) {
   const [, refresh] = useReducer((value) => value + 1, 0);
   useEffect(() => {
     if (!research.consented) return;
@@ -23,8 +17,7 @@ function ResearchPanelContent({
     return () => window.clearInterval(timer);
   }, [research.consented]);
   const metrics = research.getMetrics();
-  const formatMs = (value: number | null) =>
-    value === null ? "—" : `${Math.round(value)} ms`;
+  const formatMs = (value: number | null) => (value === null ? "—" : `${Math.round(value)} ms`);
 
   return (
     <div className="mt-4 space-y-4">
@@ -36,12 +29,9 @@ function ResearchPanelContent({
           type="checkbox"
         />
         <span>
-          <strong className="block text-white">
-            Opt in to local measurement recording
-          </strong>
-          Records launch timings, frame pacing, long tasks, runtime errors, and
-          supported browser capability fields. Data remains in this tab until
-          you export it.
+          <strong className="block text-white">Opt in to local measurement recording</strong>
+          Records launch timings, frame pacing, long tasks, runtime errors, and supported browser
+          capability fields. Data remains in this tab until you export it.
         </span>
       </label>
       {research.consented && (
@@ -53,9 +43,7 @@ function ResearchPanelContent({
           >
             <span className="rounded border border-synth-border bg-synth-bg p-2">
               ROM download
-              <strong className="block text-white">
-                {formatMs(metrics.launch.romDownloadMs)}
-              </strong>
+              <strong className="block text-white">{formatMs(metrics.launch.romDownloadMs)}</strong>
             </span>
             <span className="rounded border border-synth-border bg-synth-bg p-2">
               ROM verification
@@ -65,9 +53,7 @@ function ResearchPanelContent({
             </span>
             <span className="rounded border border-synth-border bg-synth-bg p-2">
               Core load
-              <strong className="block text-white">
-                {formatMs(metrics.launch.coreLoadMs)}
-              </strong>
+              <strong className="block text-white">{formatMs(metrics.launch.coreLoadMs)}</strong>
             </span>
             <span className="rounded border border-synth-border bg-synth-bg p-2">
               First frame
@@ -77,9 +63,7 @@ function ResearchPanelContent({
             </span>
             <span className="rounded border border-synth-border bg-synth-bg p-2">
               Frame samples
-              <strong className="block text-white">
-                {metrics.frames.sampleCount}
-              </strong>
+              <strong className="block text-white">{metrics.frames.sampleCount}</strong>
             </span>
             <span className="rounded border border-synth-border bg-synth-bg p-2">
               Approx. FPS

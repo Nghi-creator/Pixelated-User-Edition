@@ -83,9 +83,7 @@ export default function ResetPassword() {
       <div className="min-h-[85vh] flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-synth-surface border border-synth-border rounded-lg shadow-card p-12 text-center">
           <CheckCircle2 className="w-16 h-16 text-[#C02066] mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Password Updated
-          </h2>
+          <h2 className="text-3xl font-bold text-white mb-2">Password Updated</h2>
           <p className="text-gray-400">Taking you back to your library...</p>
         </div>
       </div>
@@ -96,16 +94,9 @@ export default function ResetPassword() {
     <div className="min-h-[85vh] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-synth-surface border border-synth-border rounded-lg shadow-card p-8">
         <div className="text-center mb-8">
-          <PixelIcon
-            className="mx-auto mb-4 h-12 w-12 text-synth-secondary"
-            name="brand"
-          />
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Create New Password
-          </h2>
-          <p className="text-gray-400">
-            Enter a strong password for your account.
-          </p>
+          <PixelIcon className="mx-auto mb-4 h-12 w-12 text-synth-secondary" name="brand" />
+          <h2 className="text-3xl font-bold text-white mb-2">Create New Password</h2>
+          <p className="text-gray-400">Enter a strong password for your account.</p>
         </div>
 
         {error && (
@@ -128,9 +119,7 @@ export default function ResetPassword() {
             />
           </div>
 
-          <p className="-mt-2 text-xs leading-5 text-gray-400">
-            {PASSWORD_POLICY_HINT}
-          </p>
+          <p className="-mt-2 text-xs leading-5 text-gray-400">{PASSWORD_POLICY_HINT}</p>
 
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
@@ -150,11 +139,7 @@ export default function ResetPassword() {
             disabled={loading}
             className="w-full bg-synth-primary hover:bg-synth-primary-hover text-white font-bold py-3 rounded-lg transition-all flex justify-center items-center mt-6 active:scale-[0.99]"
           >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              "Update Password"
-            )}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Update Password"}
           </button>
         </form>
       </div>

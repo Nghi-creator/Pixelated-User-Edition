@@ -17,9 +17,7 @@ export function AuthSocialActions({
     <>
       <div className="my-6 flex items-center">
         <div className="flex-grow border-t border-synth-border" />
-        <span className="px-3 text-sm uppercase tracking-wider text-white">
-          Or continue with
-        </span>
+        <span className="px-3 text-sm uppercase tracking-wider text-white">Or continue with</span>
         <div className="flex-grow border-t border-synth-border" />
       </div>
 
@@ -47,9 +45,7 @@ export function AuthSocialActions({
           onClick={onToggleAuthMode}
           className="text-white/80 hover:text-white text-sm transition-colors"
         >
-          {isLogin
-            ? "Don't have an account? Sign up"
-            : "Already have an account? Sign in"}
+          {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
         </button>
 
         <div className="block">

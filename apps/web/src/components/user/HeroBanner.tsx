@@ -1,18 +1,8 @@
-import {
-  Play,
-  Plus,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  Pause,
-} from "lucide-react";
+import { Play, Plus, Check, ChevronLeft, ChevronRight, Loader2, Pause } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFavorite } from "../../hooks/useFavorite";
-import {
-  GameArtworkFallback,
-} from "./GameArtworkFallback";
+import { GameArtworkFallback } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
 import { useFeaturedCarousel } from "./useFeaturedCarousel";
 import { getGamePlayPath } from "../../lib/appUrl";
@@ -29,9 +19,7 @@ interface HeroBannerProps {
 }
 
 export default function HeroBanner({ featuredGames }: HeroBannerProps) {
-  const [failedArtworkIds, setFailedArtworkIds] = useState<Set<string>>(
-    () => new Set(),
-  );
+  const [failedArtworkIds, setFailedArtworkIds] = useState<Set<string>>(() => new Set());
   const [favoriteError, setFavoriteError] = useState("");
   const carousel = useFeaturedCarousel(featuredGames.length);
   const navigate = useNavigate();
@@ -61,9 +49,7 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
   };
 
   if (!featuredGames || featuredGames.length === 0) {
-    return (
-      <div className="w-full h-[360px] md:h-[440px] bg-synth-bg animate-pulse" />
-    );
+    return <div className="w-full h-[360px] md:h-[440px] bg-synth-bg animate-pulse" />;
   }
 
   return (
