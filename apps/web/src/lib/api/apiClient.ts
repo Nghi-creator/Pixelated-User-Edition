@@ -5,6 +5,7 @@ import {
   withTimeout,
 } from "./requestLifecycle";
 import {
+  clearCacheEntryOnRejection,
   clearAuthScopedCache,
   setAuthScopedSession,
 } from "../auth/authCache";
@@ -201,12 +202,17 @@ export async function getCachedPermissions(): Promise<ApiPermissionsResponse> {
     return authScopedCache.permissions.promise;
   }
 
-  const promise = apiRequest<ApiPermissionsResponse>("/me/permissions").then(
+  const request = apiRequest<ApiPermissionsResponse>("/me/permissions").then(
     (value) => {
       if (authScopedCache.permissions) authScopedCache.permissions.value = value;
       return value;
     },
   );
+  const promise = clearCacheEntryOnRejection(request, (rejectedPromise) => {
+    if (authScopedCache.permissions?.promise === rejectedPromise) {
+      authScopedCache.permissions = null;
+    }
+  });
   authScopedCache.permissions = {
     expiresAt: Date.now() + CLIENT_CACHE_TTL_MS,
     promise,
@@ -225,7 +231,7 @@ async function getFavoriteIds(): Promise<Set<string>> {
     return authScopedCache.favorites.promise;
   }
 
-  const promise = apiRequest<{ favorites: FavoriteLike[] }>("/favorites").then(
+  const request = apiRequest<{ favorites: FavoriteLike[] }>("/favorites").then(
     ({ favorites }) => {
       const favoriteIds = new Set(
         favorites
@@ -236,6 +242,11 @@ async function getFavoriteIds(): Promise<Set<string>> {
       return favoriteIds;
     },
   );
+  const promise = clearCacheEntryOnRejection(request, (rejectedPromise) => {
+    if (authScopedCache.favorites?.promise === rejectedPromise) {
+      authScopedCache.favorites = null;
+    }
+  });
 
   authScopedCache.favorites = {
     expiresAt: Date.now() + CLIENT_CACHE_TTL_MS,

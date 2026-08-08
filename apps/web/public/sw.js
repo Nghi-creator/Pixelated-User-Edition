@@ -1,5 +1,6 @@
-// Change only when the cache schema changes. Core files revalidate on every launch.
-const CACHE_VERSION = "2";
+// The app registers this worker with a build ID so old release caches can be removed.
+// Core files remain shared across releases and revalidate on every launch.
+const CACHE_VERSION = new URL(self.location.href).searchParams.get("v") || "development";
 const CACHE_PREFIX = "pixelated-user-";
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `${CACHE_PREFIX}assets-${CACHE_VERSION}`;

@@ -10,6 +10,7 @@ type VercelConfig = {
 };
 
 const config = JSON.parse(readFileSync("vercel.json", "utf8")) as VercelConfig;
+const viteConfig = readFileSync("vite.config.ts", "utf8");
 const headers = new Map(
   config.headers.flatMap((entry) =>
     entry.headers.map((header) => [header.key, header.value] as const),
@@ -44,4 +45,12 @@ test("emulator dependency is pinned exactly", () => {
     dependencies: Record<string, string>;
   };
   assert.equal(packageJson.dependencies.nostalgist, "0.21.0");
+});
+
+test("route-only dependencies are not forced into eager shared chunks", () => {
+  assert.match(viteConfig, /return "wasm-runtime"/);
+  assert.match(viteConfig, /return "supabase"/);
+  assert.doesNotMatch(viteConfig, /return "vendor"/);
+  assert.doesNotMatch(viteConfig, /react-icons/);
+  assert.doesNotMatch(viteConfig, /react-easy-crop/);
 });
