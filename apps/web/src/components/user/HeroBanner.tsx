@@ -15,7 +15,7 @@ import {
 } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
 import { useFeaturedCarousel } from "./useFeaturedCarousel";
-import { getGamePlayPath } from "../../lib/navigation/appUrl";
+import { getGamePlayPath } from "../../lib/appUrl";
 
 interface Game {
   id: string;

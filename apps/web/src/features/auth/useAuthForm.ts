@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/auth/supabaseClient";
-import { getPublicAppUrl } from "../../lib/navigation/appUrl";
+import { getPublicAppUrl } from "../../lib/appUrl";
 import { getPasswordPolicyError } from "../../lib/auth/passwordPolicy";
 import { isAuthCaptchaEnabled } from "../../lib/auth/captchaConfig";
 
