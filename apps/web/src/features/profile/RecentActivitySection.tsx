@@ -2,7 +2,7 @@ import { Clock3, Loader2, Monitor, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GameArtworkFallback } from "../../components/user/GameArtworkFallback";
 import type { ProfileSettingsState } from "./ProfileSettingsState";
-import { getGamePlayPath } from "../../lib/navigation/appUrl";
+import { getGamePlayPath } from "../../lib/appUrl";
 
 export function RecentActivitySection({ profile }: { profile: ProfileSettingsState }) {
   if (profile.activityLoading) return <section className="rounded-lg border border-synth-border bg-[#2B1720] p-6 shadow-card"><div className="flex items-center gap-2 text-sm font-semibold text-gray-300" role="status"><Loader2 className="h-4 w-4 animate-spin" />Loading recent activity…</div></section>;

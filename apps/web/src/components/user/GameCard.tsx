@@ -7,7 +7,7 @@ import {
 } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
 import type { BrowserGameCompatibility } from "../../lib/browserCompatibility";
-import { getGamePlayPath } from "../../lib/navigation/appUrl";
+import { getGamePlayPath } from "../../lib/appUrl";
 
 interface GameCardProps {
   id: string;
