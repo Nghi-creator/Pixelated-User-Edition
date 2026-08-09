@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  MAX_API_JSON_BYTES,
   MAX_BROWSER_ARTIFACT_BYTES,
   readBoundedResponseBlob,
+  readBoundedResponseText,
 } from "../../../src/lib/api/boundedResponse.ts";
 
 test("bounded response reader accepts an exact streamed artifact", async () => {
@@ -42,4 +44,22 @@ test("bounded response reader rejects a mismatched content length immediately", 
   });
 
   await assert.rejects(readBoundedResponseBlob(response, 2), /size mismatch/);
+});
+
+test("bounded text reader accepts JSON within the response limit", async () => {
+  const response = new Response('{"ok":true}', {
+    headers: { "content-length": "11" },
+  });
+
+  assert.equal(await readBoundedResponseText(response), '{"ok":true}');
+});
+
+test("bounded text reader rejects declared and streamed oversized API responses", async () => {
+  await assert.rejects(
+    readBoundedResponseText(
+      new Response("{}", { headers: { "content-length": String(MAX_API_JSON_BYTES + 1) } }),
+    ),
+    /safety limit/,
+  );
+  await assert.rejects(readBoundedResponseText(new Response("oversized"), 4), /safety limit/);
 });
