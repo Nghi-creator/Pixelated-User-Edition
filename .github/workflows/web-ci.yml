@@ -7,10 +7,8 @@ on:
     paths:
       - "apps/web/**"
       - ".github/workflows/web-ci.yml"
+
   pull_request:
-    paths:
-      - "apps/web/**"
-      - ".github/workflows/web-ci.yml"
   workflow_dispatch:
 
 permissions:
