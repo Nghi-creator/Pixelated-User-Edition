@@ -1,0 +1,162 @@
+<mxfile host="app.diagrams.net" agent="Codex" pages="1">
+  <diagram id="user-edition-architecture" name="01 - User Edition Architecture">
+    <mxGraphModel dx="1780" dy="1020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="user-baseline" parent="0" value="User Edition" />
+
+        <mxCell id="cloud-zone" parent="user-baseline" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7F9FC;strokeColor=#A9B5C6;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=16;spacingTop=14;fontFamily=Helvetica;fontSize=17;fontStyle=1;fontColor=#344154;" value="HOSTED CLOUD" vertex="1">
+          <mxGeometry height="650" width="380" x="40" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="browser-zone" parent="user-baseline" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F5FAF7;strokeColor=#7FA18C;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=16;spacingTop=14;fontFamily=Helvetica;fontSize=17;fontStyle=1;fontColor=#304B39;" value="USER DEVICE / BROWSER" vertex="1">
+          <mxGeometry height="650" width="1100" x="460" y="115" as="geometry" />
+        </mxCell>
+
+        <mxCell id="hosted-web" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EAF2FF;strokeColor=#3574C4;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=15;fontColor=#173A65;spacing=8;" value="&lt;b&gt;Hosted Web Delivery&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52657A&quot;&gt;Vercel • React / Vite bundle • security headers&lt;/font&gt;" vertex="1">
+          <mxGeometry height="85" width="300" x="80" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-api" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EAF2FF;strokeColor=#3574C4;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=15;fontColor=#173A65;spacing=8;" value="&lt;b&gt;Shared Hosted API / Control Plane&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52657A&quot;&gt;Studio-owned: catalog, profiles, social, sessions, telemetry&lt;/font&gt;" vertex="1">
+          <mxGeometry height="100" width="300" x="80" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="supabase" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EDF7F3;strokeColor=#3B8B6A;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=15;fontColor=#235D47;spacing=8;" value="&lt;b&gt;Supabase&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52657A&quot;&gt;Auth • Postgres • Storage • RLS&lt;/font&gt;" vertex="1">
+          <mxGeometry height="85" width="300" x="80" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="turnstile" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#D3A33A;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#654E16;spacing=7;" value="&lt;b&gt;Cloudflare Turnstile&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#6B6250&quot;&gt;Optional auth challenge&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="300" x="80" y="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spa" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EAF7EF;strokeColor=#3A8A61;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=15;fontColor=#245A40;spacing=8;" value="&lt;b&gt;User Edition SPA&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#526B5B&quot;&gt;Routes, catalog, profile, favorites, community, player UI&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="280" x="500" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="client-services" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EAF7EF;strokeColor=#3A8A61;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#245A40;spacing=7;" value="&lt;b&gt;Browser Data Services&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#526B5B&quot;&gt;Supabase auth • bounded API client • Zod • React Query&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="300" x="820" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="pwa" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F0F1F3;strokeColor=#626B78;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#2F3742;spacing=7;" value="&lt;b&gt;PWA / Service Worker&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5F6570&quot;&gt;App shell + versioned assets + pinned core cache&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="300" x="1200" y="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="runtime-boundary" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8D96A3;strokeWidth=2;dashed=1;dashPattern=8 4;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#525B68;" value="IN-TAB WEBASSEMBLY GAME RUNTIME" vertex="1">
+          <mxGeometry height="385" width="650" x="500" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="rom-validation" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EAF2FF;strokeColor=#356AC3;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#244B89;spacing=6;" value="&lt;b&gt;ROM Source + Validation&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52657A&quot;&gt;64 MB bound • header • size • SHA-256&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="520" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="nostalgist" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=#596574;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#26313F;spacing=6;" value="&lt;b&gt;Nostalgist Runtime Adapter&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5F6570&quot;&gt;Lazy load • lifecycle • progress • controls&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="730" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="cores" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=#596574;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#26313F;spacing=6;" value="&lt;b&gt;Pinned Libretro WASM Cores&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5F6570&quot;&gt;FCEUmm: NES&lt;br&gt;Gambatte: GB / GBC&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="940" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="input" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#EAF2FF;strokeColor=#356AC3;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#244B89;spacing=6;" value="&lt;b&gt;Player Input&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52657A&quot;&gt;Keyboard • gamepad • touch • remapping&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="520" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="display" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ECF8F1;strokeColor=#33825D;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#20583F;spacing=6;" value="&lt;b&gt;Local Render + Audio&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5F6570&quot;&gt;Canvas • WebAudio • fullscreen • frame telemetry&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="730" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="runtime-state" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#D3A33A;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#654E16;spacing=6;" value="&lt;b&gt;Local Runtime State&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#6B6250&quot;&gt;Save slots • battery RAM • research export&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="940" y="545" as="geometry" />
+        </mxCell>
+
+        <mxCell id="local-rom" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#D3A33A;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#654E16;spacing=7;" value="&lt;b&gt;Personal ROM Picker&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#6B6250&quot;&gt;File object stays in browser memory; never uploaded&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="300" x="1200" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="browser-storage" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#D3A33A;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#654E16;spacing=7;" value="&lt;b&gt;Browser-Local Storage&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#6B6250&quot;&gt;IndexedDB: save states + recent metadata&lt;br&gt;local/session storage: mappings + tracker state&lt;/font&gt;" vertex="1">
+          <mxGeometry height="105" width="300" x="1200" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="privacy-boundary" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F0F1F3;strokeColor=#626B78;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#2F3742;spacing=6;" value="No Electron • no Docker engine • no LAN pairing • no WebRTC stream" vertex="1">
+          <mxGeometry height="48" width="300" x="1200" y="660" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-web-spa" edge="1" parent="user-baseline" source="hosted-web" target="spa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=12;fontColor=#4E5866;" value="load application">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-spa-services" edge="1" parent="user-baseline" source="spa" target="client-services" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#4E5866;" value="UI state + queries">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-services-api" edge="1" parent="user-baseline" source="shared-api" target="client-services" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=12;fontColor=#4E5866;" value="HTTPS JSON + bearer auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-supabase" edge="1" parent="user-baseline" source="shared-api" target="supabase" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#64766D;strokeWidth=2;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=12;fontColor=#4F6257;" value="data + policy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-services-supabase" edge="1" parent="user-baseline" source="supabase" target="client-services" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#64766D;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#4F6257;" value="auth session + avatar storage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-turnstile-services" edge="1" parent="user-baseline" source="turnstile" target="client-services" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#A17A27;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#654E16;" value="challenge token">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-spa-runtime" edge="1" parent="user-baseline" source="spa" target="rom-validation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#4E5866;" value="launch / lifecycle">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-runtime" edge="1" parent="user-baseline" source="shared-api" target="rom-validation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#4E5866;" value="browser session + immutable metadata">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-supabase-rom" edge="1" parent="user-baseline" source="supabase" target="rom-validation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2E8B57;strokeWidth=3;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#20583F;" value="catalog ROM via short-lived URL">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-local-rom" edge="1" parent="user-baseline" source="local-rom" target="rom-validation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#A17A27;strokeWidth=3;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#654E16;" value="local File (memory only)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-validation-adapter" edge="1" parent="user-baseline" source="rom-validation" target="nostalgist" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2E8B57;strokeWidth=3;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#20583F;" value="verified bytes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-adapter-cores" edge="1" parent="user-baseline" source="nostalgist" target="cores" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2E8B57;strokeWidth=3;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#20583F;" value="load + execute">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-input-cores" edge="1" parent="user-baseline" source="input" target="cores" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#356AC3;strokeWidth=3;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#244B89;" value="input events">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-cores-display" edge="1" parent="user-baseline" source="cores" target="display" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2E8B57;strokeWidth=4;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#20583F;" value="frames + audio">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-cores-state" edge="1" parent="user-baseline" source="cores" target="runtime-state" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#A17A27;strokeWidth=2;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#654E16;" value="save / restore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-state-storage" edge="1" parent="user-baseline" source="runtime-state" target="browser-storage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#A17A27;strokeWidth=2;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#654E16;" value="local persistence">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-input-storage" edge="1" parent="user-baseline" source="input" target="browser-storage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#A17A27;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#654E16;" value="mapping preferences">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-pwa-cores" edge="1" parent="user-baseline" source="pwa" target="cores" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=11;fontColor=#4E5866;" value="same-origin core cache">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="title" parent="user-baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=28;fontColor=#18212F;" value="&lt;b&gt;PIXELATED User Edition Browser-Native Architecture&lt;/b&gt;" vertex="1">
+          <mxGeometry height="42" width="1000" x="40" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="user-baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#5E6673;" value="Shared hosted control plane + browser-resident WebAssembly gameplay + privacy-preserving local storage" vertex="1">
+          <mxGeometry height="28" width="1100" x="42" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-game" parent="user-baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=#20583F;fontStyle=1;" value="Game data / render" vertex="1">
+          <mxGeometry height="25" width="125" x="60" y="805" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-game-line" edge="1" parent="user-baseline" style="endArrow=block;endFill=1;strokeColor=#2E8B57;strokeWidth=4;" value="">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="185" y="818" as="sourcePoint" /><mxPoint x="250" y="818" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="legend-input" parent="user-baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=#244B89;fontStyle=1;" value="Input" vertex="1">
+          <mxGeometry height="25" width="55" x="290" y="805" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-input-line" edge="1" parent="user-baseline" style="endArrow=block;endFill=1;strokeColor=#356AC3;strokeWidth=3;" value="">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="345" y="818" as="sourcePoint" /><mxPoint x="410" y="818" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="legend-control" parent="user-baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=#4E5866;fontStyle=1;" value="Control / API" vertex="1">
+          <mxGeometry height="25" width="95" x="450" y="805" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-control-line" edge="1" parent="user-baseline" style="endArrow=block;endFill=1;strokeColor=#646E7C;strokeWidth=2;dashed=1;" value="">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="550" y="818" as="sourcePoint" /><mxPoint x="615" y="818" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="legend-local" parent="user-baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=#654E16;fontStyle=1;" value="Browser-local" vertex="1">
+          <mxGeometry height="25" width="95" x="655" y="805" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-local-line" edge="1" parent="user-baseline" style="endArrow=block;endFill=1;strokeColor=#A17A27;strokeWidth=3;" value="">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="750" y="818" as="sourcePoint" /><mxPoint x="815" y="818" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="note" parent="user-baseline" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#D3A33A;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=13;fontColor=#654E16;spacing=6;" value="Game execution, input, rendering, measurements, and personal ROM bytes stay on the user device; only shared account and community state uses the hosted services." vertex="1">
+          <mxGeometry height="50" width="680" x="860" y="795" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
