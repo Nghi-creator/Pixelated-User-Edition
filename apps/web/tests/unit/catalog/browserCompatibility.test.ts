@@ -46,6 +46,12 @@ test("marks native and unsupported libretro systems as desktop-only", () => {
     ).kind,
     "desktop",
   );
+  assert.equal(
+    getBrowserGameCompatibility(
+      game({ artifact_filename: "game.gba", platform_id: "gba", runtime_id: "mgba" }),
+    ).label,
+    "Desktop required",
+  );
 });
 
 test("marks missing verification metadata as unavailable", () => {

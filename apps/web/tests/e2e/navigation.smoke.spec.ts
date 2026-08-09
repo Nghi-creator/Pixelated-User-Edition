@@ -60,6 +60,64 @@ test("malformed catalog responses fail closed without crashing the app shell", a
   await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
 });
 
+test("featured Studio-only games do not expose a browser play action", async ({ page }) => {
+  const desktopGame = {
+    cover_url: "",
+    game_builds: [
+      {
+        artifact_filename: "featured.gba",
+        artifact_sha256: "a".repeat(64),
+        artifact_size: 1024,
+        artifact_url: "https://example.com/featured.gba",
+        enabled: true,
+        game_id: "featured",
+        id: "build",
+        platform_id: "gba",
+        runtime_id: "mgba",
+        runtime_kind: "libretro",
+      },
+    ],
+    id: "featured",
+    title: "Studio Feature",
+  };
+
+  await page.route("http://127.0.0.1:4000/games/featured", async (route) => {
+    await route.fulfill({
+      body: JSON.stringify({ featuredGames: [desktopGame] }),
+      contentType: "application/json",
+      status: 200,
+    });
+  });
+  await page.route("http://127.0.0.1:4000/games/filters", async (route) => {
+    await route.fulfill({
+      body: JSON.stringify({ genres: [], licenses: [] }),
+      contentType: "application/json",
+      status: 200,
+    });
+  });
+  await page.route("http://127.0.0.1:4000/games?**", async (route) => {
+    await route.fulfill({
+      body: JSON.stringify({
+        featuredGames: [desktopGame],
+        games: [desktopGame],
+        page: 1,
+        pageSize: 15,
+        total: 1,
+        totalPages: 1,
+      }),
+      contentType: "application/json",
+      status: 200,
+    });
+  });
+
+  await page.goto("/home");
+
+  const action = page.getByRole("button", { name: "Studio Required" });
+  await expect(action).toBeVisible();
+  await expect(action).toBeDisabled();
+  await expect(page).toHaveURL(/\/home$/);
+});
+
 test("local ROM inspection rejects invalid executable content in the browser", async ({ page }) => {
   await page.goto("/local");
   await page.getByLabel("Choose a ROM file").setInputFiles({

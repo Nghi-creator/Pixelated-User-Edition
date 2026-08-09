@@ -6,16 +6,11 @@ import { GameArtworkFallback } from "./GameArtworkFallback";
 import { isGeneratedCatalogArtworkUrl } from "./gameArtworkUtils";
 import { useFeaturedCarousel } from "./useFeaturedCarousel";
 import { getGamePlayPath } from "../../lib/appUrl";
-
-interface Game {
-  id: string;
-  title: string;
-  cover_url: string;
-  backdrop_url?: string | null;
-}
+import type { ApiGame } from "../../lib/api/apiTypes";
+import { getBrowserGameCompatibility } from "../../lib/browserCompatibility";
 
 interface HeroBannerProps {
-  featuredGames: Game[];
+  featuredGames: ApiGame[];
 }
 
 export default function HeroBanner({ featuredGames }: HeroBannerProps) {
@@ -51,6 +46,14 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
   if (!featuredGames || featuredGames.length === 0) {
     return <div className="w-full h-[360px] md:h-[440px] bg-synth-bg animate-pulse" />;
   }
+
+  const compatibility = getBrowserGameCompatibility(currentGame);
+  const canPlayInBrowser = compatibility.kind === "browser";
+  const playLabel = canPlayInBrowser
+    ? "Play Now"
+    : compatibility.kind === "desktop"
+      ? "Studio Required"
+      : "Unavailable";
 
   return (
     <div className="relative h-[380px] w-full overflow-hidden border-b border-synth-border bg-synth-bg transition-all duration-700 group md:h-[460px]">
@@ -119,11 +122,15 @@ export default function HeroBanner({ featuredGames }: HeroBannerProps) {
 
             <div className="flex flex-wrap gap-4">
               <button
-                onClick={() => navigate(getGamePlayPath(currentGame.id))}
+                disabled={!canPlayInBrowser}
+                onClick={() => {
+                  if (canPlayInBrowser) navigate(getGamePlayPath(currentGame.id));
+                }}
+                title={compatibility.reason}
                 type="button"
-                className="flex items-center gap-2 rounded-lg border border-synth-border bg-synth-primary px-6 py-2.5 font-bold text-white transition-colors hover:bg-synth-primary-hover active:scale-[0.98]"
+                className="flex items-center gap-2 rounded-lg border border-synth-border bg-synth-primary px-6 py-2.5 font-bold text-white transition-colors hover:bg-synth-primary-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-synth-elevated disabled:text-gray-300 disabled:hover:bg-synth-elevated"
               >
-                <Play className="w-5 h-5 fill-white" /> Play Now
+                <Play className="w-5 h-5 fill-current" /> {playLabel}
               </button>
 
               <button

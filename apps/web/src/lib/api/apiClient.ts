@@ -14,6 +14,7 @@ import { createSocialApi } from "./socialApi";
 import { createTelemetryApi } from "./telemetryApi";
 import type { ApiRequest, ApiRequestOptions, ApiResponseParser } from "./apiRequestTypes.ts";
 import { apiPermissionsSchema, favoriteIdsSchema } from "./apiResponseSchemas.ts";
+import { readBoundedResponseText } from "./boundedResponse.ts";
 
 export type * from "./apiTypes";
 
@@ -131,59 +132,66 @@ export const apiRequest: ApiRequest = async <T>(
 
   const { controller, cleanup } = createRequestAbortController(timeoutMs, options.signal);
 
-  let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    const response = await fetch(`${API_URL}${path}`, {
       ...options,
       headers: requestHeaders,
       signal: controller.signal,
     });
+    if (response.status === 204) return undefined as T;
+
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.toLowerCase().includes("application/json")) {
+      throw new ApiError(response.status, {
+        error: "The API returned an unsupported response format.",
+      });
+    }
+
+    let responseText: string;
+    try {
+      responseText = await readBoundedResponseText(response);
+    } catch (error) {
+      throw new ApiError(response.status, {
+        error:
+          error instanceof Error ? error.message : "The API response could not be read safely.",
+      });
+    }
+
+    let payload: unknown;
+    try {
+      payload = JSON.parse(responseText);
+    } catch {
+      throw new ApiError(response.status, {
+        error: "The API returned malformed JSON.",
+      });
+    }
+
+    if (payload === null || typeof payload !== "object") {
+      throw new ApiError(response.status, {
+        error: "The API returned an invalid payload shape.",
+      });
+    }
+
+    if (!response.ok) {
+      throw new ApiError(response.status, payload);
+    }
+
+    try {
+      return parser.parse(payload);
+    } catch {
+      throw new ApiError(response.status, {
+        error: "The API returned data that did not match the expected response shape.",
+      });
+    }
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       throw new ApiError(0, {
         error: "The API did not respond in time. The backend may be waking up; try again shortly.",
       });
     }
-
     throw error;
   } finally {
     cleanup();
-  }
-
-  if (response.status === 204) return undefined as T;
-
-  const contentType = response.headers.get("content-type") || "";
-  if (!contentType.toLowerCase().includes("application/json")) {
-    throw new ApiError(response.status, {
-      error: "The API returned an unsupported response format.",
-    });
-  }
-
-  let payload: unknown;
-  try {
-    payload = await response.json();
-  } catch {
-    throw new ApiError(response.status, {
-      error: "The API returned malformed JSON.",
-    });
-  }
-
-  if (payload === null || typeof payload !== "object") {
-    throw new ApiError(response.status, {
-      error: "The API returned an invalid payload shape.",
-    });
-  }
-
-  if (!response.ok) {
-    throw new ApiError(response.status, payload);
-  }
-
-  try {
-    return parser.parse(payload);
-  } catch {
-    throw new ApiError(response.status, {
-      error: "The API returned data that did not match the expected response shape.",
-    });
   }
 };
 
