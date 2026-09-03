@@ -119,3 +119,12 @@ export async function readBoundedResponseText(response: Response, maxBytes = MAX
   }
   return new TextDecoder().decode(bytes);
 }
+
+export async function readBoundedResponseJson(response: Response, maxBytes = MAX_API_JSON_BYTES) {
+  const responseText = await readBoundedResponseText(response, maxBytes);
+  try {
+    return JSON.parse(responseText) as unknown;
+  } catch {
+    throw new Error("The API returned malformed JSON.");
+  }
+}

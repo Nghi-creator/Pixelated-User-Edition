@@ -4,6 +4,7 @@ import {
   MAX_API_JSON_BYTES,
   MAX_BROWSER_ARTIFACT_BYTES,
   readBoundedResponseBlob,
+  readBoundedResponseJson,
   readBoundedResponseText,
 } from "../../../src/lib/api/boundedResponse.ts";
 
@@ -62,4 +63,9 @@ test("bounded text reader rejects declared and streamed oversized API responses"
     /safety limit/,
   );
   await assert.rejects(readBoundedResponseText(new Response("oversized"), 4), /safety limit/);
+});
+
+test("bounded JSON reader parses valid payloads and rejects malformed JSON", async () => {
+  assert.deepEqual(await readBoundedResponseJson(new Response('{"ok":true}')), { ok: true });
+  await assert.rejects(readBoundedResponseJson(new Response("not-json")), /malformed JSON/);
 });
