@@ -126,5 +126,5 @@ test("local ROM inspection rejects invalid executable content in the browser", a
     name: "invalid.nes",
   });
 
-  await expect(page.getByRole("alert")).toContainText("valid NES ROM header");
+  await expect(page.getByRole("alert").filter({ hasText: "valid NES ROM header" })).toBeVisible();
 });
