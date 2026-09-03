@@ -4,6 +4,8 @@ export function registerServiceWorker() {
   window.addEventListener("load", () => {
     const workerUrl = new URL("/sw.js", window.location.origin);
     workerUrl.searchParams.set("v", __APP_BUILD_ID__);
-    void navigator.serviceWorker.register(workerUrl, { scope: "/" });
+    void navigator.serviceWorker.register(workerUrl, { scope: "/" }).catch(() => {
+      // Offline support is optional; registration failures must not become app-level rejections.
+    });
   });
 }

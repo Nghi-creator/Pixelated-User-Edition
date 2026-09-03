@@ -49,7 +49,8 @@ npm run preview
 ```
 
 Run `npx playwright install chromium` once before the browser smoke suite on a
-new development or CI machine.
+new development machine. `npm run test:e2e` builds the production bundle and
+tests it through Vite's preview server; CI installs Chromium automatically.
 
 ## Main routes
 

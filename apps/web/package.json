@@ -11,7 +11,7 @@
     "lint": "npm run format:check && eslint .",
     "preview": "vite preview",
     "test": "node --test --experimental-strip-types \"tests/unit/**/*.test.ts\"",
-    "test:e2e": "playwright test"
+    "test:e2e": "npm run build && playwright test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.0",
