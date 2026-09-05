@@ -11,6 +11,7 @@ type VercelConfig = {
 
 const config = JSON.parse(readFileSync("vercel.json", "utf8")) as VercelConfig;
 const viteConfig = readFileSync("vite.config.ts", "utf8");
+const webCiWorkflow = readFileSync("../../.github/workflows/web-ci.yml", "utf8");
 const headers = new Map(
   config.headers.flatMap((entry) =>
     entry.headers.map((header) => [header.key, header.value] as const),
@@ -42,6 +43,16 @@ test("emulator dependency is pinned exactly", () => {
     dependencies: Record<string, string>;
   };
   assert.equal(packageJson.dependencies.nostalgist, "0.21.0");
+});
+
+test("third-party CI actions are pinned to immutable commits", () => {
+  const actionReferences = [...webCiWorkflow.matchAll(/^\s*uses:\s*([^#\s]+)/gm)].map(
+    ([, reference]) => reference,
+  );
+  assert.ok(actionReferences.length > 0);
+  for (const reference of actionReferences) {
+    assert.match(reference, /^[\w.-]+\/[\w.-]+@[0-9a-f]{40}$/);
+  }
 });
 
 test("route-only dependencies are not forced into eager shared chunks", () => {
